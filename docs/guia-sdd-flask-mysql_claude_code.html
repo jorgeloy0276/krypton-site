@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Guía SDD: commands, skills y Spec Driven Development</title>
+<style>
+:root{--bg:#f5f7f9;--panel:#fff;--ink:#17222d;--mute:#5a6876;--line:#d9e0e6;--acc:#1f5fbf;--accbg:#e6eefb;--code:#0f1b26;--codeink:#dbe6f0;--warn:#fff4d6;--warnl:#e0b84a}
+@media(prefers-color-scheme:dark){:root{--bg:#0f161d;--panel:#16212b;--ink:#e3eaf0;--mute:#93a1ae;--line:#2a3845;--acc:#7fb0ff;--accbg:#1b2c44;--code:#0a1117;--codeink:#d3dfea;--warn:#3a3217;--warnl:#8a7424}}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:16px}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;display:flex;min-height:100vh}
+nav{position:sticky;top:0;align-self:flex-start;height:100vh;overflow:auto;width:250px;flex:none;padding:24px 18px;border-right:1px solid var(--line);background:var(--panel)}
+nav b{display:block;font-size:15px;margin-bottom:12px}
+nav a{display:block;color:var(--mute);text-decoration:none;padding:5px 8px;border-radius:6px;font-size:14px}
+nav a:hover,nav a:focus-visible{background:var(--accbg);color:var(--acc);outline:none}
+nav .g{margin:14px 8px 4px;font-size:12px;color:var(--mute);font-weight:600}
+main{flex:1;min-width:0;max-width:880px;padding:32px 36px 80px;margin:0 auto}
+h1{font:700 32px/1.2 Georgia,"Times New Roman",serif;margin:0 0 8px}
+h2{font:700 25px/1.25 Georgia,serif;margin:52px 0 10px;padding-top:20px;border-top:1px solid var(--line)}
+h3{font-size:17px;margin:26px 0 6px}
+p,li{max-width:74ch}
+.lead{color:var(--mute);font-size:18px}
+code{font:13.5px ui-monospace,Menlo,Consolas,monospace;background:var(--accbg);padding:1px 5px;border-radius:4px}
+.f{position:relative;margin:12px 0}
+.f .n{font:600 12.5px ui-monospace,Menlo,monospace;background:var(--line);color:var(--ink);padding:4px 10px;border-radius:8px 8px 0 0;display:inline-block}
+pre{margin:0;background:var(--code);color:var(--codeink);padding:14px 16px;border-radius:0 8px 8px 8px;overflow-x:auto;font:13px/1.55 ui-monospace,Menlo,Consolas,monospace;tab-size:2}
+pre code{background:none;padding:0;font:inherit;color:inherit}
+.cp{position:absolute;right:8px;top:30px;border:1px solid #3b4d5e;background:#1a2937;color:#cfe0f0;font-size:12px;padding:3px 9px;border-radius:6px;cursor:pointer}
+.cp:hover,.cp:focus-visible{background:#254057}
+table{border-collapse:collapse;width:100%;margin:12px 0;font-size:14.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+th{background:var(--accbg)}
+.box{background:var(--warn);border-left:4px solid var(--warnl);padding:10px 14px;border-radius:6px;margin:14px 0}
+.flow{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0;padding:0;list-style:none}
+.flow li{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:8px 12px;font-size:14px}
+.flow li b{color:var(--acc)}
+@media(max-width:820px){body{display:block}nav{position:static;height:auto;width:auto;border:0;border-bottom:1px solid var(--line)}main{padding:22px 16px 60px}}
+</style>
+</head>
+<body>
+<nav>
+<b>Guía SDD</b>
+<div class="g">Conceptos</div>
+<a href="#mapa">Mapa general</a>
+<a href="#commands">Custom commands</a>
+<a href="#skills">Skills</a>
+<a href="#sdd">Qué es SDD</a>
+<div class="g">Proyecto ejemplo</div>
+<a href="#base">Base de cualquier proyecto</a>
+<a href="#claude">1. CLAUDE.md</a>
+<a href="#cmds">2. Los 4 comandos</a>
+<a href="#spec">3. spec.md</a>
+<a href="#plan">4. plan.md</a>
+<a href="#tasks">5. tasks.md</a>
+<a href="#impl">6. Implementar</a>
+<a href="#cambios">7. Cambios</a>
+<div class="g">Referencia</div>
+<a href="#escala">Proyectos grandes</a>
+<a href="#chuleta">Chuleta</a>
+</nav>
+<main>
+<h1>Commands, skills y Spec Driven Development</h1>
+<p class="lead">Guía práctica con un proyecto completo: app de tareas en Python, Flask y MySQL. Todos los bloques tienen botón para copiar. Rutas y sintaxis son de Claude Code; en Cursor, Copilot o Gemini CLI la idea es igual y cambian las carpetas.</p>
+
+<h2 id="mapa">Mapa general</h2>
+<table>
+<tr><th>Pieza</th><th>Qué es</th><th>Quién la activa</th><th>Dónde vive</th></tr>
+<tr><td><code>CLAUDE.md</code></td><td>Reglas permanentes del proyecto</td><td>Siempre cargado</td><td>Raíz del repo</td></tr>
+<tr><td>Custom command</td><td>Prompt reutilizable</td><td>Tú, con <code>/nombre</code></td><td><code>.claude/commands/</code></td></tr>
+<tr><td>Skill</td><td>Instrucciones y recursos para un tipo de tarea</td><td>El agente, según su <code>description</code></td><td><code>.claude/skills/nombre/SKILL.md</code></td></tr>
+<tr><td>Spec, plan, tasks</td><td>Documentos del método SDD</td><td>Los generan los commands</td><td><code>specs/</code></td></tr>
+</table>
+<ul class="flow"><li><b>CLAUDE.md</b> principios</li><li><b>/spec</b> qué y por qué</li><li><b>/plan</b> cómo</li><li><b>/tasks</b> pasos</li><li><b>/implement N</b> código + tests</li></ul>
+
+<h2 id="commands">Custom commands</h2>
+<p>De dónde sale el prompt: <b>lo escribes tú</b>. Cada vez que repitas un prompt, guárdalo en un archivo <code>.md</code>; el nombre del archivo es el nombre del comando. <code>$ARGUMENTS</code> se reemplaza por lo que escribas después.</p>
+<div class="f"><span class="n">.claude/commands/revisar.md</span><pre><code>---
+description: Revisa un archivo buscando bugs y fallos de seguridad
+argument-hint: [archivo]
+---
+Revisa $ARGUMENTS buscando:
+1. Bugs lógicos
+2. Seguridad (SQL injection, secretos en el código)
+3. Falta de manejo de errores
+Responde con una lista priorizada y el fix de cada punto.</code></pre></div>
+<p>Uso: <code>/revisar app/routes.py</code>. Carpeta del proyecto (se comparte por git) o <code>~/.claude/commands/</code> (personales).</p>
+<p><b>¿Plantillas?</b> No hay un catálogo oficial único. Hay repositorios de la comunidad para inspirarte, pero lo útil es crear los tuyos desde tus propios prompts repetidos. Las plantillas de esta guía son un buen punto de partida.</p>
+
+<h2 id="skills">Skills</h2>
+<p>Una carpeta con un <code>SKILL.md</code> (y opcionalmente scripts o plantillas) que el agente carga solo cuando la tarea coincide con su <code>description</code>. Escribe esa descripción pensando en cuándo debe activarse.</p>
+<div class="f"><span class="n">.claude/skills/endpoints-flask/SKILL.md</span><pre><code>---
+name: endpoints-flask
+description: Usar al crear o modificar endpoints REST de Flask en este proyecto
+---
+- Todo endpoint va en un Blueprint dentro de app/routes/
+- Valida la entrada antes de tocar la base de datos
+- SQL siempre parametrizado, nunca f-strings
+- Errores con el formato {"error": "mensaje"} y código HTTP correcto</code></pre></div>
+<p><b>¿Se inventan?</b> Sí, sobre todo los que reflejan reglas de tu proyecto. Hay ejemplos oficiales en <code>github.com/anthropics/skills</code> y un skill llamado <code>skill-creator</code> que te guía para crear uno.</p>
+<div class="box"><b>Regla para elegir:</b> ¿lo quieres disparar tú en un momento concreto (<code>/spec</code>)? Command. ¿Es conocimiento que el agente debe aplicar solo cuando toque (cómo hacemos endpoints)? Skill. ¿Es una regla que aplica siempre? <code>CLAUDE.md</code>.</div>
+
+<h2 id="sdd">Qué es Spec Driven Development</h2>
+<p>En vez de pedir "hazme una app de tareas", escribes una especificación y el código se deriva de ella. La spec es la fuente de verdad. Los agentes fallan cuando adivinan, y una spec revisada elimina las adivinanzas antes de gastar tiempo en código.</p>
+<table>
+<tr><th>Fase</th><th>Responde</th><th>Archivo</th><th>Lo revisas buscando</th></tr>
+<tr><td>Principios</td><td>¿Con qué reglas trabajamos?</td><td>CLAUDE.md</td><td>Stack, estilo, seguridad</td></tr>
+<tr><td>Spec</td><td>¿Qué y por qué? (sin tecnología)</td><td>specs/spec.md</td><td>Criterios verificables, alcance</td></tr>
+<tr><td>Plan</td><td>¿Cómo? (técnico)</td><td>specs/plan.md</td><td>Cada criterio tiene dónde cumplirse</td></tr>
+<tr><td>Tareas</td><td>¿En qué orden?</td><td>specs/tasks.md</td><td>Pasos pequeños y verificables</td></tr>
+<tr><td>Implementar</td><td>Código + tests</td><td>app/, tests/</td><td>Diff y tests en verde</td></tr>
+</table>
+<p>La regla de oro: revisa y corrige cada documento antes de pasar al siguiente. Un error en la spec cuesta una línea; en el código cuesta una tarde.</p>
+
+<h2 id="base">La base que necesitas para cualquier proyecto</h2>
+<p>Antes de ejecutar <code>/spec</code>, junta estos datos. Con ellos puedes iniciar un proyecto de cualquier tamaño; si no los tienes, el agente los preguntará, pero llegarás más rápido si los traes.</p>
+<div class="f"><span class="n">brief.md (plantilla universal)</span><pre><code># Brief: [nombre del proyecto]
+1. Qué: una frase de lo que hace
+2. Para quién: usuarios y su situación
+3. Funcionalidades deseadas: lista de lo que debe poder hacerse
+4. Fuera de alcance: lo que NO se hará (en esta versión)
+5. Restricciones técnicas: lenguaje, base de datos, hosting, librerías
+6. Restricciones no técnicas: plazo, presupuesto, normativa
+7. Datos: qué información se guarda y cuál es sensible
+8. Seguridad y acceso: quién puede hacer qué
+9. Criterio de éxito: cómo sabré que está terminado
+10. Dudas abiertas: lo que aún no he decidido</code></pre></div>
+<p>Ese brief es lo que pasas como argumento a <code>/spec</code>. Para el ejemplo, queda así:</p>
+<div class="f"><span class="n">Brief del ejemplo</span><pre><code>Qué: API web para gestionar tareas personales
+Para quién: una persona sola, uso local
+Funcionalidades: crear, listar, completar y eliminar tareas
+Fuera de alcance: login, fechas límite, categorías, interfaz elaborada
+Restricciones: Python 3.12, Flask, MySQL 8, tests con pytest
+Datos: título (obligatorio), descripción (opcional); nada sensible
+Éxito: los 4 flujos funcionan y tienen tests que pasan
+Dudas: ninguna por ahora</code></pre></div>
+
+<h2 id="claude">1. CLAUDE.md (principios)</h2>
+<div class="f"><span class="n">CLAUDE.md</span><pre><code># Proyecto: todo-app
+
+## Stack
+- Python 3.12, Flask 3, MySQL 8 con mysql-connector-python
+- Tests con pytest
+
+## Reglas
+- SQL siempre parametrizado (%s), nunca concatenar ni f-strings
+- Credenciales solo en variables de entorno (.env); nunca en el código ni en git
+- Validar toda entrada antes de tocar la base de datos
+- Errores en JSON: {"error": "mensaje claro"} con el código HTTP correcto
+- Código simple: sin patrones ni capas que no hagan falta
+- Cada función de ruta hace una sola cosa
+
+## Flujo de trabajo
+- Seguir el método SDD: specs/spec.md -> specs/plan.md -> specs/tasks.md
+- No escribir código fuera de lo que pida la tarea actual
+- Si algo es ambiguo, preguntar antes de asumir
+- Todo cambio de comportamiento se refleja primero en la spec
+
+## Comandos útiles
+- Ejecutar: flask --app app run --debug
+- Tests: pytest -q</code></pre></div>
+
+<h2 id="cmds">2. Los cuatro comandos</h2>
+<p>Crea la carpeta <code>.claude/commands/</code> y estos cuatro archivos. Son genéricos: sirven igual para cualquier otro proyecto.</p>
+<div class="f"><span class="n">.claude/commands/spec.md</span><pre><code>---
+description: Genera specs/spec.md a partir de un brief
+argument-hint: [brief o descripción]
+---
+Lee CLAUDE.md y crea specs/spec.md para este brief:
+
+$ARGUMENTS
+
+Reglas:
+- Solo el QUÉ y el POR QUÉ. Prohibido mencionar tecnologías, tablas o rutas.
+- Secciones: Objetivo, Usuarios, Historias de usuario, Criterios de
+  aceptación, Reglas de negocio, Fuera de alcance, Dudas abiertas.
+- Numera historias (HU-1...) y criterios (CA-1...). Cada criterio debe ser
+  verificable: alguien debe poder decir "cumple" o "no cumple".
+- Si algo del brief es ambiguo, NO lo asumas: anótalo en Dudas abiertas
+  y pregúntame antes de continuar.</code></pre></div>
+<div class="f"><span class="n">.claude/commands/plan.md</span><pre><code>---
+description: Genera specs/plan.md a partir de la spec
+---
+Lee specs/spec.md y CLAUDE.md. Crea specs/plan.md con:
+1. Arquitectura y estructura de carpetas
+2. Esquema de base de datos (SQL completo)
+3. Contrato de endpoints: método, ruta, entrada, salida, errores
+4. Validaciones y formato de errores
+5. Configuración (variables de entorno)
+6. Estrategia de pruebas
+7. Decisiones técnicas y su razón
+8. Tabla de trazabilidad: cada CA de la spec -> dónde se cumple
+No escribas código de implementación. Si un CA no tiene dónde cumplirse,
+avísame.</code></pre></div>
+<div class="f"><span class="n">.claude/commands/tasks.md</span><pre><code>---
+description: Genera specs/tasks.md a partir del plan
+---
+Lee specs/plan.md y crea specs/tasks.md.
+Cada tarea: id (T1, T2...), descripción de una línea, archivos que toca,
+criterios CA que cubre, cómo verificarla, y dependencias.
+Reglas: tareas pequeñas (menos de ~1 hora), ordenadas, cada una deja el
+proyecto funcionando. Formato con casilla: - [ ] T1 ...
+Los tests van dentro de la tarea que prueban, no al final.</code></pre></div>
+<div class="f"><span class="n">.claude/commands/implement.md</span><pre><code>---
+description: Implementa UNA tarea de specs/tasks.md
+argument-hint: [id de tarea, ej. T3]
+---
+Implementa SOLO la tarea $ARGUMENTS.
+1. Lee specs/spec.md, specs/plan.md, la tarea en specs/tasks.md y CLAUDE.md.
+2. Verifica que sus dependencias estén marcadas [x]; si no, detente y avísame.
+3. Escribe primero los tests de la tarea, luego el código.
+4. Ejecuta pytest. Si falla, corrige hasta que pase.
+5. Marca la tarea con [x] y resume: archivos cambiados y tests que pasan.
+Reglas: no toques código ajeno a la tarea. Si descubres que la spec o el
+plan están mal o incompletos, detente y propón el cambio en el documento
+en lugar de improvisar en el código.</code></pre></div>
+
+<h2 id="spec">3. specs/spec.md (cómo lo escribiría)</h2>
+<p>Ejecuta <code>/spec</code> con el brief del ejemplo. Este es el resultado que yo consideraría bueno; tu versión será parecida y la ajustas a mano.</p>
+<div class="f"><span class="n">specs/spec.md</span><pre><code># Spec: Gestor de tareas personales
+
+## Objetivo
+Permitir a una persona registrar sus tareas pendientes y saber cuáles
+ha completado, para no olvidar lo que tiene que hacer.
+
+## Usuarios
+Una sola persona usando la aplicación en su equipo. No hay cuentas.
+
+## Historias de usuario
+- HU-1: Como usuario quiero crear una tarea con un título y una
+  descripción opcional, para registrar algo pendiente.
+- HU-2: Como usuario quiero ver todas mis tareas, para saber qué
+  tengo por hacer.
+- HU-3: Como usuario quiero marcar una tarea como completada, para
+  distinguir lo hecho de lo pendiente.
+- HU-4: Como usuario quiero eliminar una tarea, para quitar lo que
+  ya no es relevante.
+
+## Criterios de aceptación
+- CA-1: Una tarea nueva requiere título; sin título o con solo espacios
+  se rechaza con un mensaje claro.
+- CA-2: El título admite como máximo 100 caracteres; más se rechaza.
+- CA-3: La descripción es opcional.
+- CA-4: Toda tarea nueva nace como pendiente.
+- CA-5: El listado muestra todas las tareas, la más reciente primero.
+- CA-6: El listado indica de cada tarea título, descripción, estado
+  y fecha de creación.
+- CA-7: Completar una tarea ya completada no produce error y la deja
+  completada.
+- CA-8: Completar o eliminar una tarea que no existe produce un error
+  claro de "no encontrada".
+- CA-9: Una tarea eliminada no vuelve a aparecer en el listado.
+- CA-10: Las tareas persisten aunque se reinicie la aplicación.
+
+## Reglas de negocio
+- El título se guarda sin espacios sobrantes al inicio y al final.
+- Una tarea solo pasa de pendiente a completada (no se desmarca).
+
+## Fuera de alcance (esta versión)
+Usuarios y login, fechas límite, categorías, edición del título,
+búsqueda, paginación, interfaz elaborada.
+
+## Dudas abiertas
+- ¿Se debe poder desmarcar una tarea completada? (asumido: no, ver
+  Reglas de negocio; confirmar)</code></pre></div>
+<div class="box"><b>Revisión de la spec:</b> ¿hay tecnología? (no debe haber). ¿Cada CA se puede probar con "cumple/no cumple"? ¿Falta algún caso de borde? Responde las dudas abiertas aquí, antes de seguir.</div>
+
+<h2 id="plan">4. specs/plan.md (cómo lo escribiría)</h2>
+<div class="f"><span class="n">specs/plan.md</span><pre><code># Plan técnico: Gestor de tareas
+
+## 1. Arquitectura
+Aplicación Flask con application factory y un Blueprint. Acceso a MySQL
+con funciones simples en app/db.py (sin ORM, para mantenerlo sencillo).
+Una página HTML mínima servida por Flask que consume la API con fetch.
+
+## 2. Estructura
+todo-app/
+  app/
+    __init__.py      # create_app(), registra el blueprint
+    db.py            # get_connection(), init_db()
+    routes.py        # blueprint "tareas"
+    templates/index.html
+  schema.sql
+  tests/
+    conftest.py      # cliente de prueba y BD de test limpia
+    test_tareas.py
+  .env.example
+  requirements.txt
+  README.md
+
+## 3. Base de datos
+CREATE TABLE IF NOT EXISTS tareas (
+  id          INT AUTO_INCREMENT PRIMARY KEY,
+  titulo      VARCHAR(100) NOT NULL,
+  descripcion TEXT NULL,
+  completada  BOOLEAN NOT NULL DEFAULT FALSE,
+  creada_en   TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+## 4. Endpoints
+| Método | Ruta                    | Entrada (JSON)             | Éxito            | Errores        |
+|--------|-------------------------|----------------------------|------------------|----------------|
+| GET    | /                       | -                          | 200 HTML         | -              |
+| GET    | /api/tareas             | -                          | 200 lista JSON   | -              |
+| POST   | /api/tareas             | titulo, descripcion?       | 201 tarea creada | 400            |
+| PATCH  | /api/tareas/<id>/completar | -                       | 200 tarea        | 404            |
+| DELETE | /api/tareas/<id>        | -                          | 204 sin cuerpo   | 404            |
+
+Objeto tarea: {id, titulo, descripcion, completada, creada_en}
+Listado ordenado por creada_en DESC, id DESC.
+
+## 5. Validaciones y errores
+- titulo: string, strip(); vacío -> 400; más de 100 -> 400
+- descripcion: string o null
+- Formato de error: {"error": "mensaje"}
+- 404: {"error": "Tarea no encontrada"}
+
+## 6. Configuración (.env)
+DB_HOST, DB_PORT, DB_USER, DB_PASSWORD, DB_NAME
+Los tests usan DB_NAME=todo_test.
+
+## 7. Pruebas
+pytest con cliente de Flask. Cada test parte de la tabla vacía.
+Un test por criterio de aceptación relevante.
+
+## 8. Decisiones
+- Sin ORM: son 4 consultas; menos dependencias y más claro.
+- PATCH /completar en vez de PUT genérico: refleja la acción de negocio
+  y evita edición accidental de otros campos.
+- Completar es idempotente (CA-7): UPDATE sin error si ya está completa.
+- 204 en DELETE: no hay nada que devolver.
+
+## 9. Trazabilidad
+| CA        | Se cumple en                                       |
+|-----------|----------------------------------------------------|
+| CA-1,2,3  | Validación en POST /api/tareas                     |
+| CA-4      | DEFAULT FALSE en la tabla                          |
+| CA-5,6    | GET /api/tareas con ORDER BY creada_en DESC        |
+| CA-7,8    | PATCH /api/tareas/<id>/completar                   |
+| CA-8,9    | DELETE /api/tareas/<id>                            |
+| CA-10     | Persistencia en MySQL                              |</code></pre></div>
+<div class="box"><b>Revisión del plan:</b> ¿la tabla de trazabilidad cubre todos los CA? ¿Las decisiones tienen razón? ¿Hay algo que la spec no pidió y el plan agregó? Si es así, quítalo o súbelo a la spec.</div>
+
+<h2 id="tasks">5. specs/tasks.md (cómo lo escribiría)</h2>
+<div class="f"><span class="n">specs/tasks.md</span><pre><code># Tareas
+
+- [ ] T1 Estructura base del proyecto
+  Archivos: requirements.txt, .env.example, .gitignore, app/__init__.py
+  Cubre: -  |  Depende de: -
+  Verifica: `flask --app app run` arranca sin errores
+
+- [ ] T2 Conexión a MySQL y esquema
+  Archivos: app/db.py, schema.sql, tests/conftest.py
+  Cubre: CA-10  |  Depende de: T1
+  Verifica: init_db() crea la tabla; un test inserta y lee un registro
+
+- [ ] T3 POST /api/tareas con validación
+  Archivos: app/routes.py, tests/test_tareas.py
+  Cubre: CA-1, CA-2, CA-3, CA-4  |  Depende de: T2
+  Verifica: tests de título vacío, de 101 caracteres, sin descripción
+
+- [ ] T4 GET /api/tareas
+  Archivos: app/routes.py, tests/test_tareas.py
+  Cubre: CA-5, CA-6  |  Depende de: T3
+  Verifica: test de orden descendente y de campos devueltos
+
+- [ ] T5 PATCH /api/tareas/&lt;id&gt;/completar
+  Archivos: app/routes.py, tests/test_tareas.py
+  Cubre: CA-7, CA-8  |  Depende de: T3
+  Verifica: tests de completar, repetir, y id inexistente (404)
+
+- [ ] T6 DELETE /api/tareas/&lt;id&gt;
+  Archivos: app/routes.py, tests/test_tareas.py
+  Cubre: CA-8, CA-9  |  Depende de: T3
+  Verifica: tests de eliminar y de id inexistente (404)
+
+- [ ] T7 Página mínima
+  Archivos: app/templates/index.html, app/routes.py
+  Cubre: HU-1 a HU-4 desde el navegador  |  Depende de: T4, T5, T6
+  Verifica: manual, crear, completar y eliminar desde la página
+
+- [ ] T8 README y revisión final
+  Archivos: README.md
+  Cubre: todos  |  Depende de: T7
+  Verifica: seguir el README en un entorno limpio y pasar pytest</code></pre></div>
+
+<h2 id="impl">6. Implementar, una tarea por vez</h2>
+<p>Antes: crea la base de datos de desarrollo y la de test en MySQL y llena tu <code>.env</code>.</p>
+<div class="f"><span class="n">Sesión de trabajo</span><pre><code>/implement T1
+  -> revisas el diff, corres pytest -q, haces commit
+/implement T2
+  -> revisas, pruebas, commit
+/implement T3
+  ...</code></pre></div>
+<p><b>Checklist de revisión después de cada tarea:</b></p>
+<ul>
+<li>El diff solo toca archivos de la tarea.</li>
+<li><code>pytest -q</code> pasa y los tests prueban el criterio, no solo "que corra".</li>
+<li>No hay SQL concatenado ni credenciales escritas en el código.</li>
+<li>La tarea quedó con <code>[x]</code> y haces un commit por tarea.</li>
+</ul>
+<p>Si el agente se detiene diciendo que la spec o el plan están incompletos, eso es una buena señal del método: corrige el documento, no improvises en el código.</p>
+
+<h2 id="cambios">7. Cuando algo cambia</h2>
+<p>Ejemplo: quieres fecha límite en las tareas. El orden es siempre el mismo:</p>
+<div class="f"><span class="n">Flujo de un cambio</span><pre><code>1. Edita specs/spec.md: nueva HU-5, nuevos CA (formato de fecha,
+   si es obligatoria, qué pasa con fechas pasadas). Revisa.
+2. /plan   -> actualiza plan.md (columna en BD, cambios en endpoints)
+3. /tasks  -> agrega tareas nuevas (ej. T9 migración, T10 POST con fecha)
+4. /implement T9, /implement T10 ...</code></pre></div>
+<p>Así la documentación nunca queda desfasada del código, que es el objetivo de todo el método.</p>
+
+<h2 id="escala">Proyectos de otro tamaño</h2>
+<table>
+<tr><th>Tamaño</th><th>Cómo aplicar SDD</th></tr>
+<tr><td>Script o utilidad</td><td>Spec de media página y 3 a 5 tareas. Puedes saltarte <code>/plan</code> si no hay decisiones técnicas.</td></tr>
+<tr><td>App pequeña (como esta)</td><td>El flujo completo tal cual está en esta guía.</td></tr>
+<tr><td>App mediana o grande</td><td>Una carpeta por funcionalidad: <code>specs/001-usuarios/</code>, <code>specs/002-pagos/</code>, cada una con su spec, plan y tasks. El <code>CLAUDE.md</code> es común y los comandos reciben la carpeta como argumento.</td></tr>
+</table>
+<div class="f"><span class="n">Variante para varias funcionalidades</span><pre><code>/spec 001-usuarios: [brief de esa funcionalidad]
+  -> crea specs/001-usuarios/spec.md
+(en el prompt de cada command, sustituye "specs/" por la carpeta indicada)</code></pre></div>
+<p>Opcional y muy útil: un comando <code>/clarify</code> que lea la spec y te haga preguntas sobre lo ambiguo antes de planificar.</p>
+<div class="f"><span class="n">.claude/commands/clarify.md</span><pre><code>---
+description: Detecta ambigüedades en la spec
+---
+Lee specs/spec.md. Lista hasta 8 preguntas sobre casos de borde, reglas
+no definidas o criterios no verificables. Hazlas una por una y, con mis
+respuestas, actualiza la spec.</code></pre></div>
+
+<h2 id="chuleta">Chuleta</h2>
+<div class="f"><span class="n">Resumen</span><pre><code>CLAUDE.md  -> reglas permanentes (siempre cargado)
+Command    -> prompt que TÚ invocas (/nombre)
+Skill      -> conocimiento que el AGENTE carga solo
+
+SDD: Brief -> /spec (qué) -> /plan (cómo) -> /tasks -> /implement T#
+
+Reglas:
+ · Revisar cada documento antes de avanzar
+ · Una tarea por vez, con tests y un commit
+ · Los cambios empiezan en la spec, no en el código
+ · Si es ambiguo, preguntar; no asumir
+ · Cada criterio de aceptación debe ser verificable
+ · Cada CA debe tener dónde cumplirse (trazabilidad)
+
+Errores comunes:
+ × Meter tecnología en la spec
+ × Tareas gigantes ("implementar la API")
+ × Saltarse la revisión porque "se ve bien"
+ × Arreglar el código sin actualizar la spec</code></pre></div>
+</main>
+<script>
+document.querySelectorAll('.f').forEach(function(f){
+  var b=document.createElement('button');b.className='cp';b.type='button';b.textContent='Copiar';
+  b.addEventListener('click',function(){
+    var t=f.querySelector('pre').innerText;
+    var done=function(){b.textContent='Copiado';setTimeout(function(){b.textContent='Copiar'},1500)};
+    try{navigator.clipboard.writeText(t).then(done,function(){})}catch(e){}
+  });
+  f.appendChild(b);
+});
+</script>
+</body>
+</html>

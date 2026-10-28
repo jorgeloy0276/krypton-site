@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Chuleta de Git: de la instalación a lo avanzado</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+--bg:#f1f3f8;--card:#fff;--tx:#141a2e;--mut:#5b6580;--bd:#dce1ec;--ac:#e8472a;--ok:#118a68;--cb:#12172b;--ct:#e8ecf8;--cm:#8f9ac0;--r:1.2rem}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0b0e1a;--card:#131828;--tx:#e8ebf6;--mut:#97a0bd;--bd:#232a42;--ac:#ff6a4d;--ok:#3ccf9f;--cb:#080b15}}
+:root[data-theme="dark"]{--bg:#0b0e1a;--card:#131828;--tx:#e8ebf6;--mut:#97a0bd;--bd:#232a42;--ac:#ff6a4d;--ok:#3ccf9f;--cb:#080b15}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 1rem);scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.55 "Segoe UI",system-ui,sans-serif}
+.w{max-width:60rem;margin:0 auto;padding:2rem 1rem 4rem}
+h1{font:800 clamp(2.4rem,8vw,4.2rem)/1 "Bricolage Grotesque","Segoe UI",sans-serif;margin:0 0 .6rem;letter-spacing:-.03em}
+h2{font:600 1.5rem/1.2 "Bricolage Grotesque","Segoe UI",sans-serif;margin:0;letter-spacing:-.01em}
+.sub{color:var(--mut);max-width:34rem;margin:0 0 1.4rem}
+#q{width:100%;padding:.8rem 1rem;border:1px solid var(--bd);border-radius:.7rem;background:var(--card);color:var(--tx);font:inherit}
+#q:focus-visible,a:focus-visible,.c:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
+.log{margin:1.6rem 0 2.4rem;background:var(--cb);border-radius:var(--r);padding:1rem 1.1rem;font:400 .88rem/1.9 "JetBrains Mono",ui-monospace,Consolas,monospace;color:var(--ct);overflow-x:auto}
+.log .p{color:var(--cm);margin-bottom:.3rem}
+.ix{display:flex;gap:.8rem;color:var(--ct);text-decoration:none;white-space:nowrap;padding:0 .3rem;border-radius:.3rem}
+.ix:hover{background:rgba(255,255,255,.08)}
+.ix i{color:#f5c542;font-style:normal}.ix s{text-decoration:none;color:var(--cm)}
+.ix em{color:var(--ok);font-style:normal}
+.main{border-left:2px solid var(--bd);padding-left:var(--r);margin-left:7px}
+.sec{position:relative;margin-bottom:2.6rem}
+.dot{position:absolute;left:calc(-1.2rem - 9px);top:.35rem;width:16px;height:16px;border-radius:50%;background:var(--ac);box-shadow:0 0 0 5px var(--bg)}
+.sec.adv .dot{background:var(--ok)}
+.hd{display:flex;align-items:baseline;gap:1rem;justify-content:space-between}
+.hd a{color:var(--mut);font-size:.85rem;text-decoration:none;white-space:nowrap}
+.sec>p{color:var(--mut);margin:.3rem 0 1rem}
+.r{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:.3rem 1rem;align-items:center;padding:.55rem 0;border-bottom:1px solid var(--bd)}
+.r span{color:var(--mut);font-size:.92rem}
+.c{all:unset;box-sizing:border-box;cursor:pointer;display:block;background:var(--cb);color:var(--ct);font:400 .85rem/1.5 "JetBrains Mono",ui-monospace,Consolas,monospace;padding:.45rem .7rem;border-radius:.5rem;overflow-x:auto;white-space:pre}
+.c:hover{box-shadow:inset 3px 0 0 var(--ac)}
+.g{display:grid;grid-template-columns:repeat(auto-fill,minmax(15rem,1fr));gap:.8rem}
+.k{background:var(--card);border:1px solid var(--bd);border-radius:.9rem;padding:1rem}
+.k b{font:600 1.05rem "Bricolage Grotesque","Segoe UI",sans-serif}
+.k small{display:block;color:var(--ok);margin:.1rem 0 .4rem;font-weight:600}
+.k p{margin:0 0 .5rem;font-size:.9rem;color:var(--mut)}
+.k a{color:var(--ac);font-size:.85rem;word-break:break-all}
+#t{position:fixed;left:50%;bottom:calc(1.2rem + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ok);color:#fff;padding:.5rem 1rem;border-radius:2rem;font-size:.9rem;opacity:0;pointer-events:none;transition:opacity .2s}
+#t.on{opacity:1}
+#none{display:none;color:var(--mut)}
+@media(max-width:620px){.r{grid-template-columns:1fr}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+<div class="w" id="top">
+<h1>Chuleta de Git</h1>
+<p class="sub">De instalarlo a dominarlo, en el orden en que lo vas a usar. Toca un comando para copiarlo.</p>
+<input id="q" type="search" placeholder="Buscar comando o palabra: stash, rebase, deshacer…" aria-label="Buscar">
+<div class="log" id="log"></div>
+<div class="main" id="main"></div>
+<p id="none">Sin resultados. Prueba con otra palabra.</p>
+</div>
+<div id="t" role="status">Copiado</div>
+<script>
+const S=[
+["Instalación","Una sola vez por equipo.",[
+["git --version","Comprueba si ya lo tienes y qué versión"],
+["winget install --id Git.Git -e","Windows (o el instalador de git-scm.com)"],
+["brew install git","macOS con Homebrew"],
+["sudo apt install git","Debian / Ubuntu"],
+["sudo dnf install git","Fedora / RHEL"],
+["sudo pacman -S git","Arch Linux"]]],
+["Configuración inicial","Tu identidad y tus preferencias. Solo se hace una vez.",[
+["git config --global user.name \"Tu Nombre\"","Nombre que aparece en tus commits"],
+["git config --global user.email \"tu@correo.com\"","Correo de tus commits"],
+["git config --global init.defaultBranch main","Rama inicial por defecto: main"],
+["git config --global core.editor \"code --wait\"","Editor para mensajes (aquí VS Code)"],
+["git config --global pull.rebase true","El pull hace rebase en vez de merge"],
+["git config --global core.autocrlf input","Saltos de línea (en Windows usa true)"],
+["git config --global alias.st status","Crea un atajo: git st"],
+["git config --list --show-origin","Ver toda la configuración y de dónde viene"],
+["ssh-keygen -t ed25519 -C \"tu@correo.com\"","Llave SSH para GitHub / GitLab"],
+["ssh -T git@github.com","Prueba la conexión SSH"],
+["git help <comando>","Manual de cualquier comando"]]],
+["Crear o clonar un repositorio","El punto de partida de cada proyecto.",[
+["git init -b main","Convierte la carpeta actual en repo"],
+["git clone <url>","Descarga un repo completo"],
+["git clone <url> <carpeta>","Clona con otro nombre de carpeta"],
+["git clone --depth 1 <url>","Solo el último commit (rápido y ligero)"],
+["git clone --branch <rama> --single-branch <url>","Clona solo una rama"],
+["git clone --recurse-submodules <url>","Clona incluyendo submódulos"],
+["git remote add origin <url>","Conecta un repo local con uno remoto"]]],
+["Ciclo diario","Lo que harás cientos de veces: ver, preparar, guardar.",[
+["git status","Estado de archivos modificados y preparados"],
+["git status -s","Versión corta"],
+["git add <archivo>","Prepara un archivo para el commit"],
+["git add .","Prepara todos los cambios"],
+["git add -p","Elige trozo a trozo qué preparar"],
+["git commit -m \"mensaje\"","Guarda lo preparado"],
+["git commit -am \"mensaje\"","Prepara archivos ya rastreados y guarda"],
+["git commit --amend","Edita el último commit (mensaje o contenido)"],
+["git commit --amend --no-edit","Añade cambios al último commit sin tocar el mensaje"],
+["git diff","Cambios sin preparar"],
+["git diff --staged","Cambios ya preparados"],
+["git rm <archivo>","Borra un archivo y lo registra"],
+["git rm --cached <archivo>","Deja de rastrearlo sin borrarlo del disco"],
+["git mv <viejo> <nuevo>","Renombra o mueve un archivo"],
+["echo \"node_modules/\" >> .gitignore","Ignora archivos o carpetas"]]],
+["Ver el historial","Averigua qué pasó, quién lo hizo y cuándo.",[
+["git log","Historial completo"],
+["git log --oneline --graph --decorate --all","Vista compacta con el árbol de ramas"],
+["git log -p <archivo>","Historial de un archivo con sus cambios"],
+["git log --author=\"nombre\"","Commits de una persona"],
+["git log --since=\"2 weeks ago\"","Commits recientes"],
+["git log -S\"texto\"","Commits que añadieron o quitaron ese texto"],
+["git log --follow <archivo>","Sigue un archivo aunque se haya renombrado"],
+["git show <commit>","Detalle de un commit"],
+["git blame <archivo>","Quién cambió cada línea"],
+["git shortlog -sn","Commits por persona"],
+["git grep \"texto\"","Busca texto en el código rastreado"]]],
+["Ramas","Trabaja en paralelo sin romper main.",[
+["git branch","Lista las ramas locales"],
+["git branch -a","Incluye las remotas"],
+["git branch -vv","Con su último commit y rama remota asociada"],
+["git switch <rama>","Cambia de rama"],
+["git switch -c <nueva>","Crea una rama y cambia a ella"],
+["git merge <rama>","Une esa rama a la actual"],
+["git merge --no-ff <rama>","Fuerza un commit de merge"],
+["git merge --squash <rama>","Une todo como un único commit"],
+["git branch -d <rama>","Borra una rama ya fusionada"],
+["git branch -D <rama>","Borra una rama aunque no esté fusionada"],
+["git branch -m <nuevo-nombre>","Renombra la rama actual"],
+["git branch --merged","Ramas ya fusionadas (candidatas a borrar)"]]],
+["Remotos","Sincroniza con GitHub, GitLab o Bitbucket.",[
+["git remote -v","Lista los remotos y sus URLs"],
+["git remote set-url origin <url>","Cambia la URL del remoto"],
+["git fetch","Descarga cambios sin integrarlos"],
+["git fetch --prune","Y limpia ramas remotas que ya no existen"],
+["git pull","Descarga e integra"],
+["git pull --rebase","Descarga y reaplica tus commits encima"],
+["git push","Sube tus commits"],
+["git push -u origin <rama>","Primera subida y enlaza la rama"],
+["git push origin --delete <rama>","Borra una rama remota"],
+["git push --force-with-lease","Fuerza el push de forma segura"],
+["git push --tags","Sube todas las etiquetas"]]],
+["Deshacer cambios","Del cambio más suave al más drástico.",[
+["git restore <archivo>","Descarta cambios sin preparar"],
+["git restore --staged <archivo>","Quita un archivo de lo preparado"],
+["git restore --source=<commit> <archivo>","Recupera un archivo de otro commit"],
+["git reset --soft HEAD~1","Deshace el commit, conserva todo preparado"],
+["git reset HEAD~1","Deshace el commit, conserva los cambios sin preparar"],
+["git reset --hard HEAD~1","Deshace el commit y borra los cambios (cuidado)"],
+["git reset --hard origin/main","Iguala tu rama al remoto, descartando lo local"],
+["git revert <commit>","Crea un commit que invierte otro (seguro en ramas compartidas)"],
+["git clean -n","Previsualiza qué archivos sin rastrear se borrarían"],
+["git clean -fd","Borra archivos y carpetas sin rastrear"]]],
+["Stash","Guarda trabajo a medias para cambiar de rama.",[
+["git stash","Guarda los cambios y deja el directorio limpio"],
+["git stash push -u -m \"mensaje\"","Con mensaje, incluyendo archivos nuevos"],
+["git stash list","Lista lo guardado"],
+["git stash show -p","Ver el contenido del último stash"],
+["git stash pop","Recupera y elimina el último"],
+["git stash apply stash@{1}","Aplica uno concreto y lo conserva"],
+["git stash drop stash@{0}","Elimina uno"],
+["git stash branch <rama>","Crea una rama a partir de un stash"]]],
+["Etiquetas y versiones","Marca releases como v1.0.0.",[
+["git tag","Lista las etiquetas"],
+["git tag -a v1.0.0 -m \"Versión 1.0.0\"","Etiqueta anotada (la recomendada)"],
+["git tag v1.0.0 <commit>","Etiqueta un commit antiguo"],
+["git push origin v1.0.0","Sube una etiqueta"],
+["git tag -d v1.0.0","Borra una etiqueta local"],
+["git push origin --delete v1.0.0","Borra una etiqueta remota"],
+["git describe --tags","Versión más cercana al commit actual"]]],
+["Conflictos, rebase y cherry-pick","Cuando las ramas chocan o quieres un historial limpio.",[
+["git rebase main","Reaplica tu rama encima de main"],
+["git rebase --continue","Sigue tras resolver un conflicto"],
+["git rebase --abort","Cancela y vuelve al estado anterior"],
+["git rebase -i HEAD~4","Reordena, une o edita los últimos 4 commits"],
+["git cherry-pick <commit>","Copia un commit a la rama actual"],
+["git merge --abort","Cancela un merge con conflictos"],
+["git diff --name-only --diff-filter=U","Lista los archivos en conflicto"],
+["git checkout --ours <archivo>","Conserva tu versión en el conflicto"],
+["git checkout --theirs <archivo>","Conserva la versión entrante"],
+["git mergetool","Abre tu herramienta visual de merge"]]],
+["Avanzado","Para cuando el proyecto crece o algo sale mal.",[
+["git reflog","Registro de a dónde ha apuntado HEAD: salvavidas"],
+["git reset --hard HEAD@{2}","Vuelve a un estado anterior sacado del reflog"],
+["git bisect start","Inicia la búsqueda binaria de un bug"],
+["git bisect bad && git bisect good <commit>","Marca el punto malo y el último bueno"],
+["git bisect run <script>","Automatiza la búsqueda con un test"],
+["git bisect reset","Termina bisect"],
+["git worktree add ../otra-carpeta <rama>","Otra rama en otra carpeta, sin stash"],
+["git worktree list","Lista los worktrees"],
+["git commit --fixup <commit>","Prepara una corrección para un commit anterior"],
+["git rebase -i --autosquash <base>","Une automáticamente los fixup"],
+["git rebase --onto <nueva-base> <vieja-base> <rama>","Trasplanta una rama a otra base"],
+["git submodule add <url> <ruta>","Incluye otro repo dentro del tuyo"],
+["git submodule update --init --recursive","Inicializa y actualiza submódulos"],
+["git sparse-checkout set <carpeta>","Trabaja solo con parte de un repo grande"],
+["git log -L :<funcion>:<archivo>","Historial de una función concreta"],
+["git config --global rerere.enabled true","Recuerda cómo resolviste conflictos repetidos"],
+["git update-index --assume-unchanged <archivo>","Ignora cambios locales de un archivo rastreado"],
+["git config core.hooksPath .githooks","Hooks compartidos (pre-commit, etc.)"],
+["git archive -o repo.zip HEAD","Exporta el código sin la carpeta .git"],
+["git bundle create repo.bundle --all","Repo en un solo archivo, sin red"],
+["git filter-repo --path <ruta> --invert-paths","Borra un archivo de todo el historial (instalar aparte)"],
+["git fsck --lost-found","Busca objetos huérfanos"],
+["git gc --prune=now","Limpia y comprime el repo"],
+["git maintenance start","Mantenimiento automático en segundo plano"],
+["git range-diff <a>...<b>","Compara dos versiones de una serie de commits"]]]
+];
+const G=[
+["GitHub Desktop","Windows · macOS","Gratis","La opción más sencilla para empezar. Ideal con GitHub.","desktop.github.com"],
+["Visual Studio Code","Windows · macOS · Linux","Gratis","Git integrado en el editor: cambios, commits y resolución de conflictos.","code.visualstudio.com"],
+["GitKraken","Windows · macOS · Linux","Gratis / de pago","Grafo visual muy claro y gestión de ramas con arrastrar y soltar.","gitkraken.com"],
+["Sourcetree","Windows · macOS","Gratis","Completo y de Atlassian. Cubre casi todo Git, incluido flow.","sourcetreeapp.com"],
+["Fork","Windows · macOS","De pago (prueba gratis)","Rápido, limpio y con buen rebase interactivo.","git-fork.com"],
+["Sublime Merge","Windows · macOS · Linux","Gratis / de pago","Muy veloz, con buena búsqueda y vista de diferencias.","sublimemerge.com"],
+["Tower","Windows · macOS","De pago","Cliente profesional con deshacer casi todo.","git-tower.com"],
+["TortoiseGit","Windows","Gratis","Se integra en el menú del botón derecho del Explorador.","tortoisegit.org"],
+["lazygit","Terminal · todos los sistemas","Gratis","Interfaz en terminal, muy rápida con teclado.","github.com/jesseduffield/lazygit"],
+["GitHub CLI (gh)","Terminal · todos los sistemas","Gratis","Pull requests, issues y repos de GitHub desde la terminal.","cli.github.com"],
+["git gui y gitk","Vienen con Git","Gratis","Interfaz básica y visor de historial. Ejecuta git gui o gitk.","git-scm.com"]
+];
+const esc=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const hash=i=>(Math.imul(i+7,2654435761)>>>0).toString(16).padStart(8,'0').slice(0,7);
+const all=S.length+1;
+let lg='<div class="p">$ git log --oneline</div>',mn='';
+const names=S.map(s=>s[0]).concat(["Apps con interfaz gráfica"]);
+names.forEach((n,i)=>{
+  const dec=i===0?' <em>(HEAD → main)</em>':i===all-1?' <em>(origin/main)</em>':'';
+  lg+=`<a class="ix" href="#s${i}"><i>${hash(i)}</i><span>${i+1}. ${esc(n)}</span>${dec}</a>`;
+});
+S.forEach((s,i)=>{
+  const adv=i===S.length-1?' adv':'';
+  mn+=`<section class="sec${adv}" id="s${i}"><span class="dot"></span><div class="hd"><h2>${i+1}. ${esc(s[0])}</h2><a href="#top">↑ índice</a></div><p>${esc(s[1])}</p>`;
+  s[2].forEach(r=>{mn+=`<div class="r"><button class="c" type="button" title="Copiar">${esc(r[0])}</button><span>${esc(r[1])}</span></div>`});
+  mn+='</section>';
+});
+mn+=`<section class="sec" id="s${all-1}"><span class="dot"></span><div class="hd"><h2>${all}. Apps con interfaz gráfica</h2><a href="#top">↑ índice</a></div><p>Todo lo anterior se puede hacer con clics. Estas son las más usadas.</p><div class="g">`;
+G.forEach(g=>{mn+=`<div class="k r0"><b>${esc(g[0])}</b><small>${esc(g[1])} · ${esc(g[2])}</small><p>${esc(g[3])}</p><a href="https://${g[4]}" target="_blank" rel="noopener">${g[4]}</a></div>`});
+mn+='</div></section>';
+document.getElementById('log').innerHTML=lg;
+document.getElementById('main').innerHTML=mn;
+const t=document.getElementById('t');let tm;
+function toast(m){t.textContent=m;t.classList.add('on');clearTimeout(tm);tm=setTimeout(()=>t.classList.remove('on'),1400)}
+document.addEventListener('click',e=>{
+  const b=e.target.closest('.c');if(!b)return;
+  try{navigator.clipboard.writeText(b.textContent).then(()=>toast('Copiado'),()=>toast('No se pudo copiar'))}catch(_){toast('No se pudo copiar')}
+});
+document.getElementById('q').addEventListener('input',e=>{
+  const v=e.target.value.trim().toLowerCase();let any=false;
+  document.querySelectorAll('.sec').forEach(sec=>{
+    let n=0;
+    sec.querySelectorAll('.r,.k').forEach(r=>{const ok=!v||r.textContent.toLowerCase().includes(v);r.style.display=ok?'':'none';if(ok)n++});
+    sec.style.display=n?'':'none';if(n)any=true;
+  });
+  document.getElementById('none').style.display=any?'none':'block';
+});
+</script>
+</body>
+</html>

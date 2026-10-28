@@ -1,0 +1,2242 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Angular 21 — De Básico a Avanzado</title>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg:       #0d0d14;
+      --surface:  #13131f;
+      --card:     #1a1a2e;
+      --border:   #2a2a45;
+      --accent:   #e040fb;
+      --accent2:  #7c4dff;
+      --accent3:  #00e5ff;
+      --green:    #69ff47;
+      --yellow:   #ffea00;
+      --red:      #ff5252;
+      --text:     #e8e8f0;
+      --muted:    #7878a0;
+      --code-bg:  #0a0a16;
+      --tag-bg:   #1e1e3a;
+
+      /* colores por nivel */
+      --lvl1: #00e5ff;   /* básico */
+      --lvl2: #69ff47;   /* intermedio-bajo */
+      --lvl3: #ffea00;   /* intermedio */
+      --lvl4: #ff9800;   /* intermedio-alto */
+      --lvl5: #e040fb;   /* avanzado */
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    /* ─── HERO ───────────────────────────────────── */
+    .hero {
+      background: linear-gradient(135deg, #0d0d14 0%, #1a0030 50%, #001a40 100%);
+      border-bottom: 1px solid var(--border);
+      padding: 36px 32px 28px;
+    }
+    .hero-inner { max-width: 1400px; margin: 0 auto; }
+    .hero-logo {
+      font-family: 'Syne', sans-serif;
+      font-size: 40px;
+      font-weight: 800;
+      background: linear-gradient(90deg, var(--accent), var(--accent3));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: -1px;
+    }
+    .hero-sub { color: var(--muted); font-size: 13px; margin-top: 4px; }
+
+    .level-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 18px;
+    }
+    .lvl-badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--muted);
+    }
+    .lvl-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+
+    /* ─── NAV LATERAL ───────────────────────────── */
+    .layout {
+      display: flex;
+      max-width: 1500px;
+      margin: 0 auto;
+    }
+
+    .sidebar {
+      width: 220px;
+      min-width: 220px;
+      padding: 28px 16px;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+      border-right: 1px solid var(--border);
+      scrollbar-width: thin;
+      scrollbar-color: var(--border) transparent;
+    }
+    .sidebar-title {
+      font-size: 10px;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--muted);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 14px;
+    }
+    .chapter-link {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+      padding: 6px 8px;
+      border-radius: 6px;
+      margin-bottom: 2px;
+      transition: background .15s;
+    }
+    .chapter-link:hover { background: var(--tag-bg); }
+    .chapter-link .ch-num {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      color: var(--muted);
+      min-width: 20px;
+    }
+    .chapter-link .ch-name {
+      font-size: 12px;
+      color: var(--text);
+      line-height: 1.3;
+    }
+    .chapter-link .ch-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      min-width: 6px;
+    }
+
+    /* ─── CONTENIDO PRINCIPAL ───────────────────── */
+    .main {
+      flex: 1;
+      padding: 40px 28px;
+      min-width: 0;
+    }
+
+    /* ─── CHAPTER HEADER ────────────────────────── */
+    .chapter {
+      margin-bottom: 56px;
+    }
+    .chapter-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 2px solid var(--border);
+    }
+    .chapter-number {
+      font-family: 'Syne', sans-serif;
+      font-size: 48px;
+      font-weight: 800;
+      line-height: 1;
+      opacity: .15;
+      min-width: 70px;
+    }
+    .chapter-info {}
+    .chapter-level {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+    .chapter-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 26px;
+      font-weight: 800;
+      color: #fff;
+      line-height: 1.1;
+    }
+    .chapter-desc {
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 6px;
+      max-width: 600px;
+    }
+
+    /* ─── GRID ──────────────────────────────────── */
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(540px, 1fr)); gap: 20px; }
+
+    /* ─── CARDS ─────────────────────────────────── */
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    .card.wide { grid-column: 1 / -1; }
+
+    .card-header {
+      padding: 14px 18px 12px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .card-icon  { font-size: 17px; }
+    .card-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      color: #fff;
+    }
+    .card-tag {
+      margin-left: auto;
+      font-size: 10px;
+      font-family: 'JetBrains Mono', monospace;
+      background: var(--tag-bg);
+      padding: 2px 8px;
+      border-radius: 4px;
+      color: var(--muted);
+      border: 1px solid var(--border);
+    }
+    .card-body { padding: 14px 18px; display: flex; flex-direction: column; gap: 12px; flex: 1; }
+
+    /* ─── CODE ──────────────────────────────────── */
+    pre {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 13px 15px;
+      overflow-x: auto;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11.5px;
+      line-height: 1.75;
+    }
+    .comment   { color: #5c6bc0; font-style: italic; }
+    .kw        { color: var(--accent); font-weight: 700; }
+    .fn        { color: var(--accent3); }
+    .str       { color: var(--green); }
+    .num       { color: var(--yellow); }
+    .decorator { color: #ff9800; font-weight: 700; }
+    .type      { color: #80cbc4; }
+    .op        { color: var(--red); }
+
+    /* ─── MISC ──────────────────────────────────── */
+    .desc { color: var(--muted); font-size: 12.5px; line-height: 1.65; }
+
+    .label {
+      display: inline-block;
+      font-size: 10px;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 3px;
+      margin-bottom: 4px;
+    }
+    .label.ng   { background: #e040fb22; color: var(--accent);  border: 1px solid #e040fb44; }
+    .label.ts   { background: #3178c622; color: #60a5fa;        border: 1px solid #3178c644; }
+    .label.html { background: #ff572222; color: #ff8a65;        border: 1px solid #ff572244; }
+    .label.rxjs { background: #7c4dff22; color: #b39ddb;        border: 1px solid #7c4dff44; }
+    .label.new  { background: #69ff4722; color: var(--green);   border: 1px solid #69ff4744; }
+    .label.cli  { background: #ffea0022; color: var(--yellow);  border: 1px solid #ffea0044; }
+
+    .pill-row { display: flex; flex-wrap: wrap; gap: 6px; }
+    .pill {
+      font-size: 11px;
+      font-family: 'JetBrains Mono', monospace;
+      padding: 3px 10px;
+      border-radius: 20px;
+      background: var(--tag-bg);
+      border: 1px solid var(--border);
+      color: var(--accent3);
+    }
+
+    .tip {
+      background: #00e5ff0d;
+      border: 1px solid #00e5ff22;
+      border-left: 3px solid var(--accent3);
+      border-radius: 6px;
+      padding: 10px 14px;
+      font-size: 12.5px;
+      color: var(--muted);
+    }
+    .tip strong { color: var(--accent3); }
+
+    footer {
+      text-align: center;
+      padding: 28px;
+      color: var(--muted);
+      font-size: 12px;
+      border-top: 1px solid var(--border);
+      margin-top: 40px;
+    }
+    footer span { color: var(--accent); }
+
+    @media (max-width: 900px) {
+      .sidebar { display: none; }
+      .grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══ HERO ══════════════════════════════════════════ -->
+<header class="hero">
+  <div class="hero-inner">
+    <div class="hero-logo">Angular 21 — De Básico a Avanzado</div>
+    <div class="hero-sub">Guía estructurada por capítulos · Como si fuera un libro · v20+ / v21</div>
+    <div class="level-legend">
+      <div class="lvl-badge"><div class="lvl-dot" style="background:var(--lvl1)"></div> Cap. 1–3: Fundamentos</div>
+      <div class="lvl-badge"><div class="lvl-dot" style="background:var(--lvl2)"></div> Cap. 4–6: Intermedio Bajo</div>
+      <div class="lvl-badge"><div class="lvl-dot" style="background:var(--lvl3)"></div> Cap. 7–9: Intermedio</div>
+      <div class="lvl-badge"><div class="lvl-dot" style="background:var(--lvl4)"></div> Cap. 10–12: Intermedio Alto</div>
+      <div class="lvl-badge"><div class="lvl-dot" style="background:var(--lvl5)"></div> Cap. 13–16: Avanzado</div>
+    </div>
+  </div>
+</header>
+
+<div class="layout">
+
+  <!-- ══ SIDEBAR ══════════════════════════════════════ -->
+  <nav class="sidebar">
+    <div class="sidebar-title">Capítulos</div>
+
+    <a class="chapter-link" href="#cap1"><span class="ch-dot" style="background:var(--lvl1)"></span><span class="ch-num">01</span><span class="ch-name">TypeScript Esencial</span></a>
+    <a class="chapter-link" href="#cap2"><span class="ch-dot" style="background:var(--lvl1)"></span><span class="ch-num">02</span><span class="ch-name">CLI y Proyecto</span></a>
+    <a class="chapter-link" href="#cap3"><span class="ch-dot" style="background:var(--lvl1)"></span><span class="ch-num">03</span><span class="ch-name">Primer Componente</span></a>
+    <a class="chapter-link" href="#cap4"><span class="ch-dot" style="background:var(--lvl2)"></span><span class="ch-num">04</span><span class="ch-name">Templates y Binding</span></a>
+    <a class="chapter-link" href="#cap5"><span class="ch-dot" style="background:var(--lvl2)"></span><span class="ch-num">05</span><span class="ch-name">Directivas y Pipes</span></a>
+    <a class="chapter-link" href="#cap6"><span class="ch-dot" style="background:var(--lvl2)"></span><span class="ch-num">06</span><span class="ch-name">Comunicación entre Componentes</span></a>
+    <a class="chapter-link" href="#cap7"><span class="ch-dot" style="background:var(--lvl3)"></span><span class="ch-num">07</span><span class="ch-name">Servicios e Inyección</span></a>
+    <a class="chapter-link" href="#cap8"><span class="ch-dot" style="background:var(--lvl3)"></span><span class="ch-num">08</span><span class="ch-name">Routing y Navegación</span></a>
+    <a class="chapter-link" href="#cap9"><span class="ch-dot" style="background:var(--lvl3)"></span><span class="ch-num">09</span><span class="ch-name">Formularios</span></a>
+    <a class="chapter-link" href="#cap10"><span class="ch-dot" style="background:var(--lvl4)"></span><span class="ch-num">10</span><span class="ch-name">HTTP / AJAX</span></a>
+    <a class="chapter-link" href="#cap11"><span class="ch-dot" style="background:var(--lvl4)"></span><span class="ch-num">11</span><span class="ch-name">RxJS</span></a>
+    <a class="chapter-link" href="#cap12"><span class="ch-dot" style="background:var(--lvl4)"></span><span class="ch-num">12</span><span class="ch-name">Signals — Nueva Reactividad</span></a>
+    <a class="chapter-link" href="#cap13"><span class="ch-dot" style="background:var(--lvl5)"></span><span class="ch-num">13</span><span class="ch-name">Guards, Interceptors y Resolvers</span></a>
+    <a class="chapter-link" href="#cap14"><span class="ch-dot" style="background:var(--lvl5)"></span><span class="ch-num">14</span><span class="ch-name">Change Detection y Performance</span></a>
+    <a class="chapter-link" href="#cap15"><span class="ch-dot" style="background:var(--lvl5)"></span><span class="ch-num">15</span><span class="ch-name">State Management</span></a>
+    <a class="chapter-link" href="#cap16"><span class="ch-dot" style="background:var(--lvl5)"></span><span class="ch-num">16</span><span class="ch-name">APIs Nuevas v17–v21</span></a>
+  </nav>
+
+  <!-- ══ MAIN ════════════════════════════════════════ -->
+  <main class="main">
+
+    <!-- ══════════════════════════════════════════════
+         CAPÍTULO 1 — TypeScript Esencial
+    ══════════════════════════════════════════════ -->
+    <section class="chapter" id="cap1">
+      <div class="chapter-header">
+        <div class="chapter-number" style="color:var(--lvl1)">01</div>
+        <div class="chapter-info">
+          <div class="chapter-level" style="color:var(--lvl1)">Fundamentos · Capítulo 1</div>
+          <div class="chapter-title">TypeScript Esencial</div>
+          <div class="chapter-desc">Antes de Angular necesitas entender TypeScript. Tipos, interfaces, clases, genéricos y utility types son el vocabulario diario del desarrollador Angular.</div>
+        </div>
+      </div>
+      <div class="grid">
+
+        <div class="card">
+          <div class="card-header">
+            <span class="card-icon">📐</span>
+            <span class="card-title">Tipos Básicos e Interfaces</span>
+            <span class="card-tag">TypeScript</span>
+          </div>
+          <div class="card-body">
+            <span class="label ts">TypeScript</span>
+            <p class="desc">Las interfaces son el contrato de tus datos. Son el principal modo de modelar la respuesta de una API o el estado de un componente.</p>
+            <pre>
+<span class="comment">// Tipos primitivos</span>
+<span class="kw">let</span> nombre:  <span class="type">string</span>  = <span class="str">'Angular'</span>;
+<span class="kw">let</span> version: <span class="type">number</span>  = <span class="num">21</span>;
+<span class="kw">let</span> activo:  <span class="type">boolean</span> = <span class="kw">true</span>;
+<span class="kw">let</span> datos:   <span class="type">any</span>     = {};      <span class="comment">// evitar en lo posible</span>
+<span class="kw">let</span> valor:   <span class="type">unknown</span> = <span class="num">42</span>;    <span class="comment">// más seguro que any</span>
+
+<span class="comment">// Interface — contrato de tipo (para DTOs y modelos)</span>
+<span class="kw">export interface</span> <span class="type">Usuario</span> {
+  id:         <span class="type">number</span>;
+  nombre:     <span class="type">string</span>;
+  email:      <span class="type">string</span>;
+  rol:        <span class="str">'admin'</span> | <span class="str">'usuario'</span> | <span class="str">'invitado'</span>; <span class="comment">// union</span>
+  createdAt?: <span class="type">Date</span>;     <span class="comment">// ? = opcional</span>
+}
+
+<span class="comment">// Type alias (más flexible que interface)</span>
+<span class="kw">type</span> <span class="type">Estado</span> = <span class="str">'idle'</span> | <span class="str">'loading'</span> | <span class="str">'success'</span> | <span class="str">'error'</span>;
+<span class="kw">type</span> <span class="type">ID</span>     = <span class="type">number</span> | <span class="type">string</span>;
+
+<span class="comment">// Genéricos — respuesta paginada de API</span>
+<span class="kw">interface</span> <span class="type">Paginated</span>&lt;<span class="type">T</span>&gt; {
+  data:     <span class="type">T[]</span>;
+  total:    <span class="type">number</span>;
+  page:     <span class="type">number</span>;
+  pageSize: <span class="type">number</span>;
+}
+<span class="comment">// uso: Paginated&lt;Usuario&gt;, Paginated&lt;Producto&gt;</span>
+
+<span class="comment">// Utility Types — muy usados en Angular</span>
+<span class="kw">type</span> <span class="type">Partial</span>&lt;<span class="type">Usuario</span>&gt;  <span class="comment">// todos opcionales (PATCH)</span>
+<span class="kw">type</span> <span class="type">Required</span>&lt;<span class="type">Usuario</span>&gt; <span class="comment">// todos requeridos</span>
+<span class="kw">type</span> <span class="type">Readonly</span>&lt;<span class="type">Usuario</span>&gt; <span class="comment">// todo readonly</span>
+<span class="kw">type</span> <span class="type">Pick</span>&lt;<span class="type">Usuario</span>, <span class="str">'id'</span> | <span class="str">'nombre'</span>&gt; <span class="comment">// solo esas props</span>
+<span class="kw">type</span> <span class="type">Omit</span>&lt;<span class="type">Usuario</span>, <span class="str">'password'</span>&gt;    <span class="comment">// sin password</span>
+            </pre>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <span class="card-icon">🏛️</span>
+            <span class="card-title">Clases, Decoradores y Enums</span>
+            <span class="card-tag">TypeScript</span>
+          </div>
+          <div class="card-body">
+            <span class="label ts">TypeScript</span>
+            <p class="desc">Angular está construido sobre clases TypeScript con decoradores. Entender los modificadores de acceso es clave.</p>
+            <pre>
+<span class="comment">// Clase con constructor shorthand</span>
+<span class="kw">export class</span> <span class="type">UsuarioModel</span> {
+  nombreCompleto: <span class="type">string</span>;
+
+  <span class="kw">constructor</span>(
+    <span class="kw">public</span>    nombre:   <span class="type">string</span>,  <span class="comment">// public: accesible desde fuera</span>
+    <span class="kw">private</span>   email:    <span class="type">string</span>,  <span class="comment">// private: solo en esta clase</span>
+    <span class="kw">protected</span> rol:      <span class="type">string</span>,  <span class="comment">// protected: esta clase + hijos</span>
+    <span class="kw">readonly</span>  id:       <span class="type">number</span>,  <span class="comment">// readonly: no se puede cambiar</span>
+  ) {
+    <span class="kw">this</span>.nombreCompleto = <span class="str">`</span>${nombre}<span class="str">`</span>;
+  }
+
+  <span class="fn">esAdmin</span>(): <span class="type">boolean</span> { <span class="kw">return</span> <span class="kw">this</span>.rol === <span class="str">'admin'</span>; }
+}
+
+<span class="comment">// Enum de string (común en Angular)</span>
+<span class="kw">export enum</span> <span class="type">EstadoPedido</span> {
+  Pendiente  = <span class="str">'PENDIENTE'</span>,
+  Procesando = <span class="str">'PROCESANDO'</span>,
+  Entregado  = <span class="str">'ENTREGADO'</span>,
+}
+
+<span class="comment">// Mejor alternativa: const object (tree-shakeable)</span>
+<span class="kw">export const</span> <span class="type">ROLES</span> = {
+  ADMIN:    <span class="str">'admin'</span>,
+  USUARIO:  <span class="str">'usuario'</span>,
+} <span class="kw">as const</span>;
+<span class="kw">export type</span> <span class="type">Rol</span> = <span class="kw">typeof</span> <span class="type">ROLES</span>[<span class="kw">keyof typeof</span> <span class="type">ROLES</span>];
+<span class="comment">// Rol = 'admin' | 'usuario'</span>
+
+<span class="comment">// Decoradores (Angular los define sobre clases/propiedades)</span>
+<span class="decorator">@Component</span>({ ... })   <span class="comment">// marca la clase como Componente</span>
+<span class="decorator">@Injectable</span>({ ... }) <span class="comment">// marca la clase como Servicio</span>
+<span class="decorator">@Input</span>()              <span class="comment">// marca una prop como Input</span>
+            </pre>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════
+         CAPÍTULO 2 — CLI y Proyecto
+    ══════════════════════════════════════════════ -->
+    <section class="chapter" id="cap2">
+      <div class="chapter-header">
+        <div class="chapter-number" style="color:var(--lvl1)">02</div>
+        <div class="chapter-info">
+          <div class="chapter-level" style="color:var(--lvl1)">Fundamentos · Capítulo 2</div>
+          <div class="chapter-title">CLI y Estructura del Proyecto</div>
+          <div class="chapter-desc">El Angular CLI es tu mejor herramienta. Genera componentes, servicios, pipes, guards y más con un solo comando.</div>
+        </div>
+      </div>
+      <div class="grid">
+
+        <div class="card">
+          <div class="card-header">
+            <span class="card-icon">⌨️</span>
+            <span class="card-title">Comandos CLI Esenciales</span>
+            <span class="card-tag">ng</span>
+          </div>
+          <div class="card-body">
+            <span class="label cli">CLI</span>
+            <pre>
+<span class="comment"># Instalar y crear</span>
+npm install -g @angular/cli
+ng new mi-app --standalone --style=scss
+cd mi-app
+ng serve                   <span class="comment"># localhost:4200</span>
+ng serve --port 4201 --open
+
+<span class="comment"># Generar (g = generate)</span>
+ng g component ruta/nombre         <span class="comment"># componente</span>
+ng g service   services/usuario    <span class="comment"># servicio</span>
+ng g pipe      pipes/truncate      <span class="comment"># pipe</span>
+ng g directive directives/resalta  <span class="comment"># directiva</span>
+ng g guard     guards/auth         <span class="comment"># guard</span>
+ng g interceptor interceptors/auth <span class="comment"># interceptor</span>
+ng g resolver  resolvers/usuario   <span class="comment"># resolver</span>
+ng g interface models/usuario      <span class="comment"># interface</span>
+ng g class     models/usuario      <span class="comment"># clase</span>
+ng g enum      models/roles        <span class="comment"># enum</span>
+ng g environments                  <span class="comment"># archivos environment</span>
+
+<span class="comment"># Flags útiles</span>
+--skip-tests          <span class="comment"># no genera .spec.ts</span>
+--dry-run             <span class="comment"># muestra sin crear</span>
+--flat                <span class="comment"># sin carpeta</span>
+
+<span class="comment"># Build y utilidades</span>
+ng build                            <span class="comment"># dev</span>
+ng build --configuration production <span class="comment"># producción</span>
+ng test                             <span class="comment"># unit tests</span>
+ng lint                             <span class="comment"># ESLint</span>
+ng update @angular/core @angular/cli <span class="comment"># actualizar</span>
+ng add @angular/material            <span class="comment"># Angular Material</span>
+ng add @angular/pwa                 <span class="comment"># PWA</span>
+ng version                          <span class="comment"># ver versión</span>
+            </pre>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <span class="card-icon">🗂️</span>
+            <span class="card-title">Estructura de Proyecto Recomendada</span>
+            <span class="card-tag">Arquitectura</span>
+          </div>
+          <div class="card-body">
+            <span class="label ts">Arquitectura</span>
+            <p class="desc">La estructura por features (características) es la más escalable. Cada feature es independiente y se carga de forma lazy.</p>
+            <pre>
+src/
+├── app/
+│   ├── core/              <span class="comment">// singleton: guards, layout global</span>
+│   │   ├── guards/
+│   │   ├── interceptors/
+│   │   └── layout/        <span class="comment">// header, footer, sidebar</span>
+│   │
+│   ├── shared/            <span class="comment">// reutilizable entre features</span>
+│   │   ├── components/    <span class="comment">// botones, modales, etc.</span>
+│   │   ├── directives/
+│   │   ├── pipes/
+│   │   └── utils/
+│   │
+│   ├── features/          <span class="comment">// por funcionalidad (lazy)</span>
+│   │   ├── auth/
+│   │   │   ├── login/
+│   │   │   └── auth.routes.ts
+│   │   ├── dashboard/
+│   │   └── productos/
+│   │       ├── models/    <span class="comment">// interfaces y tipos</span>
+│   │       ├── services/
+│   │       ├── store/     <span class="comment">// state management</span>
+│   │       └── productos.routes.ts
+│   │
+│   ├── app.component.ts
+│   ├── app.config.ts      <span class="comment">// providers (antes AppModule)</span>
+│   └── app.routes.ts
+│
+├── environments/
+│   ├── environment.ts       <span class="comment">// dev</span>
+│   └── environment.prod.ts  <span class="comment">// producción</span>
+└── assets/
+            </pre>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <span class="card-icon">⚙️</span>
+            <span class="card-title">Environments y Configuración</span>
+            <span class="card-tag">Deploy</span>
+          </div>
+          <div class="card-body">
+            <span class="label ts">TypeScript</span>
+            <pre>
+<span class="comment">// environments/environment.ts (desarrollo)</span>
+<span class="kw">export const</span> environment = {
+  production: <span class="kw">false</span>,
+  apiUrl:     <span class="str">'http://localhost:3000/api'</span>,
+  debug:      <span class="kw">true</span>,
+};
+
+<span class="comment">// environments/environment.prod.ts</span>
+<span class="kw">export const</span> environment = {
+  production: <span class="kw">true</span>,
+  apiUrl:     <span class="str">'https://api.miapp.com'</span>,
+  debug:      <span class="kw">false</span>,
+};
+
+<span class="comment">// Uso en cualquier servicio</span>
+<span class="kw">import</span> { environment } <span class="kw">from</span> <span class="str">'../environments/environment'</span>;
+
+<span class="decorator">@Injectable</span>({ providedIn: <span class="str">'root'</span> })
+<span class="kw">export class</span> <span class="type">ApiService</span> {
+  <span class="kw">private</span> url = environment.apiUrl; <span class="comment">// cambia automáticamente</span>
+}
+<span class="comment">// ng build --configuration production
+// → reemplaza environment.ts con environment.prod.ts</span>
+            </pre>
+            <div class="tip"><strong>Tip:</strong> Usa <code>ng g environments</code> para generar los archivos y Angular CLI los configura en <code>angular.json</code> automáticamente.</div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════
+         CAPÍTULO 3 — Primer Componente
+    ══════════════════════════════════════════════ -->
+    <section class="chapter" id="cap3">
+      <div class="chapter-header">
+        <div class="chapter-number" style="color:var(--lvl1)">03</div>
+        <div class="chapter-info">
+          <div class="chapter-level" style="color:var(--lvl1)">Fundamentos · Capítulo 3</div>
+          <div class="chapter-title">El Componente — Unidad Básica</div>
+          <div class="chapter-desc">Todo en Angular es un componente. Aprende su anatomía, el decorador @Component, el ciclo de vida y la proyección de contenido.</div>
+        </div>
+      </div>
+      <div class="grid">
+
+        <div class="card">
+          <div class="card-header">
+            <span class="card-icon">🧩</span>
+            <span class="card-title">Anatomía de un Componente Standalone</span>
+            <span class="card-tag">@Component</span>
+          </div>
+          <div class="card-body">
+            <span class="label ng">Angular</span>
+            <p class="desc">Un componente combina lógica (TypeScript), vista (HTML) y estilos (CSS/SCSS). El decorador <code>@Component</code> lo registra en Angular.</p>
+            <pre>
+<span class="comment">// app.component.ts</span>
+<span class="kw">import</span> { Component } <span class="kw">from</span> <span class="str">'@angular/core'</span>;
+<span class="kw">import</span> { RouterOutlet } <span class="kw">from</span> <span class="str">'@angular/router'</span>;
+
+<span class="decorator">@Component</span>({
+  selector:    <span class="str">'app-root'</span>,      <span class="comment">// tag HTML: &lt;app-root&gt;</span>
+  standalone:  <span class="kw">true</span>,           <span class="comment">// sin NgModule (v17+, default)</span>
+  imports:     [RouterOutlet],  <span class="comment">// qué necesita este componente</span>
+  templateUrl: <span class="str">'./app.component.html'</span>,
+  styleUrl:    <span class="str">'./app.component.scss'</span>,
+  <span class="comment">// template: `&lt;p&gt;inline&lt;/p&gt;`,  ← alternativa inline</span>
+  <span class="comment">// styles:   [`h1 { color: red }`], ← estilos inline</span>
+})
+<span class="kw">export class</span> <span class="type">AppComponent</span> {
+  title = <span class="str">'mi-app'</span>;
+  contador = <span class="num">0</span>;
+
+  <span class="fn">incrementar</span>() { <span class="kw">this</span>.contador++; }
+}
+
+<span class="comment">&lt;!-- app.component.html --&gt;</span>
+&lt;<span class="kw">h1</span>&gt;{{ title }}&lt;/<span class="kw">h1</span>&gt;
+&lt;<span class="kw">p</span>&gt;Contador: {{ contador }}&lt;/<span class="kw">p</span>&gt;
+&lt;<span class="kw">button</span> (click)="<span class="fn">incrementar</span>()"&gt;+1&lt;/<span class="kw">button</span>&gt;
+            </pre>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <span class="card-icon">🔄</span>
+            <span class="card-title">Ciclo de Vida (Lifecycle Hooks)</span>
+            <span class="card-tag">Lifecycle</span>
+          </div>
+          <div class="card-body">
+            <span class="label ng">Angular</span>
+            <p class="desc">Angular llama estos métodos en orden durante la vida del componente. Los más usados son <code>ngOnInit</code> y <code>ngOnDestroy</code>.</p>
+            <pre>
+<span class="kw">import</span> { OnInit, OnDestroy, OnChanges, SimpleChanges,
+         AfterViewInit } <span class="kw">from</span> <span class="str">'@angular/core'</span>;
+
+<span class="decorator">@Component</span>({ ... })
+<span class="kw">export class</span> <span class="type">Demo</span> <span class="kw">implements</span> <span class="type">OnInit</span>, <span class="type">OnDestroy</span>, <span class="type">OnChanges</span> {
+
+  <span class="comment">// 1. constructor → solo inyectar dependencias</span>
+  <span class="kw">constructor</span>() {}
+
+  <span class="comment">// 2. ngOnChanges → cuando cambia un @Input</span>
+  <span class="fn">ngOnChanges</span>(changes: <span class="type">SimpleChanges</span>) {
+    <span class="kw">if</span> (changes[<span class="str">'nombre'</span>])
+      console.<span class="fn">log</span>(<span class="str">'Nuevo valor:'</span>, changes[<span class="str">'nombre'</span>].currentValue);
+  }
+
+  <span class="comment">// 3. ngOnInit → inicialización, llamadas HTTP ✅ más usado</span>
+  <span class="fn">ngOnInit</span>() { <span class="comment">/* cargar datos, iniciar subscriptions */</span> }
+
+  <span class="comment">// 4. ngDoCheck → detección manual (raro)</span>
+  <span class="comment">// 5. ngAfterContentInit → ng-content listo</span>
+  <span class="comment">// 6. ngAfterContentChecked</span>
+
+  <span class="comment">// 7. ngAfterViewInit → template e hijos listos ✅</span>
+  <span class="fn">ngAfterViewInit</span>() { <span class="comment">/* acceder a @ViewChild aquí */</span> }
+
+  <span class="comment">// 8. ngAfterViewChecked</span>
+
+  <span class="comment">// 9. ngOnDestroy → limpieza ✅ cancelar subs, intervals</span>
+  <span class="fn">ngOnDestroy</span>() { <span class="comment">/* limpiar todo para evitar memory leaks */</span> }
+}
+
+<span class="comment">// ORDEN: constructor → ngOnChanges → ngOnInit →
+//        ngAfterViewInit → (cambios) → ngOnDestroy</span>
+            </pre>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <span class="card-icon">🎭</span>
+            <span class="card-title">ng-content — Proyección de Contenido</span>
+            <span class="card-tag">Slots</span>
+          </div>
+          <div class="card-body">
+            <span class="label html">HTML</span>
+            <p class="desc">Permite que un componente padre inserte HTML dentro del template hijo. Como los "slots" de Web Components.</p>
+            <pre>
+<span class="comment">&lt;!-- card.component.html —  componente que recibe contenido --&gt;</span>
+&lt;<span class="kw">div</span> class="card"&gt;
+  &lt;<span class="kw">div</span> class="card-header"&gt;
+    <span class="comment">&lt;!-- Slot con selector --&gt;</span>
+    &lt;<span class="kw">ng-content</span> select="[card-title]"&gt;&lt;/<span class="kw">ng-content</span>&gt;
+  &lt;/<span class="kw">div</span>&gt;
+  &lt;<span class="kw">div</span> class="card-body"&gt;
+    <span class="comment">&lt;!-- Slot por defecto --&gt;</span>
+    &lt;<span class="kw">ng-content</span>&gt;&lt;/<span class="kw">ng-content</span>&gt;
+  &lt;/<span class="kw">div</span>&gt;
+&lt;/<span class="kw">div</span>&gt;
+
+<span class="comment">&lt;!-- Uso del componente --&gt;</span>
+&lt;<span class="kw">app-card</span>&gt;
+  &lt;<span class="kw">h2</span> card-title&gt;Mi Título&lt;/<span class="kw">h2</span>&gt;   <span class="comment">&lt;!-- → slot header --&gt;</span>
+  &lt;<span class="kw">p</span>&gt;Contenido del cuerpo&lt;/<span class="kw">p</span>&gt;        <span class="comment">&lt;!-- → slot default --&gt;</span>
+&lt;/<span class="kw">app-card</span>&gt;
+            </pre>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <span class="card-icon">🔭</span>
+            <span class="card-title">@ViewChild y @ContentChild</span>
+            <span class="card-tag">DOM Access</span>
+          </div>
+          <div class="card-body">
+            <span class="label ng">Angular</span>
+            <pre>
+<span class="kw">import</span> { ViewChild, ElementRef, AfterViewInit } <span class="kw">from</span> <span class="str">'@angular/core'</span>;
+
+<span class="decorator">@Component</span>({
+  standalone: <span class="kw">true</span>,
+  template: <span class="str">`
+    &lt;input #miInput type="text" /&gt;
+    &lt;app-hijo #hijoRef&gt;&lt;/app-hijo&gt;
+  `</span>
+})
+<span class="kw">export class</span> <span class="type">Demo</span> <span class="kw">implements</span> <span class="type">AfterViewInit</span> {
+  <span class="comment">// Referencia a elemento DOM (#miInput)</span>
+  <span class="decorator">@ViewChild</span>(<span class="str">'miInput'</span>) inputRef!: <span class="type">ElementRef</span>&lt;<span class="type">HTMLInputElement</span>&gt;;
+
+  <span class="comment">// Referencia a componente hijo</span>
+  <span class="decorator">@ViewChild</span>(<span class="type">HijoComponent</span>) hijo!: <span class="type">HijoComponent</span>;
+
+  <span class="fn">ngAfterViewInit</span>() {
+    <span class="comment">// disponible SOLO en AfterViewInit en adelante</span>
+    <span class="kw">this</span>.inputRef.nativeElement.<span class="fn">focus</span>();
+    <span class="kw">this</span>.hijo.<span class="fn">metodoPublico</span>();
+  }
+}
+
+<span class="comment">// @ViewChildren → QueryList de varios</span>
+<span class="comment">// @ContentChild / @ContentChildren → para ng-content</span>
+            </pre>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════
+         CAPÍTULO 4 — Templates y Binding
+    ══════════════════════════════════════════════ -->
+    <section class="chapter" id="cap4">
+      <div class="chapter-header">
+        <div class="chapter-number" style="color:var(--lvl2)">04</div>
+        <div class="chapter-info">
+          <div class="chapter-level" style="color:var(--lvl2)">Intermedio Bajo · Capítulo 4</div>
+          <div class="chapter-title">Templates — Data Binding y Sintaxis</div>
+          <div class="chapter-desc">Cómo Angular conecta el TypeScript con el HTML. Los 4 tipos de binding y la nueva sintaxis de bloques de control @if / @for / @switch.</div>
+        </div>
+      </div>
+      <div class="grid">
+
+        <div class="card wide">
+          <div class="card-header">
+            <span class="card-icon">🔗</span>
+            <span class="card-title">Los 4 Tipos de Data Binding</span>
+            <span class="card-tag">Core</span>
+          </div>
+          <div class="card-body">
+            <span class="label html">HTML</span>
+            <pre>
+<span class="comment">&lt;!-- ① INTERPOLACIÓN: TypeScript → DOM (mostrar valor) --&gt;</span>
+&lt;<span class="kw">h1</span>&gt;{{ titulo }}&lt;/<span class="kw">h1</span>&gt;
+&lt;<span class="kw">p</span>&gt;{{ 2 + 2 }}&lt;/<span class="kw">p</span>&gt;
+&lt;<span class="kw">p</span>&gt;{{ usuario?.nombre | uppercase }}&lt;/<span class="kw">p</span>&gt;   <span class="comment">&lt;!-- optional chaining + pipe --&gt;</span>
+
+<span class="comment">&lt;!-- ② PROPERTY BINDING: TypeScript → propiedad DOM [prop] --&gt;</span>
+&lt;<span class="kw">img</span>    [src]="imagenUrl" [alt]="descripcion" /&gt;
+&lt;<span class="kw">button</span> [disabled]="formulario.invalid"&gt;Enviar&lt;/<span class="kw">button</span>&gt;
+&lt;<span class="kw">div</span>    [class.activo]="estaActivo"&gt;&lt;/<span class="kw">div</span>&gt;     <span class="comment">&lt;!-- clase condicional --&gt;</span>
+&lt;<span class="kw">div</span>    [style.color]="color"&gt;&lt;/<span class="kw">div</span>&gt;           <span class="comment">&lt;!-- estilo inline --&gt;</span>
+&lt;<span class="kw">div</span>    [ngClass]="{'activo': ok, 'error': !ok}"&gt;&lt;/<span class="kw">div</span>&gt;
+&lt;<span class="kw">div</span>    [ngStyle]="{ color: 'red', fontSize: '14px' }"&gt;&lt;/<span class="kw">div</span>&gt;
+&lt;<span class="kw">td</span>     [attr.colspan]="columnas"&gt;&lt;/<span class="kw">td</span>&gt;         <span class="comment">&lt;!-- atributo HTML (no propiedad) --&gt;</span>
+
+<span class="comment">&lt;!-- ③ EVENT BINDING: DOM → TypeScript (reaccionar a eventos) --&gt;</span>
+&lt;<span class="kw">button</span> (click)="<span class="fn">guardar</span>()"&gt;Guardar&lt;/<span class="kw">button</span>&gt;
+&lt;<span class="kw">input</span>  (input)="<span class="fn">onChange</span>($event)"&gt;         <span class="comment">&lt;!-- $event = evento nativo --&gt;</span>
+&lt;<span class="kw">input</span>  (keyup.enter)="<span class="fn">buscar</span>()"&gt;            <span class="comment">&lt;!-- filtro de tecla --&gt;</span>
+&lt;<span class="kw">form</span>   (ngSubmit)="<span class="fn">onSubmit</span>()"&gt;&lt;/<span class="kw">form</span>&gt;
+
+<span class="comment">&lt;!-- ④ TWO-WAY BINDING: [(ngModel)] — requiere FormsModule --&gt;</span>
+&lt;<span class="kw">input</span> [(ngModel)]="email" /&gt;
+<span class="comment">&lt;!-- equivale a: [value]="email" + (input)="email=$event.target.value" --&gt;</span>
+            </pre>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <span class="card-icon">🧱</span>
+            <span class="card-title">Nueva Sintaxis: @if / @for / @switch</span>
+            <span class="card-tag">v17+</span>
+          </div>
+          <div class="card-body">
+            <span class="label new">v17+</span>
+            <p class="desc">Reemplazan a <code>*ngIf</code>, <code>*ngFor</code> y <code>*ngSwitch</code>. Son más legibles, no requieren importar nada y tienen mejor rendimiento.</p>
+            <pre>
+<span class="comment">&lt;!-- @if — reemplaza *ngIf --&gt;</span>
+@<span class="kw">if</span> (usuario()) {
+  &lt;<span class="kw">p</span>&gt;Bienvenido, {{ usuario()?.nombre }}&lt;/<span class="kw">p</span>&gt;
+} @<span class="kw">else if</span> (cargando()) {
+  &lt;<span class="kw">app-spinner</span>&gt;&lt;/<span class="kw">app-spinner</span>&gt;
+} @<span class="kw">else</span> {
+  &lt;<span class="kw">p</span>&gt;No hay sesión&lt;/<span class="kw">p</span>&gt;
+}
+
+<span class="comment">&lt;!-- @for — reemplaza *ngFor (track obligatorio) --&gt;</span>
+@<span class="kw">for</span> (item <span class="kw">of</span> items(); track item.id) {
+  &lt;<span class="kw">li</span>&gt;{{ item.nombre }}&lt;/<span class="kw">li</span>&gt;
+} @<span class="kw">empty</span> {
+  &lt;<span class="kw">p</span>&gt;No hay items&lt;/<span class="kw">p</span>&gt;
+}
+
+<span class="comment">&lt;!-- Variables de @for --&gt;</span>
+@<span class="kw">for</span> (item <span class="kw">of</span> lista; track item.id; let i = $index,
+       first = $first, last = $last, even = $even) {
+  &lt;<span class="kw">div</span> [class.par]="even"&gt;{{ i }}: {{ item }}&lt;/<span class="kw">div</span>&gt;
+}
+
+<span class="comment">&lt;!-- @switch --&gt;</span>
+@<span class="kw">switch</span> (estado()) {
+  @<span class="kw">case</span> (<span class="str">'activo'</span>)   { &lt;<span class="kw">span</span>&gt;✅&lt;/<span class="kw">span</span>&gt; }
+  @<span class="kw">case</span> (<span class="str">'error'</span>)    { &lt;<span class="kw">span</span>&gt;❌&lt;/<span class="kw">span</span>&gt; }
+  @<span class="kw">default</span>           { &lt;<span class="kw">span</span>&gt;❓&lt;/<span class="kw">span</span>&gt; }
+}
+
+<span class="comment">&lt;!-- @let — variable local en template (v18+) --&gt;</span>
+@<span class="kw">let</span> user = usuarioSignal();
+&lt;<span class="kw">h1</span>&gt;{{ user.nombre + ' ' + user.apellido }}&lt;/<span class="kw">h1</span>&gt;
+            </pre>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <span class="card-icon">🧰</span>
+            <span class="card-title">ng-template y ng-container</span>
+            <span class="card-tag">Template helpers</span>
+          </div>
+          <div class="card-body">
+            <span class="label html">HTML</span>
+            <pre>
+<span class="comment">&lt;!-- ng-template: bloque sin renderizar (con referencia #) --&gt;</span>
+&lt;<span class="kw">div</span> *ngIf="cargando; else contenido"&gt;Cargando...&lt;/<span class="kw">div</span>&gt;
+&lt;<span class="kw">ng-template</span> #contenido&gt;
+  &lt;<span class="kw">p</span>&gt;Datos cargados&lt;/<span class="kw">p</span>&gt;
+&lt;/<span class="kw">ng-template</span>&gt;
+
+<span class="comment">&lt;!-- ng-container: agrupa sin crear elemento DOM real --&gt;</span>
+<span class="comment">&lt;!-- Útil cuando no quieres un div extra --&gt;</span>
+&lt;<span class="kw">ng-container</span> *ngIf="condicion"&gt;
+  &lt;<span class="kw">p</span>&gt;Elemento A&lt;/<span class="kw">p</span>&gt;
+  &lt;<span class="kw">p</span>&gt;Elemento B&lt;/<span class="kw">p</span>&gt;
+&lt;/<span class="kw">ng-container</span>&gt;
+
+<span class="comment">&lt;!-- ng-container con dos directivas (no se puede en mismo elemento) --&gt;</span>
+&lt;<span class="kw">ng-container</span> *ngFor="let item of items"&gt;
+  &lt;<span class="kw">li</span> *ngIf="item.activo"&gt;{{ item.nombre }}&lt;/<span class="kw">li</span>&gt;
+&lt;/<span class="kw">ng-container</span>&gt;
+            </pre>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════
+         CAPÍTULO 5 — Directivas y Pipes
+    ══════════════════════════════════════════════ -->
+    <section class="chapter" id="cap5">
+      <div class="chapter-header">
+        <div class="chapter-number" style="color:var(--lvl2)">05</div>
+        <div class="chapter-info">
+          <div class="chapter-level" style="color:var(--lvl2)">Intermedio Bajo · Capítulo 5</div>
+          <div class="chapter-title">Directivas y Pipes</div>
+          <div class="chapter-desc">Las directivas modifican el comportamiento del DOM. Los pipes transforman valores en el template. Ambos son reutilizables.</div>
+        </div>
+      </div>
+      <div class="grid">
+
+        <div class="card">
+          <div class="card-header">
+            <span class="card-icon">🎨</span>
+            <span class="card-title">Directiva de Atributo Personalizada</span>
+            <span class="card-tag">@Directive</span>
+          </div>
+          <div class="card-body">
+            <span class="label ng">Angular</span>
+            <p class="desc">Modifican comportamiento/apariencia de un elemento sin crear uno nuevo. <code>@HostListener</code> escucha eventos del elemento host. <code>@HostBinding</code> enlaza propiedades.</p>
+            <pre>
+<span class="kw">import</span> { Directive, ElementRef, HostListener,
+         HostBinding, Input } <span class="kw">from</span> <span class="str">'@angular/core'</span>;
+
+<span class="decorator">@Directive</span>({
+  selector: <span class="str">'[appResalta]'</span>,  <span class="comment">// se aplica como atributo</span>
+  standalone: <span class="kw">true</span>,
+})
+<span class="kw">export class</span> <span class="type">ResaltaDirective</span> {
+  <span class="decorator">@Input</span>() appResalta = <span class="str">'yellow'</span>;  <span class="comment">// color como input</span>
+
+  <span class="comment">// @HostBinding enlaza una propiedad del elemento</span>
+  <span class="decorator">@HostBinding</span>(<span class="str">'style.backgroundColor'</span>) bgColor = <span class="str">''</span>;
+
+  <span class="decorator">@HostListener</span>(<span class="str">'mouseenter'</span>) <span class="fn">onEnter</span>() {
+    <span class="kw">this</span>.bgColor = <span class="kw">this</span>.appResalta;
+  }
+  <span class="decorator">@HostListener</span>(<span class="str">'mouseleave'</span>) <span class="fn">onLeave</span>() {
+    <span class="kw">this</span>.bgColor = <span class="str">''</span>;
+  }
+}
+
+<span class="comment">&lt;!-- Uso --&gt;</span>
+&lt;<span class="kw">p</span> [appResalta]="<span class="str">'cyan'</span>"&gt;Hover sobre mí&lt;/<span class="kw">p</span>&gt;
+&lt;<span class="kw">p</span> appResalta&gt;Usa color por defecto&lt;/<span class="kw">p</span>&gt;
+            </pre>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <span class="card-icon">🔧</span>
+            <span class="card-title">Pipes — Built-in y Personalizados</span>
+            <span class="card-tag">@Pipe</span>
+          </div>
+          <div class="card-body">
+            <span class="label ng">Angular</span>
+            <pre>
+<span class="comment">&lt;!-- PIPES INTEGRADOS --&gt;</span>
+{{ nombre | uppercase }}           <span class="comment">&lt;!-- CARLOS --&gt;</span>
+{{ nombre | lowercase }}           <span class="comment">&lt;!-- carlos --&gt;</span>
+{{ nombre | titlecase }}           <span class="comment">&lt;!-- Carlos García --&gt;</span>
+{{ texto  | slice:0:100 }}         <span class="comment">&lt;!-- primeros 100 chars --&gt;</span>
+{{ 1234.5 | number:'1.2-2' }}      <span class="comment">&lt;!-- 1,234.50 --&gt;</span>
+{{ precio | currency:'USD':'symbol':'1.2-2' }} <span class="comment">&lt;!-- $12.00 --&gt;</span>
+{{ 0.75   | percent }}             <span class="comment">&lt;!-- 75% --&gt;</span>
+{{ hoy    | date:'dd/MM/yyyy' }}   <span class="comment">&lt;!-- 16/06/2025 --&gt;</span>
+{{ hoy    | date:'medium' }}       <span class="comment">&lt;!-- Jun 16, 2025 --&gt;</span>
+{{ objeto | json }}                <span class="comment">&lt;!-- debug: imprime JSON --&gt;</span>
+{{ items  | keyvalue }}            <span class="comment">&lt;!-- itera objeto como {key,value} --&gt;</span>
+{{ data$  | async }}               <span class="comment">&lt;!-- auto-subscribe a Observable --&gt;</span>
+
+<span class="comment">// PIPE PERSONALIZADO</span>
+<span class="decorator">@Pipe</span>({ name: <span class="str">'truncate'</span>, standalone: <span class="kw">true</span>, pure: <span class="kw">true</span> })
+<span class="kw">export class</span> <span class="type">TruncatePipe</span> <span class="kw">implements</span> <span class="type">PipeTransform</span> {
+  <span class="fn">transform</span>(v: <span class="type">string</span>, limit = <span class="num">50</span>, suffix = <span class="str">'...'</span>): <span class="type">string</span> {
+    <span class="kw">return</span> v.length <= limit ? v : v.<span class="fn">slice</span>(<span class="num">0</span>, limit) + suffix;
+  }
+}
+<span class="comment">// Uso: {{ descripcion | truncate:100:'…' }}</span>
+
+<span class="comment">// pure: true  → solo recalcula si el input cambia (default) ✅</span>
+<span class="comment">// pure: false → recalcula en cada detección de cambios (costoso)</span>
+            </pre>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════
+         CAPÍTULO 6 — Comunicación entre Componentes
+    ══════════════════════════════════════════════ -->
+    <section class="chapter" id="cap6">
+      <div class="chapter-header">
+        <div class="chapter-number" style="color:var(--lvl2)">06</div>
+        <div class="chapter-info">
+          <div class="chapter-level" style="color:var(--lvl2)">Intermedio Bajo · Capítulo 6</div>
+          <div class="chapter-title">Comunicación entre Componentes</div>
+          <div class="chapter-desc">Padre a hijo con @Input, hijo a padre con @Output/EventEmitter. Y las formas funcionales modernas: input() y output().</div>
+        </div>
+      </div>
+      <div class="grid">
+
+        <div class="card wide">
+          <div class="card-header">
+            <span class="card-icon">📡</span>
+            <span class="card-title">@Input / @Output — Clásico y Moderno</span>
+            <span class="card-tag">Comunicación</span>
+          </div>
+          <div class="card-body">
+            <span class="label ng">Angular</span>
+            <pre>
+<span class="comment">// ── HIJO — recibe y emite ─────────────────────────────────────</span>
+<span class="kw">import</span> { Component, Input, Output, EventEmitter,
+         input, output, model } <span class="kw">from</span> <span class="str">'@angular/core'</span>;
+
+<span class="decorator">@Component</span>({ selector: <span class="str">'app-tarjeta'</span>, standalone: <span class="kw">true</span>, template: <span class="str">`
+  &lt;h3&gt;{{ titulo }}&lt;/h3&gt;
+  &lt;p&gt;Edad: {{ edad() }}&lt;/p&gt;
+  &lt;button (click)="eliminar()"&gt;Eliminar&lt;/button&gt;
+  &lt;input [(ngModel)]="seleccionado" /&gt;   &lt;!-- model() = two-way --&gt;
+`</span> })
+<span class="kw">export class</span> <span class="type">TarjetaComponent</span> {
+  <span class="comment">// Forma CLÁSICA (decorador)</span>
+  <span class="decorator">@Input</span>({ required: <span class="kw">true</span> }) titulo!: <span class="type">string</span>;   <span class="comment">// requerido</span>
+  <span class="decorator">@Input</span>() color = <span class="str">'blue'</span>;                        <span class="comment">// con default</span>
+  <span class="decorator">@Output</span>() deleted = <span class="kw">new</span> <span class="fn">EventEmitter</span>&lt;<span class="type">void</span>&gt;();
+
+  <span class="comment">// Forma MODERNA funcional (Angular 17+) — son Signals</span>
+  edad         = <span class="fn">input</span>&lt;<span class="type">number</span>&gt;(<span class="num">0</span>);           <span class="comment">// input signal (read-only)</span>
+  edadReq      = <span class="fn">input</span>.<span class="fn">required</span>&lt;<span class="type">string</span>&gt;();    <span class="comment">// input requerido</span>
+  onDelete     = <span class="fn">output</span>&lt;<span class="type">string</span>&gt;();             <span class="comment">// output signal</span>
+  seleccionado = <span class="fn">model</span>(<span class="str">''</span>);                   <span class="comment">// two-way (v17.1+)</span>
+
+  <span class="fn">eliminar</span>() {
+    <span class="kw">this</span>.deleted.<span class="fn">emit</span>();         <span class="comment">// forma clásica</span>
+    <span class="kw">this</span>.onDelete.<span class="fn">emit</span>(<span class="str">'ok'</span>);   <span class="comment">// forma moderna</span>
+  }
+}
+
+<span class="comment">// ── PADRE — pasa y escucha ────────────────────────────────────</span>
+<span class="comment">&lt;!-- [propiedad] = pasar valor | (evento) = escuchar --&gt;</span>
+&lt;<span class="kw">app-tarjeta</span>
+  titulo="<span class="str">Mi tarjeta</span>"
+  [color]="colorActual"
+  [edad]="<span class="num">25</span>"
+  (deleted)="<span class="fn">onDelete</span>()"
+  (onDelete)="<span class="fn">handleDelete</span>($event)"
+  [(seleccionado)]="valorPadre"&gt;
+&lt;/<span class="kw">app-tarjeta</span>&gt;
+            </pre>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════
+         CAPÍTULO 7 — Servicios e Inyección de Dependencias
+    ══════════════════════════════════════════════ -->
+    <section class="chapter" id="cap7">
+      <div class="chapter-header">
+        <div class="chapter-number" style="color:var(--lvl3)">07</div>
+        <div class="chapter-info">
+          <div class="chapter-level" style="color:var(--lvl3)">Intermedio · Capítulo 7</div>
+          <div class="chapter-title">Servicios e Inyección de Dependencias</div>
+          <div class="chapter-desc">Los servicios centralizan la lógica compartida. Angular los crea una sola vez (singleton) y los inyecta donde se necesiten.</div>
+        </div>
+      </div>
+      <div class="grid">
+
+        <div class="card">
+          <div class="card-header">
+            <span class="card-icon">💉</span>
+            <span class="card-title">@Injectable e inject()</span>
+            <span class="card-tag">DI</span>
+          </div>
+          <div class="card-body">
+            <span class="label ng">Angular</span>
+            <pre>
+<span class="decorator">@Injectable</span>({
+  providedIn: <span class="str">'root'</span>  <span class="comment">// singleton global (recomendado)</span>
+  <span class="comment">// 'platform'  → compartido entre apps en la misma página</span>
+  <span class="comment">// 'any'       → instancia por módulo lazy</span>
+  <span class="comment">// providers en @Component → instancia por componente</span>
+})
+<span class="kw">export class</span> <span class="type">UsuarioService</span> {
+  <span class="kw">private</span> usuarios = <span class="fn">signal</span>&lt;<span class="type">Usuario[]</span>&gt;([]);
+  usuariosPublico = <span class="kw">this</span>.usuarios.<span class="fn">asReadonly</span>();
+
+  <span class="fn">agregar</span>(u: <span class="type">Usuario</span>) {
+    <span class="kw">this</span>.usuarios.<span class="fn">update</span>(lista => [...lista, u]);
+  }
+}
+
+<span class="comment">// ── Consumir el servicio ──────────────────────────</span>
+
+<span class="comment">// Forma MODERNA — inject() (recomendada Angular 14+)</span>
+<span class="kw">export class</span> <span class="type">MiComponent</span> {
+  <span class="kw">private</span> usuarioSrv = <span class="fn">inject</span>(<span class="type">UsuarioService</span>);
+  <span class="kw">private</span> router     = <span class="fn">inject</span>(<span class="type">Router</span>);
+}
+
+<span class="comment">// Forma CLÁSICA — constructor (sigue siendo válida)</span>
+<span class="kw">constructor</span>(<span class="kw">private</span> usuarioSrv: <span class="type">UsuarioService</span>) {}
+            </pre>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <span class="card-icon">🏭</span>
+            <span class="card-title">InjectionToken y Proveedores</span>
+            <span class="card-tag">Advanced DI</span>
+          </div>
+          <div class="card-body">
+            <span class="label ng">Angular</span>
+            <p class="desc">Para inyectar valores que no son clases: strings, objetos de configuración, funciones factory.</p>
+            <pre>
+<span class="kw">import</span> { InjectionToken, inject } <span class="kw">from</span> <span class="str">'@angular/core'</span>;
+
+<span class="comment">// Definir el token tipado</span>
+<span class="kw">const</span> <span class="type">API_URL</span> = <span class="kw">new</span> <span class="fn">InjectionToken</span>&lt;<span class="type">string</span>&gt;(<span class="str">'ApiUrl'</span>);
+
+<span class="comment">// app.config.ts — registrar el valor</span>
+providers: [
+  { provide: <span class="type">API_URL</span>, useValue: <span class="str">'https://api.ejemplo.com'</span> },
+
+  <span class="comment">// useClass   → provee una clase alternativa/mock</span>
+  { provide: <span class="type">Logger</span>, useClass: <span class="type">FileLogger</span> },
+
+  <span class="comment">// useFactory → función que crea el valor</span>
+  { provide: <span class="type">CONFIG</span>, useFactory: () => ({ debug: <span class="kw">false</span> }) },
+
+  <span class="comment">// useExisting → alias de otro provider ya registrado</span>
+  { provide: <span class="type">AbstractLogger</span>, useExisting: <span class="type">Logger</span> },
+]
+
+<span class="comment">// Consumir el token</span>
+<span class="kw">export class</span> <span class="type">ApiService</span> {
+  <span class="kw">private</span> url = <span class="fn">inject</span>(<span class="type">API_URL</span>);
+}
+            </pre>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════
+         CAPÍTULO 8 — Routing
+    ══════════════════════════════════════════════ -->
+    <section class="chapter" id="cap8">
+      <div class="chapter-header">
+        <div class="chapter-number" style="color:var(--lvl3)">08</div>
+        <div class="chapter-info">
+          <div class="chapter-level" style="color:var(--lvl3)">Intermedio · Capítulo 8</div>
+          <div class="chapter-title">Routing y Navegación</div>
+          <div class="chapter-desc">El Router de Angular permite construir SPAs con múltiples vistas. Lazy loading, rutas hijas, parámetros y navegación programática.</div>
+        </div>
+      </div>
+      <div class="grid">
+
+        <div class="card">
+          <div class="card-header">
+            <span class="card-icon">🗺️</span>
+            <span class="card-title">Definición de Rutas</span>
+            <span class="card-tag">app.routes.ts</span>
+          </div>
+          <div class="card-body">
+            <span class="label ng">Angular</span>
+            <pre>
+<span class="comment">// app.routes.ts</span>
+<span class="kw">export const</span> routes: <span class="type">Routes</span> = [
+  <span class="comment">// Redirección por defecto</span>
+  { path: <span class="str">''</span>, redirectTo: <span class="str">'/home'</span>, pathMatch: <span class="str">'full'</span> },
+
+  <span class="comment">// Ruta simple</span>
+  { path: <span class="str">'home'</span>, component: <span class="type">HomeComponent</span> },
+
+  <span class="comment">// Con parámetro de ruta (:id)</span>
+  { path: <span class="str">'usuario/:id'</span>, component: <span class="type">UserDetailComponent</span> },
+
+  <span class="comment">// Lazy loading ← SIEMPRE preferir esto</span>
+  {
+    path: <span class="str">'dashboard'</span>,
+    loadComponent: () =>
+      <span class="kw">import</span>(<span class="str">'./features/dashboard/dashboard.component'</span>)
+        .then(m => m.<span class="type">DashboardComponent</span>),
+  },
+
+  <span class="comment">// Lazy loading de un módulo de rutas hijas</span>
+  {
+    path: <span class="str">'admin'</span>,
+    loadChildren: () =>
+      <span class="kw">import</span>(<span class="str">'./features/admin/admin.routes'</span>)
+        .then(m => m.adminRoutes),
+  },
+
+  <span class="comment">// Ruta comodín — 404</span>
+  { path: <span class="str">'**'</span>, component: <span class="type">NotFoundComponent</span> },
+];
+
+<span class="comment">// main.ts — registrar el router</span>
+<span class="fn">bootstrapApplication</span>(<span class="type">AppComponent</span>, {
+  providers: [<span class="fn">provideRouter</span>(routes,
+    <span class="fn">withComponentInputBinding</span>(),   <span class="comment">// params → @Input</span>
+    <span class="fn">withHashLocation</span>(),             <span class="comment">// usa # en la URL</span>
+    <span class="fn">withPreloading</span>(<span class="type">PreloadAllModules</span>) <span class="comment">// precarga lazy</span>
+  )]
+});
+            </pre>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <span class="card-icon">🧭</span>
+            <span class="card-title">Navegación en Template y TypeScript</span>
+            <span class="card-tag">RouterLink</span>
+          </div>
+          <div class="card-body">
+            <span class="label ng">Angular</span>
+            <pre>
+<span class="comment">&lt;!-- En el template --&gt;</span>
+&lt;<span class="kw">router-outlet</span>&gt;&lt;/<span class="kw">router-outlet</span>&gt;  <span class="comment">&lt;!-- donde se renderizan las rutas --&gt;</span>
+
+&lt;<span class="kw">a</span> routerLink="/home"&gt;Inicio&lt;/<span class="kw">a</span>&gt;
+&lt;<span class="kw">a</span> [routerLink]="['/usuario', userId]"&gt;Ver usuario&lt;/<span class="kw">a</span>&gt;
+&lt;<span class="kw">a</span> routerLink="/buscar" [queryParams]="{ q: 'angular', page: 1 }"&gt;
+  Buscar
+&lt;/<span class="kw">a</span>&gt;
+
+<span class="comment">&lt;!-- Clase activa cuando la ruta coincide --&gt;</span>
+&lt;<span class="kw">a</span>
+  routerLink="/home"
+  routerLinkActive="activo"
+  [routerLinkActiveOptions]="{ exact: true }"&gt;
+  Home
+&lt;/<span class="kw">a</span>&gt;
+
+<span class="comment">// En TypeScript</span>
+<span class="kw">export class</span> <span class="type">UserDetail</span> {
+  <span class="kw">private</span> router = <span class="fn">inject</span>(<span class="type">Router</span>);
+  <span class="kw">private</span> route  = <span class="fn">inject</span>(<span class="type">ActivatedRoute</span>);
+
+  <span class="fn">ngOnInit</span>() {
+    <span class="comment">// Leer params (snapshot = una sola vez)</span>
+    <span class="kw">const</span> id = <span class="kw">this</span>.route.snapshot.params[<span class="str">'id'</span>];
+
+    <span class="comment">// Observable (cuando el param cambia sin recargar)</span>
+    <span class="kw">this</span>.route.params.<span class="fn">subscribe</span>(p => console.<span class="fn">log</span>(p[<span class="str">'id'</span>]));
+
+    <span class="comment">// Query params</span>
+    <span class="kw">this</span>.route.queryParams.<span class="fn">subscribe</span>(q => console.<span class="fn">log</span>(q[<span class="str">'q'</span>]));
+  }
+
+  <span class="fn">irAHome</span>()        { <span class="kw">this</span>.router.<span class="fn">navigate</span>([<span class="str">'/home'</span>]); }
+  <span class="fn">irAUsuario</span>(id: <span class="type">number</span>) { <span class="kw">this</span>.router.<span class="fn">navigate</span>([<span class="str">'/usuario'</span>, id]); }
+  <span class="fn">atras</span>()          { <span class="fn">inject</span>(<span class="type">Location</span>).<span class="fn">back</span>(); }
+}
+
+<span class="comment">// Con withComponentInputBinding(): params llegan como @Input</span>
+<span class="decorator">@Input</span>() id!: <span class="type">string</span>;  <span class="comment">// se inyecta automáticamente desde :id</span>
+            </pre>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════
+         CAPÍTULO 9 — Formularios
+    ══════════════════════════════════════════════ -->
+    <section class="chapter" id="cap9">
+      <div class="chapter-header">
+        <div class="chapter-number" style="color:var(--lvl3)">09</div>
+        <div class="chapter-info">
+          <div class="chapter-level" style="color:var(--lvl3)">Intermedio · Capítulo 9</div>
+          <div class="chapter-title">Formularios</div>
+          <div class="chapter-desc">Dos enfoques: Template-Driven (simples, declarativos) y Reactive Forms (potentes, basados en código). Para validación avanzada siempre usa Reactive.</div>
+        </div>
+      </div>
+      <div class="grid">
+
+        <div class="card">
+          <div class="card-header">
+            <span class="card-icon">📋</span>
+            <span class="card-title">Template-Driven Forms</span>
+            <span class="card-tag">FormsModule</span>
+          </div>
+          <div class="card-body">
+            <span class="label ng">Angular</span>
+            <p class="desc">Ideales para formularios pequeños. La lógica vive en el HTML con <code>ngModel</code>.</p>
+            <pre>
+<span class="comment">// Importar FormsModule en el componente standalone</span>
+<span class="decorator">@Component</span>({ imports: [FormsModule, NgIf], ... })
+<span class="kw">export class</span> <span class="type">LoginComponent</span> {
+  email    = <span class="str">''</span>;
+  password = <span class="str">''</span>;
+
+  <span class="fn">onSubmit</span>(form: <span class="type">NgForm</span>) {
+    <span class="kw">if</span> (form.valid) console.<span class="fn">log</span>(form.value);
+  }
+}
+
+<span class="comment">&lt;!-- Template --&gt;</span>
+&lt;<span class="kw">form</span> #loginForm="ngForm" (ngSubmit)="<span class="fn">onSubmit</span>(loginForm)"&gt;
+
+  &lt;<span class="kw">input</span>
+    name="email"
+    [(ngModel)]="email"
+    required
+    email
+    #emailField="ngModel"
+  /&gt;
+  &lt;<span class="kw">p</span> *ngIf="emailField.invalid &amp;&amp; emailField.touched"&gt;
+    Email inválido
+  &lt;/<span class="kw">p</span>&gt;
+
+  &lt;<span class="kw">input</span>
+    name="password"
+    type="password"
+    [(ngModel)]="password"
+    required
+    minlength="8"
+  /&gt;
+
+  &lt;<span class="kw">button</span> [disabled]="loginForm.invalid"&gt;Entrar&lt;/<span class="kw">button</span>&gt;
+&lt;/<span class="kw">form</span>&gt;
+
+<span class="comment">// Estados del control: pristine, dirty, touched, untouched, valid, invalid</span>
+            </pre>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <span class="card-icon">⚡</span>
+            <span class="card-title">Reactive Forms</span>
+            <span class="card-tag">ReactiveFormsModule</span>
+          </div>
+          <div class="card-body">
+            <span class="label ng">Angular</span>
+            <p class="desc">La lógica está en el TypeScript. Más potentes y testables. Ideales para formularios complejos.</p>
+            <pre>
+<span class="decorator">@Component</span>({ imports: [ReactiveFormsModule, NgIf], ... })
+<span class="kw">export class</span> <span class="type">RegisterComponent</span> {
+  <span class="kw">private</span> fb = <span class="fn">inject</span>(<span class="type">FormBuilder</span>);
+
+  form = <span class="kw">this</span>.fb.<span class="fn">group</span>({
+    nombre:   [<span class="str">''</span>, [Validators.required, Validators.minLength(<span class="num">3</span>)]],
+    email:    [<span class="str">''</span>, [Validators.required, Validators.email]],
+    password: [<span class="str">''</span>,  Validators.minLength(<span class="num">8</span>)],
+    terminos: [<span class="kw">false</span>, Validators.requiredTrue],
+  });
+
+  <span class="comment">// Acceso a un control individual</span>
+  <span class="fn">get</span> emailCtrl() { <span class="kw">return</span> <span class="kw">this</span>.form.<span class="fn">get</span>(<span class="str">'email'</span>)!; }
+
+  <span class="fn">onSubmit</span>() {
+    <span class="kw">if</span> (<span class="kw">this</span>.form.valid) console.<span class="fn">log</span>(<span class="kw">this</span>.form.value);
+  }
+
+  <span class="fn">precargar</span>(datos: <span class="type">any</span>) {
+    <span class="kw">this</span>.form.<span class="fn">patchValue</span>(datos);   <span class="comment">// actualiza parcialmente</span>
+    <span class="kw">this</span>.form.<span class="fn">setValue</span>(datos);    <span class="comment">// requiere TODOS los campos</span>
+    <span class="kw">this</span>.form.<span class="fn">reset</span>();            <span class="comment">// limpia todo</span>
+  }
+}
+            </pre>
+            <pre>
+<span class="comment">&lt;!-- Template con reactive forms --&gt;</span>
+&lt;<span class="kw">form</span> [formGroup]="form" (ngSubmit)="<span class="fn">onSubmit</span>()"&gt;
+  &lt;<span class="kw">input</span> formControlName="email" /&gt;
+  &lt;<span class="kw">p</span> *ngIf="emailCtrl.hasError('email') &amp;&amp; emailCtrl.touched"&gt;
+    Email inválido
+  &lt;/<span class="kw">p</span>&gt;
+  &lt;<span class="kw">button</span> [disabled]="form.invalid"&gt;Registrar&lt;/<span class="kw">button</span>&gt;
+&lt;/<span class="kw">form</span>&gt;
+            </pre>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <span class="card-icon">✅</span>
+            <span class="card-title">Validadores Personalizados y FormArray</span>
+            <span class="card-tag">Validators</span>
+          </div>
+          <div class="card-body">
+            <span class="label ts">TypeScript</span>
+            <pre>
+<span class="comment">// Validador sincrónico personalizado</span>
+<span class="kw">function</span> <span class="fn">noEspacios</span>(ctrl: <span class="type">AbstractControl</span>): <span class="type">ValidationErrors</span> | <span class="kw">null</span> {
+  <span class="kw">return</span> ctrl.value?.includes(<span class="str">' '</span>) ? { noEspacios: <span class="kw">true</span> } : <span class="kw">null</span>;
+}
+
+<span class="comment">// Validador asincrónico (llama a una API)</span>
+<span class="kw">function</span> <span class="fn">emailUnico</span>(srv: <span class="type">AuthService</span>) {
+  <span class="kw">return</span> (ctrl: <span class="type">AbstractControl</span>) =>
+    srv.<span class="fn">checkEmail</span>(ctrl.value).<span class="fn">pipe</span>(
+      <span class="fn">map</span>(existe => existe ? { emailTomado: <span class="kw">true</span> } : <span class="kw">null</span>),
+      <span class="fn">catchError</span>(() => <span class="fn">of</span>(<span class="kw">null</span>))
+    );
+}
+
+<span class="comment">// FormArray — lista dinámica de campos</span>
+<span class="kw">export class</span> <span class="type">PedidoForm</span> {
+  fb = <span class="fn">inject</span>(<span class="type">FormBuilder</span>);
+  form = <span class="kw">this</span>.fb.<span class="fn">group</span>({
+    items: <span class="kw">this</span>.fb.<span class="fn">array</span>([]),
+  });
+
+  <span class="fn">get</span> items() { <span class="kw">return</span> <span class="kw">this</span>.form.<span class="fn">get</span>(<span class="str">'items'</span>) <span class="kw">as</span> <span class="type">FormArray</span>; }
+
+  <span class="fn">agregarItem</span>() {
+    <span class="kw">this</span>.items.<span class="fn">push</span>(<span class="kw">this</span>.fb.<span class="fn">group</span>({
+      producto: [<span class="str">''</span>, Validators.required],
+      cantidad: [<span class="num">1</span>,  Validators.min(<span class="num">1</span>)],
+    }));
+  }
+  <span class="fn">quitarItem</span>(i: <span class="type">number</span>) { <span class="kw">this</span>.items.<span class="fn">removeAt</span>(i); }
+}
+            </pre>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════
+         CAPÍTULO 10 — HTTP / AJAX
+    ══════════════════════════════════════════════ -->
+    <section class="chapter" id="cap10">
+      <div class="chapter-header">
+        <div class="chapter-number" style="color:var(--lvl4)">10</div>
+        <div class="chapter-info">
+          <div class="chapter-level" style="color:var(--lvl4)">Intermedio Alto · Capítulo 10</div>
+          <div class="chapter-title">HTTP / AJAX con HttpClient</div>
+          <div class="chapter-desc">Angular usa HttpClient para todas las peticiones HTTP. Devuelve Observables y debe ser tipado. Incluye la nueva Resource API.</div>
+        </div>
+      </div>
+      <div class="grid">
+
+        <div class="card wide">
+          <div class="card-header">
+            <span class="card-icon">🌐</span>
+            <span class="card-title">CRUD Completo con HttpClient</span>
+            <span class="card-tag">HttpClient</span>
+          </div>
+          <div class="card-body">
+            <span class="label ng">Angular</span>
+            <pre>
+<span class="kw">import</span> { HttpClient, HttpHeaders, HttpParams } <span class="kw">from</span> <span class="str">'@angular/common/http'</span>;
+
+<span class="decorator">@Injectable</span>({ providedIn: <span class="str">'root'</span> })
+<span class="kw">export class</span> <span class="type">ProductoService</span> {
+  <span class="kw">private</span> http = <span class="fn">inject</span>(<span class="type">HttpClient</span>);
+  <span class="kw">private</span> url  = <span class="str">`</span>${environment.apiUrl}<span class="str">/productos`</span>;
+
+  <span class="comment">// GET — lista</span>
+  <span class="fn">getAll</span>()  { <span class="kw">return</span> <span class="kw">this</span>.http.<span class="fn">get</span>&lt;<span class="type">Producto[]</span>&gt;(<span class="kw">this</span>.url); }
+
+  <span class="comment">// GET — con query params  /productos?q=café&page=2</span>
+  <span class="fn">buscar</span>(q: <span class="type">string</span>, page = <span class="num">1</span>) {
+    <span class="kw">const</span> params = <span class="kw">new</span> <span class="type">HttpParams</span>().<span class="fn">set</span>(<span class="str">'q'</span>, q).<span class="fn">set</span>(<span class="str">'page'</span>, page);
+    <span class="kw">return</span> <span class="kw">this</span>.http.<span class="fn">get</span>&lt;<span class="type">Producto[]</span>&gt;(<span class="kw">this</span>.url, { params });
+  }
+
+  <span class="comment">// POST — crear</span>
+  <span class="fn">crear</span>(p: <span class="type">Omit</span>&lt;<span class="type">Producto</span>, <span class="str">'id'</span>&gt;) {
+    <span class="kw">return</span> <span class="kw">this</span>.http.<span class="fn">post</span>&lt;<span class="type">Producto</span>&gt;(<span class="kw">this</span>.url, p);
+  }
+
+  <span class="comment">// PUT — reemplazar completo</span>
+  <span class="fn">actualizar</span>(id: <span class="type">number</span>, p: <span class="type">Producto</span>) {
+    <span class="kw">return</span> <span class="kw">this</span>.http.<span class="fn">put</span>&lt;<span class="type">Producto</span>&gt;(<span class="str">`</span>${<span class="kw">this</span>.url}<span class="str">/</span>${id}<span class="str">`</span>, p);
+  }
+
+  <span class="comment">// PATCH — actualizar parcialmente</span>
+  <span class="fn">patchear</span>(id: <span class="type">number</span>, datos: <span class="type">Partial</span>&lt;<span class="type">Producto</span>&gt;) {
+    <span class="kw">return</span> <span class="kw">this</span>.http.<span class="fn">patch</span>&lt;<span class="type">Producto</span>&gt;(<span class="str">`</span>${<span class="kw">this</span>.url}<span class="str">/</span>${id}<span class="str">`</span>, datos);
+  }
+
+  <span class="comment">// DELETE</span>
+  <span class="fn">eliminar</span>(id: <span class="type">number</span>) {
+    <span class="kw">return</span> <span class="kw">this</span>.http.<span class="fn">delete</span>(<span class="str">`</span>${<span class="kw">this</span>.url}<span class="str">/</span>${id}<span class="str">`</span>);
+  }
+
+  <span class="comment">// Acceder a headers/status de la respuesta</span>
+  <span class="fn">getConCabeceras</span>() {
+    <span class="kw">return</span> <span class="kw">this</span>.http.<span class="fn">get</span>&lt;<span class="type">Producto[]</span>&gt;(<span class="kw">this</span>.url, { observe: <span class="str">'response'</span> });
+    <span class="comment">// .status, .headers, .body accesibles</span>
+  }
+}
+
+<span class="comment">// En el componente — suscribirse al Observable</span>
+<span class="kw">export class</span> <span class="type">ListadoComponent</span> {
+  srv       = <span class="fn">inject</span>(<span class="type">ProductoService</span>);
+  productos = <span class="fn">signal</span>&lt;<span class="type">Producto[]</span>&gt;([]);
+  cargando  = <span class="fn">signal</span>(<span class="kw">true</span>);
+  error     = <span class="fn">signal</span>(<span class="str">''</span>);
+
+  <span class="fn">ngOnInit</span>() {
+    <span class="kw">this</span>.srv.<span class="fn">getAll</span>().<span class="fn">pipe</span>(
+      <span class="fn">takeUntilDestroyed</span>(<span class="kw">this</span>.destroyRef),
+      <span class="fn">catchError</span>(err => {
+        <span class="kw">this</span>.error.<span class="fn">set</span>(err.message);
+        <span class="kw">return</span> <span class="fn">of</span>([]);
+      }),
+      <span class="fn">finalize</span>(() => <span class="kw">this</span>.cargando.<span class="fn">set</span>(<span class="kw">false</span>))
+    ).<span class="fn">subscribe</span>(data => <span class="kw">this</span>.productos.<span class="fn">set</span>(data));
+  }
+}
+            </pre>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════
+         CAPÍTULO 11 — RxJS
+    ══════════════════════════════════════════════ -->
+    <section class="chapter" id="cap11">
+      <div class="chapter-header">
+        <div class="chapter-number" style="color:var(--lvl4)">11</div>
+        <div class="chapter-info">
+          <div class="chapter-level" style="color:var(--lvl4)">Intermedio Alto · Capítulo 11</div>
+          <div class="chapter-title">RxJS — Programación Reactiva</div>
+          <div class="chapter-desc">Angular usa RxJS para manejar eventos asíncronos. Los operadores de aplanamiento, combinación y manejo de errores son los más críticos.</div>
+        </div>
+      </div>
+      <div class="grid">
+
+        <div class="card wide">
+          <div class="card-header">
+            <span class="card-icon">🌊</span>
+            <span class="card-title">Operadores Esenciales</span>
+            <span class="card-tag">Observable</span>
+          </div>
+          <div class="card-body">
+            <span class="label rxjs">RxJS</span>
+            <pre>
+<span class="kw">import</span> { of, from, interval, Subject, BehaviorSubject } <span class="kw">from</span> <span class="str">'rxjs'</span>;
+<span class="kw">import</span> {
+  map, filter, tap, take, scan, startWith,
+  debounceTime, distinctUntilChanged, throttleTime,
+  switchMap, mergeMap, concatMap, exhaustMap,
+  catchError, retry, finalize,
+  combineLatest, forkJoin, withLatestFrom,
+  takeUntil, takeUntilDestroyed, shareReplay,
+} <span class="kw">from</span> <span class="str">'rxjs/operators'</span>;
+
+<span class="comment">// ── TRANSFORMACIÓN ───────────────────────────────────</span>
+obs$.<span class="fn">pipe</span>(
+  <span class="fn">map</span>(x => x * <span class="num">2</span>),              <span class="comment">// transforma cada valor</span>
+  <span class="fn">filter</span>(x => x > <span class="num">0</span>),           <span class="comment">// filtra valores</span>
+  <span class="fn">tap</span>(x => console.<span class="fn">log</span>(x)),     <span class="comment">// efecto sin modificar</span>
+  <span class="fn">take</span>(<span class="num">5</span>),                        <span class="comment">// toma solo 5</span>
+  <span class="fn">startWith</span>(<span class="num">0</span>),                  <span class="comment">// emite valor inicial</span>
+  <span class="fn">scan</span>((acc, v) => acc + v, <span class="num">0</span>),  <span class="comment">// acumulador (como reduce)</span>
+);
+
+<span class="comment">// ── BÚSQUEDA EN TIEMPO REAL (patrón clásico) ─────────</span>
+inputCambio$.<span class="fn">pipe</span>(
+  <span class="fn">debounceTime</span>(<span class="num">300</span>),            <span class="comment">// espera 300ms de silencio</span>
+  <span class="fn">distinctUntilChanged</span>(),        <span class="comment">// ignora si el valor no cambió</span>
+  <span class="fn">switchMap</span>(q => api.<span class="fn">buscar</span>(q)) <span class="comment">// cancela petición anterior ✅</span>
+);
+
+<span class="comment">// ── OPERADORES DE APLANAMIENTO ────────────────────────</span>
+<span class="comment">// switchMap  → cancela anterior (búsquedas, autocompletado)</span>
+<span class="comment">// mergeMap   → en paralelo, no cancela (subidas de archivos)</span>
+<span class="comment">// concatMap  → en secuencia, uno a uno (guardar en orden)</span>
+<span class="comment">// exhaustMap → ignora nuevos mientras el actual activo (login)</span>
+
+<span class="comment">// ── COMBINACIÓN ─────────────────────────────────────</span>
+<span class="fn">combineLatest</span>([user$, config$])
+  .<span class="fn">subscribe</span>(([user, config]) => { ... }); <span class="comment">// emite cuando cualquiera cambia</span>
+
+<span class="fn">forkJoin</span>([api.<span class="fn">getA</span>(), api.<span class="fn">getB</span>()])
+  .<span class="fn">subscribe</span>(([a, b]) => { ... });          <span class="comment">// espera que TODOS completen</span>
+
+<span class="comment">// ── MANEJO DE ERRORES ────────────────────────────────</span>
+api$.<span class="fn">pipe</span>(
+  <span class="fn">retry</span>(<span class="num">3</span>),                                    <span class="comment">// reintenta 3 veces</span>
+  <span class="fn">catchError</span>(err => <span class="fn">of</span>({ error: err.message })), <span class="comment">// recupera con valor</span>
+  <span class="fn">finalize</span>(() => loading.<span class="fn">set</span>(<span class="kw">false</span>))            <span class="comment">// siempre se ejecuta</span>
+);
+
+<span class="comment">// ── SUBJECTS ─────────────────────────────────────────</span>
+<span class="kw">const</span> s  = <span class="kw">new</span> <span class="fn">Subject</span>&lt;<span class="type">string</span>&gt;();         <span class="comment">// no guarda último valor</span>
+<span class="kw">const</span> bs = <span class="kw">new</span> <span class="fn">BehaviorSubject</span>(<span class="str">'init'</span>);   <span class="comment">// guarda y emite el último ✅</span>
+s.<span class="fn">next</span>(<span class="str">'valor'</span>);
+bs.<span class="fn">getValue</span>();                             <span class="comment">// valor actual síncrono</span>
+
+<span class="comment">// ── EVITAR MEMORY LEAKS ─────────────────────────────</span>
+<span class="comment">// ① takeUntilDestroyed (Angular 16+) — en constructor</span>
+<span class="kw">private</span> destroyRef = <span class="fn">inject</span>(<span class="type">DestroyRef</span>);
+stream$.<span class="fn">pipe</span>(<span class="fn">takeUntilDestroyed</span>(<span class="kw">this</span>.destroyRef)).<span class="fn">subscribe</span>(...);
+
+<span class="comment">// ② AsyncPipe en template (auto-unsubscribe)</span>
+<span class="comment">// {{ stream$ | async }}</span>
+
+<span class="comment">// ③ Manual (ngOnDestroy)</span>
+<span class="kw">private</span> destroy$ = <span class="kw">new</span> <span class="fn">Subject</span>&lt;<span class="kw">void</span>&gt;();
+stream$.<span class="fn">pipe</span>(<span class="fn">takeUntil</span>(<span class="kw">this</span>.destroy$)).<span class="fn">subscribe</span>(...);
+<span class="fn">ngOnDestroy</span>() { <span class="kw">this</span>.destroy$.<span class="fn">next</span>(); <span class="kw">this</span>.destroy$.<span class="fn">complete</span>(); }
+            </pre>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════
+         CAPÍTULO 12 — Signals
+    ══════════════════════════════════════════════ -->
+    <section class="chapter" id="cap12">
+      <div class="chapter-header">
+        <div class="chapter-number" style="color:var(--lvl4)">12</div>
+        <div class="chapter-info">
+          <div class="chapter-level" style="color:var(--lvl4)">Intermedio Alto · Capítulo 12</div>
+          <div class="chapter-title">Signals — La Nueva Reactividad</div>
+          <div class="chapter-desc">Signals es el modelo de reactividad moderno de Angular (v16+). Más simple que RxJS para estado UI. Reemplazará progresivamente a Zone.js.</div>
+        </div>
+      </div>
+      <div class="grid">
+
+        <div class="card">
+          <div class="card-header">
+            <span class="card-icon">⚡</span>
+            <span class="card-title">signal / computed / effect</span>
+            <span class="card-tag">Signals API</span>
+          </div>
+          <div class="card-body">
+            <span class="label new">v16+</span>
+            <pre>
+<span class="kw">import</span> { signal, computed, effect } <span class="kw">from</span> <span class="str">'@angular/core'</span>;
+
+<span class="kw">export class</span> <span class="type">CarritoComponent</span> {
+  <span class="comment">// signal → valor primitivo reactivo writable</span>
+  count   = <span class="fn">signal</span>(<span class="num">0</span>);
+  precio  = <span class="fn">signal</span>(<span class="num">19.99</span>);
+  nombre  = <span class="fn">signal</span>(<span class="str">'Angular'</span>);
+
+  <span class="comment">// computed → derivado de otros signals (read-only)</span>
+  total   = <span class="fn">computed</span>(() => <span class="kw">this</span>.count() * <span class="kw">this</span>.precio());
+  resumen = <span class="fn">computed</span>(() => <span class="str">`</span>${<span class="kw">this</span>.nombre()}<span class="str">: $</span>${<span class="kw">this</span>.total().<span class="fn">toFixed</span>(<span class="num">2</span>)}<span class="str">`</span>);
+
+  <span class="kw">constructor</span>() {
+    <span class="comment">// effect → efecto secundario cuando un signal cambia</span>
+    <span class="fn">effect</span>(() => {
+      console.<span class="fn">log</span>(<span class="str">'Total actualizado:'</span>, <span class="kw">this</span>.total());
+      <span class="comment">// se re-ejecuta cada vez que total() (o sus deps) cambian</span>
+    });
+  }
+
+  <span class="comment">// Formas de actualizar un signal</span>
+  <span class="fn">setCount</span>(n: <span class="type">number</span>)   { <span class="kw">this</span>.count.<span class="fn">set</span>(n); }        <span class="comment">// set valor</span>
+  <span class="fn">increment</span>()            { <span class="kw">this</span>.count.<span class="fn">update</span>(v => v + <span class="num">1</span>); } <span class="comment">// update fn</span>
+  <span class="fn">publicarSolo</span>()         { <span class="kw">return</span> <span class="kw">this</span>.count.<span class="fn">asReadonly</span>(); } <span class="comment">// read-only</span>
+}
+
+<span class="comment">&lt;!-- En el template: los signals se llaman como función --&gt;</span>
+&lt;<span class="kw">p</span>&gt;{{ count() }} x ${{ precio() }} = ${{ total() }}&lt;/<span class="kw">p</span>&gt;
+&lt;<span class="kw">button</span> (click)="<span class="fn">increment</span>()"&gt;+1&lt;/<span class="kw">button</span>&gt;
+            </pre>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <span class="card-icon">🔄</span>
+            <span class="card-title">toSignal / toObservable — Interop RxJS</span>
+            <span class="card-tag">rxjs-interop</span>
+          </div>
+          <div class="card-body">
+            <span class="label new">v16+</span>
+            <pre>
+<span class="kw">import</span> { toSignal, toObservable } <span class="kw">from</span> <span class="str">'@angular/core/rxjs-interop'</span>;
+
+<span class="kw">export class</span> <span class="type">UserComponent</span> {
+  <span class="kw">private</span> http = <span class="fn">inject</span>(<span class="type">HttpClient</span>);
+
+  <span class="comment">// Observable → Signal (se suscribe y des-suscribe solo)</span>
+  users = <span class="fn">toSignal</span>(
+    <span class="kw">this</span>.http.<span class="fn">get</span>&lt;<span class="type">User[]</span>&gt;(<span class="str">'/api/users'</span>),
+    { initialValue: [] <span class="kw">as</span> <span class="type">User[]</span> }
+  );
+
+  searchTerm = <span class="fn">signal</span>(<span class="str">''</span>);
+
+  <span class="comment">// Signal → Observable (para usar con operadores RxJS)</span>
+  searchResults = <span class="fn">toSignal</span>(
+    <span class="fn">toObservable</span>(<span class="kw">this</span>.searchTerm).<span class="fn">pipe</span>(
+      <span class="fn">debounceTime</span>(<span class="num">300</span>),
+      <span class="fn">distinctUntilChanged</span>(),
+      <span class="fn">switchMap</span>(q => <span class="kw">this</span>.http.<span class="fn">get</span>&lt;<span class="type">User[]</span>&gt;(<span class="str">`/api/users?q=</span>${q}<span class="str">`</span>))
+    ),
+    { initialValue: [] }
+  );
+}
+            </pre>
+            <div class="tip"><strong>Regla de oro:</strong> usa <strong>Signals</strong> para estado UI y <strong>RxJS</strong> para flujos de eventos complejos (búsqueda, WebSockets, combinación de fuentes). Los puentes <code>toSignal/toObservable</code> unen ambos mundos.</div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════
+         CAPÍTULO 13 — Guards, Interceptors y Resolvers
+    ══════════════════════════════════════════════ -->
+    <section class="chapter" id="cap13">
+      <div class="chapter-header">
+        <div class="chapter-number" style="color:var(--lvl5)">13</div>
+        <div class="chapter-info">
+          <div class="chapter-level" style="color:var(--lvl5)">Avanzado · Capítulo 13</div>
+          <div class="chapter-title">Guards, Interceptors y Resolvers</div>
+          <div class="chapter-desc">Guards controlan el acceso a rutas. Interceptors manipulan todas las peticiones HTTP. Resolvers precargan datos antes de activar una ruta.</div>
+        </div>
+      </div>
+      <div class="grid">
+
+        <div class="card">
+          <div class="card-header">
+            <span class="card-icon">🛡️</span>
+            <span class="card-title">Guards Funcionales (v15+)</span>
+            <span class="card-tag">canActivate</span>
+          </div>
+          <div class="card-body">
+            <span class="label ng">Angular</span>
+            <pre>
+<span class="comment">// guards/auth.guard.ts</span>
+<span class="kw">export const</span> authGuard: <span class="type">CanActivateFn</span> = (route, state) => {
+  <span class="kw">const</span> auth   = <span class="fn">inject</span>(<span class="type">AuthService</span>);
+  <span class="kw">const</span> router = <span class="fn">inject</span>(<span class="type">Router</span>);
+
+  <span class="kw">if</span> (auth.<span class="fn">isLoggedIn</span>()) <span class="kw">return</span> <span class="kw">true</span>;
+
+  <span class="comment">// Redirige y guarda la URL intentada</span>
+  <span class="kw">return</span> router.<span class="fn">createUrlTree</span>([<span class="str">'/login'</span>], {
+    queryParams: { returnUrl: state.url }
+  });
+};
+
+<span class="comment">// guard por rol</span>
+<span class="kw">export const</span> adminGuard: <span class="type">CanActivateFn</span> = () =>
+  <span class="fn">inject</span>(<span class="type">AuthService</span>).hasRole(<span class="str">'admin'</span>) || <span class="fn">inject</span>(<span class="type">Router</span>).<span class="fn">createUrlTree</span>([<span class="str">'/forbidden'</span>]);
+
+<span class="comment">// canDeactivate — confirmar salida con formulario sin guardar</span>
+<span class="kw">export const</span> unsavedGuard: <span class="type">CanDeactivateFn</span>&lt;<span class="type">unknown</span>&gt; = (component) =>
+  confirm(<span class="str">'¿Salir sin guardar cambios?'</span>);
+
+<span class="comment">// resolver — precarga datos</span>
+<span class="kw">export const</span> userResolver: <span class="type">ResolveFn</span>&lt;<span class="type">User</span>&gt; = (route) =>
+  <span class="fn">inject</span>(<span class="type">UserService</span>).<span class="fn">getById</span>(route.params[<span class="str">'id'</span>]);
+
+<span class="comment">// app.routes.ts — uso</span>
+{
+  path: <span class="str">'dashboard'</span>,
+  loadComponent: () => <span class="kw">import</span>(<span class="str">'...'</span>).then(m => m.<span class="type">DashboardComponent</span>),
+  canActivate:   [authGuard],
+  canDeactivate: [unsavedGuard],
+  resolve:       { usuario: userResolver },
+  <span class="comment">// acceder al dato resuelto: this.route.snapshot.data['usuario']</span>
+}
+            </pre>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <span class="card-icon">🔀</span>
+            <span class="card-title">HTTP Interceptors Funcionales</span>
+            <span class="card-tag">HttpInterceptorFn</span>
+          </div>
+          <div class="card-body">
+            <span class="label ng">Angular</span>
+            <pre>
+<span class="comment">// interceptors/auth.interceptor.ts</span>
+<span class="kw">export const</span> authInterceptor: <span class="type">HttpInterceptorFn</span> = (req, next) => {
+  <span class="kw">const</span> token = <span class="fn">inject</span>(<span class="type">AuthService</span>).<span class="fn">getToken</span>();
+
+  <span class="kw">const</span> newReq = token
+    ? req.<span class="fn">clone</span>({ setHeaders: { Authorization: <span class="str">`Bearer </span>${token}<span class="str">`</span> } })
+    : req;
+
+  <span class="kw">return</span> <span class="fn">next</span>(newReq);  <span class="comment">// pasa al siguiente interceptor o al servidor</span>
+};
+
+<span class="comment">// interceptors/error.interceptor.ts</span>
+<span class="kw">export const</span> errorInterceptor: <span class="type">HttpInterceptorFn</span> = (req, next) =>
+  <span class="fn">next</span>(req).<span class="fn">pipe</span>(
+    <span class="fn">catchError</span>((err: <span class="type">HttpErrorResponse</span>) => {
+      <span class="kw">const</span> router = <span class="fn">inject</span>(<span class="type">Router</span>);
+      <span class="kw">if</span> (err.status === <span class="num">401</span>) router.<span class="fn">navigate</span>([<span class="str">'/login'</span>]);
+      <span class="kw">if</span> (err.status === <span class="num">403</span>) router.<span class="fn">navigate</span>([<span class="str">'/forbidden'</span>]);
+      <span class="kw">if</span> (err.status === <span class="num">500</span>) <span class="fn">inject</span>(<span class="type">ToastService</span>).<span class="fn">error</span>(<span class="str">'Error del servidor'</span>);
+      <span class="kw">return</span> <span class="fn">throwError</span>(() => err);
+    })
+  );
+
+<span class="comment">// interceptors/loading.interceptor.ts — spinner global</span>
+<span class="kw">export const</span> loadingInterceptor: <span class="type">HttpInterceptorFn</span> = (req, next) => {
+  <span class="kw">const</span> loading = <span class="fn">inject</span>(<span class="type">LoadingService</span>);
+  loading.<span class="fn">show</span>();
+  <span class="kw">return</span> <span class="fn">next</span>(req).<span class="fn">pipe</span>(<span class="fn">finalize</span>(() => loading.<span class="fn">hide</span>()));
+};
+
+<span class="comment">// main.ts — registrar</span>
+<span class="fn">provideHttpClient</span>(
+  <span class="fn">withInterceptors</span>([authInterceptor, errorInterceptor, loadingInterceptor])
+)
+            </pre>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════
+         CAPÍTULO 14 — Change Detection y Performance
+    ══════════════════════════════════════════════ -->
+    <section class="chapter" id="cap14">
+      <div class="chapter-header">
+        <div class="chapter-number" style="color:var(--lvl5)">14</div>
+        <div class="chapter-info">
+          <div class="chapter-level" style="color:var(--lvl5)">Avanzado · Capítulo 14</div>
+          <div class="chapter-title">Change Detection y Performance</div>
+          <div class="chapter-desc">Cómo Angular detecta cambios y actualiza el DOM. OnPush, ChangeDetectorRef y el futuro Zoneless para máxima performance.</div>
+        </div>
+      </div>
+      <div class="grid">
+
+        <div class="card">
+          <div class="card-header">
+            <span class="card-icon">🔍</span>
+            <span class="card-title">OnPush y ChangeDetectorRef</span>
+            <span class="card-tag">Performance</span>
+          </div>
+          <div class="card-body">
+            <span class="label ng">Angular</span>
+            <pre>
+<span class="kw">import</span> { ChangeDetectionStrategy, ChangeDetectorRef } <span class="kw">from</span> <span class="str">'@angular/core'</span>;
+
+<span class="decorator">@Component</span>({
+  <span class="comment">// Default: detecta cambios en CUALQUIER evento de la app</span>
+  changeDetection: ChangeDetectionStrategy.Default,
+
+  <span class="comment">// OnPush: solo detecta cuando:</span>
+  <span class="comment">// 1. Un @Input cambia de referencia</span>
+  <span class="comment">// 2. Un Observable/Signal en el template emite</span>
+  <span class="comment">// 3. Se dispara un evento dentro del componente</span>
+  <span class="comment">// 4. Se llama markForCheck() o detectChanges() manualmente</span>
+  changeDetection: ChangeDetectionStrategy.OnPush,
+})
+<span class="kw">export class</span> <span class="type">OptimizedComponent</span> {
+  <span class="kw">private</span> cdr = <span class="fn">inject</span>(<span class="type">ChangeDetectorRef</span>);
+
+  <span class="fn">desde3rdPartyLib</span>(datos: <span class="type">any[]</span>) {
+    <span class="kw">this</span>.datos = datos;
+    <span class="kw">this</span>.cdr.<span class="fn">markForCheck</span>();   <span class="comment">// agenda detección</span>
+    <span class="kw">this</span>.cdr.<span class="fn">detectChanges</span>();  <span class="comment">// detecta inmediatamente</span>
+  }
+
+  <span class="fn">detachYReattach</span>() {
+    <span class="kw">this</span>.cdr.<span class="fn">detach</span>();    <span class="comment">// pausa detección (performance extrema)</span>
+    <span class="kw">this</span>.cdr.<span class="fn">reattach</span>(); <span class="comment">// reactiva</span>
+  }
+}
+
+<span class="comment">// Con Signals → compatibles con OnPush de fábrica</span>
+<span class="comment">// Angular los rastrea automáticamente sin Zone.js</span>
+            </pre>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <span class="card-icon">🏎️</span>
+            <span class="card-title">Zoneless (Angular 18+)</span>
+            <span class="card-tag">Experimental</span>
+          </div>
+          <div class="card-body">
+            <span class="label new">v18+</span>
+            <p class="desc">Elimina Zone.js. La detección de cambios es completamente manejada por Signals. Menor bundle size y mejor performance.</p>
+            <pre>
+<span class="comment">// main.ts — modo Zoneless</span>
+<span class="fn">bootstrapApplication</span>(<span class="type">AppComponent</span>, {
+  providers: [
+    <span class="fn">provideZonelessChangeDetection</span>(),  <span class="comment">// ← aquí la magia</span>
+    <span class="fn">provideRouter</span>(routes),
+  ]
+});
+
+<span class="comment">// angular.json → eliminar zone.js de polyfills</span>
+<span class="comment">// "polyfills": []   (antes tenía "zone.js")</span>
+
+<span class="comment">// Requisitos para modo Zoneless:</span>
+<span class="comment">// ✅ Usar Signals para estado (signal, computed)</span>
+<span class="comment">// ✅ Usar AsyncPipe para Observables en template</span>
+<span class="comment">// ✅ OnPush en todos los componentes</span>
+<span class="comment">// ✅ Llamar markForCheck() si usas datos externos</span>
+            </pre>
+            <div class="tip"><strong>Zoneless + Signals</strong> es el futuro de Angular. En v21 es estable para la mayoría de casos. Mejora el rendimiento hasta un 40% en apps grandes.</div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════
+         CAPÍTULO 15 — State Management
+    ══════════════════════════════════════════════ -->
+    <section class="chapter" id="cap15">
+      <div class="chapter-header">
+        <div class="chapter-number" style="color:var(--lvl5)">15</div>
+        <div class="chapter-info">
+          <div class="chapter-level" style="color:var(--lvl5)">Avanzado · Capítulo 15</div>
+          <div class="chapter-title">State Management</div>
+          <div class="chapter-desc">Cómo gestionar estado global. Desde el patrón Store con Signals (sin librerías) hasta NgRx para apps muy grandes.</div>
+        </div>
+      </div>
+      <div class="grid">
+
+        <div class="card wide">
+          <div class="card-header">
+            <span class="card-icon">🗄️</span>
+            <span class="card-title">Patrón Store con Signals (sin NgRx)</span>
+            <span class="card-tag">Recomendado</span>
+          </div>
+          <div class="card-body">
+            <span class="label new">Angular 21 — Recomendado</span>
+            <p class="desc">Para la mayoría de apps Angular 20/21, un store de Signals es suficiente. Estado encapsulado, acciones claras, sin boilerplate.</p>
+            <pre>
+<span class="comment">// features/productos/store/productos.store.ts</span>
+<span class="kw">import</span> { Injectable, signal, computed, inject } <span class="kw">from</span> <span class="str">'@angular/core'</span>;
+
+<span class="decorator">@Injectable</span>({ providedIn: <span class="str">'root'</span> })
+<span class="kw">export class</span> <span class="type">ProductosStore</span> {
+  <span class="kw">private</span> http = <span class="fn">inject</span>(<span class="type">HttpClient</span>);
+
+  <span class="comment">// ── Estado privado (solo el store puede modificarlo) ──</span>
+  <span class="kw">private</span> _productos = <span class="fn">signal</span>&lt;<span class="type">Producto[]</span>&gt;([]);
+  <span class="kw">private</span> _loading   = <span class="fn">signal</span>(<span class="kw">false</span>);
+  <span class="kw">private</span> _error     = <span class="fn">signal</span>&lt;<span class="type">string</span> | <span class="kw">null</span>&gt;(<span class="kw">null</span>);
+  <span class="kw">private</span> _filtro    = <span class="fn">signal</span>(<span class="str">''</span>);
+
+  <span class="comment">// ── Selectores públicos (read-only) ──────────────────</span>
+  productos = <span class="kw">this</span>._productos.<span class="fn">asReadonly</span>();
+  loading   = <span class="kw">this</span>._loading.<span class="fn">asReadonly</span>();
+  error     = <span class="kw">this</span>._error.<span class="fn">asReadonly</span>();
+
+  <span class="comment">// Selectores derivados (computed)</span>
+  filtrados = <span class="fn">computed</span>(() =>
+    <span class="kw">this</span>._productos().<span class="fn">filter</span>(p =>
+      p.nombre.<span class="fn">toLowerCase</span>().<span class="fn">includes</span>(<span class="kw">this</span>._filtro().<span class="fn">toLowerCase</span>())
+    )
+  );
+  total = <span class="fn">computed</span>(() => <span class="kw">this</span>._productos().length);
+
+  <span class="comment">// ── Acciones ─────────────────────────────────────────</span>
+  <span class="fn">setFiltro</span>(q: <span class="type">string</span>) { <span class="kw">this</span>._filtro.<span class="fn">set</span>(q); }
+
+  <span class="kw">async</span> <span class="fn">cargar</span>() {
+    <span class="kw">this</span>._loading.<span class="fn">set</span>(<span class="kw">true</span>);
+    <span class="kw">this</span>._error.<span class="fn">set</span>(<span class="kw">null</span>);
+    <span class="kw">try</span> {
+      <span class="kw">const</span> data = <span class="kw">await</span> <span class="fn">firstValueFrom</span>(
+        <span class="kw">this</span>.http.<span class="fn">get</span>&lt;<span class="type">Producto[]</span>&gt;(<span class="str">'/api/productos'</span>)
+      );
+      <span class="kw">this</span>._productos.<span class="fn">set</span>(data);
+    } <span class="kw">catch</span>(e: <span class="kw">any</span>) {
+      <span class="kw">this</span>._error.<span class="fn">set</span>(e.message);
+    } <span class="kw">finally</span> {
+      <span class="kw">this</span>._loading.<span class="fn">set</span>(<span class="kw">false</span>);
+    }
+  }
+
+  <span class="fn">agregar</span>(p: <span class="type">Producto</span>) {
+    <span class="kw">this</span>._productos.<span class="fn">update</span>(lista => [...lista, p]);
+  }
+
+  <span class="fn">eliminar</span>(id: <span class="type">number</span>) {
+    <span class="kw">this</span>._productos.<span class="fn">update</span>(lista => lista.<span class="fn">filter</span>(p => p.id !== id));
+  }
+}
+
+<span class="comment">// En cualquier componente</span>
+<span class="kw">export class</span> <span class="type">ListaComponent</span> {
+  store = <span class="fn">inject</span>(<span class="type">ProductosStore</span>);
+
+  <span class="fn">ngOnInit</span>() { <span class="kw">this</span>.store.<span class="fn">cargar</span>(); }
+}
+<span class="comment">// template: {{ store.filtrados() }}, {{ store.loading() }}</span>
+            </pre>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════
+         CAPÍTULO 16 — APIs Nuevas v17–v21
+    ══════════════════════════════════════════════ -->
+    <section class="chapter" id="cap16">
+      <div class="chapter-header">
+        <div class="chapter-number" style="color:var(--lvl5)">16</div>
+        <div class="chapter-info">
+          <div class="chapter-level" style="color:var(--lvl5)">Avanzado · Capítulo 16</div>
+          <div class="chapter-title">APIs Nuevas — v17 hasta v21</div>
+          <div class="chapter-desc">Las últimas incorporaciones: @defer para lazy rendering, resource() y httpResource() para datos async, linkedSignal(), y más.</div>
+        </div>
+      </div>
+      <div class="grid">
+
+        <div class="card">
+          <div class="card-header">
+            <span class="card-icon">⏳</span>
+            <span class="card-title">@defer — Lazy Rendering en Template</span>
+            <span class="card-tag">v17+</span>
+          </div>
+          <div class="card-body">
+            <span class="label new">v17+</span>
+            <p class="desc">Carga componentes de forma diferida directamente en el template. Los triggers determinan cuándo cargar.</p>
+            <pre>
+<span class="comment">&lt;!-- Triggers disponibles --&gt;</span>
+@<span class="kw">defer</span> (on viewport)         <span class="comment">&lt;!-- cuando entra al viewport --&gt;</span>
+@<span class="kw">defer</span> (on idle)             <span class="comment">&lt;!-- cuando el browser está idle --&gt;</span>
+@<span class="kw">defer</span> (on interaction(btn)) <span class="comment">&lt;!-- cuando interactúan con #btn --&gt;</span>
+@<span class="kw">defer</span> (on hover)            <span class="comment">&lt;!-- al hacer hover --&gt;</span>
+@<span class="kw">defer</span> (on timer(2000))      <span class="comment">&lt;!-- después de 2 segundos --&gt;</span>
+@<span class="kw">defer</span> (when condicion())    <span class="comment">&lt;!-- cuando signal es true --&gt;</span>
+
+<span class="comment">&lt;!-- Ejemplo completo con todos los bloques --&gt;</span>
+&lt;<span class="kw">button</span> #botonVer&gt;Ver comentarios&lt;/<span class="kw">button</span>&gt;
+
+@<span class="kw">defer</span> (on interaction(botonVer); prefetch on idle) {
+  <span class="comment">&lt;!-- Se carga al click en el botón, se prefetchea en idle --&gt;</span>
+  &lt;<span class="kw">app-comentarios</span>&gt;&lt;/<span class="kw">app-comentarios</span>&gt;
+} @<span class="kw">loading</span> (minimum 500ms) {
+  &lt;<span class="kw">app-skeleton</span>&gt;&lt;/<span class="kw">app-skeleton</span>&gt;
+} @<span class="kw">error</span> {
+  &lt;<span class="kw">p</span>&gt;Error al cargar los comentarios&lt;/<span class="kw">p</span>&gt;
+} @<span class="kw">placeholder</span> (minimum 200ms) {
+  &lt;<span class="kw">div</span> class="placeholder"&gt;Haz click para ver comentarios&lt;/<span class="kw">div</span>&gt;
+}
+
+<span class="comment">&lt;!-- SSR: hidratación incremental (v19+) --&gt;</span>
+@<span class="kw">defer</span> (hydrate on viewport) {
+  &lt;<span class="kw">app-mapa-pesado</span>&gt;&lt;/<span class="kw">app-mapa-pesado</span>&gt;
+}
+            </pre>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <span class="card-icon">🌐</span>
+            <span class="card-title">resource() y httpResource()</span>
+            <span class="card-tag">v19+</span>
+          </div>
+          <div class="card-body">
+            <span class="label new">v19+</span>
+            <p class="desc">Nueva API para manejar datos asíncronos con Signals. Gestiona loading, error y data automáticamente.</p>
+            <pre>
+<span class="comment">// resource() — para fetch genérico</span>
+<span class="kw">import</span> { resource, signal } <span class="kw">from</span> <span class="str">'@angular/core'</span>;
+
+<span class="kw">const</span> userId = <span class="fn">signal</span>(<span class="num">1</span>);
+
+<span class="kw">const</span> userResource = <span class="fn">resource</span>({
+  request: () => ({ id: userId() }),   <span class="comment">// re-ejecuta al cambiar</span>
+  loader: <span class="kw">async</span> ({ request }) => {
+    <span class="kw">const</span> res = <span class="kw">await</span> <span class="fn">fetch</span>(<span class="str">`/api/users/</span>${request.id}<span class="str">`</span>);
+    <span class="kw">return</span> res.<span class="fn">json</span>() <span class="kw">as</span> <span class="type">User</span>;
+  }
+});
+
+userResource.value();      <span class="comment">// Signal&lt;User | undefined&gt;</span>
+userResource.isLoading();  <span class="comment">// Signal&lt;boolean&gt;</span>
+userResource.error();      <span class="comment">// Signal&lt;unknown&gt;</span>
+userResource.<span class="fn">reload</span>();    <span class="comment">// refetch manual</span>
+
+<span class="comment">// httpResource() — integración directa con HttpClient</span>
+<span class="kw">import</span> { httpResource } <span class="kw">from</span> <span class="str">'@angular/common/http'</span>;
+
+<span class="kw">export class</span> <span class="type">UsersComponent</span> {
+  page = <span class="fn">signal</span>(<span class="num">1</span>);
+
+  <span class="comment">// se re-ejecuta cuando page() cambia</span>
+  usersResource = <span class="fn">httpResource</span>&lt;<span class="type">User[]</span>&gt;(
+    () => <span class="str">`/api/users?page=</span>${<span class="kw">this</span>.page()}<span class="str">`</span>
+  );
+
+  users    = <span class="kw">this</span>.usersResource.value;
+  loading  = <span class="kw">this</span>.usersResource.isLoading;
+  nextPage = () => <span class="kw">this</span>.page.<span class="fn">update</span>(p => p + <span class="num">1</span>);
+}
+            </pre>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <span class="card-icon">🔗</span>
+            <span class="card-title">linkedSignal y model()</span>
+            <span class="card-tag">v19+ / v17.1+</span>
+          </div>
+          <div class="card-body">
+            <span class="label new">v19+</span>
+            <pre>
+<span class="comment">// linkedSignal (v19+) — signal writable con dependencia</span>
+<span class="kw">import</span> { linkedSignal, signal } <span class="kw">from</span> <span class="str">'@angular/core'</span>;
+
+<span class="kw">const</span> opciones = <span class="fn">signal</span>([<span class="str">'A'</span>, <span class="str">'B'</span>, <span class="str">'C'</span>]);
+
+<span class="comment">// Se reinicia a opciones()[0] cuando opciones() cambia</span>
+<span class="comment">// Pero también puede cambiarse manualmente</span>
+<span class="kw">const</span> seleccion = <span class="fn">linkedSignal</span>(() => opciones()[<span class="num">0</span>]);
+
+seleccion.<span class="fn">set</span>(<span class="str">'B'</span>);    <span class="comment">// cambio manual ✅</span>
+opciones.<span class="fn">set</span>([<span class="str">'X'</span>, <span class="str">'Y'</span>]); <span class="comment">// seleccion vuelve a 'X' automáticamente</span>
+
+<span class="comment">// Diferencia vs computed:</span>
+<span class="comment">// computed()      → read-only, no se puede cambiar manualmente</span>
+<span class="comment">// linkedSignal()  → writable, pero se "resetea" con la fuente</span>
+
+<span class="comment">// ────────────────────────────────────────────────────</span>
+
+<span class="comment">// model() (v17.1+) — two-way binding con Signals</span>
+<span class="kw">import</span> { model, Component } <span class="kw">from</span> <span class="str">'@angular/core'</span>;
+
+<span class="decorator">@Component</span>({
+  selector: <span class="str">'app-rating'</span>,
+  standalone: <span class="kw">true</span>,
+  template: <span class="str">`
+    @for (star of [1,2,3,4,5]; track star) {
+      &lt;span (click)="rating.set(star)"&gt;
+        {{ star &lt;= rating() ? '⭐' : '☆' }}
+      &lt;/span&gt;
+    }
+  `</span>
+})
+<span class="kw">export class</span> <span class="type">RatingComponent</span> {
+  rating = <span class="fn">model</span>(<span class="num">0</span>);  <span class="comment">// input + output en uno solo</span>
+}
+
+<span class="comment">&lt;!-- Uso con two-way binding --&gt;</span>
+&lt;<span class="kw">app-rating</span> [(rating)]="miRating"&gt;&lt;/<span class="kw">app-rating</span>&gt;
+            </pre>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <span class="card-icon">🧪</span>
+            <span class="card-title">Testing — Unit y Componente</span>
+            <span class="card-tag">TestBed</span>
+          </div>
+          <div class="card-body">
+            <span class="label ts">TypeScript</span>
+            <pre>
+<span class="comment">// spec.ts — test de servicio con HTTP mock</span>
+<span class="fn">describe</span>(<span class="str">'ProductoService'</span>, () => {
+  <span class="kw">let</span> service:  <span class="type">ProductoService</span>;
+  <span class="kw">let</span> httpMock: <span class="type">HttpTestingController</span>;
+
+  <span class="fn">beforeEach</span>(() => {
+    TestBed.<span class="fn">configureTestingModule</span>({
+      imports:   [HttpClientTestingModule],
+      providers: [<span class="type">ProductoService</span>],
+    });
+    service  = TestBed.<span class="fn">inject</span>(<span class="type">ProductoService</span>);
+    httpMock = TestBed.<span class="fn">inject</span>(<span class="type">HttpTestingController</span>);
+  });
+
+  <span class="fn">afterEach</span>(() => httpMock.<span class="fn">verify</span>());
+
+  <span class="fn">it</span>(<span class="str">'debería obtener productos'</span>, () => {
+    <span class="kw">const</span> mock = [{ id: <span class="num">1</span>, nombre: <span class="str">'Test'</span> }];
+    service.<span class="fn">getAll</span>().<span class="fn">subscribe</span>(p => <span class="fn">expect</span>(p).<span class="fn">toEqual</span>(mock));
+    <span class="kw">const</span> req = httpMock.<span class="fn">expectOne</span>(<span class="str">'/api/productos'</span>);
+    <span class="fn">expect</span>(req.request.method).<span class="fn">toBe</span>(<span class="str">'GET'</span>);
+    req.<span class="fn">flush</span>(mock);
+  });
+});
+
+<span class="comment">// spec.ts — test de componente</span>
+<span class="fn">describe</span>(<span class="str">'ContadorComponent'</span>, () => {
+  <span class="kw">let</span> fixture:   <span class="type">ComponentFixture</span>&lt;<span class="type">ContadorComponent</span>&gt;;
+  <span class="kw">let</span> component: <span class="type">ContadorComponent</span>;
+
+  <span class="fn">beforeEach</span>(<span class="kw">async</span> () => {
+    <span class="kw">await</span> TestBed.<span class="fn">configureTestingModule</span>({
+      imports: [<span class="type">ContadorComponent</span>], <span class="comment">// standalone</span>
+    }).<span class="fn">compileComponents</span>();
+    fixture   = TestBed.<span class="fn">createComponent</span>(<span class="type">ContadorComponent</span>);
+    component = fixture.componentInstance;
+    fixture.<span class="fn">detectChanges</span>(); <span class="comment">// ngOnInit</span>
+  });
+
+  <span class="fn">it</span>(<span class="str">'click incrementa'</span>, () => {
+    fixture.nativeElement.<span class="fn">querySelector</span>(<span class="str">'button'</span>).<span class="fn">click</span>();
+    fixture.<span class="fn">detectChanges</span>();
+    <span class="fn">expect</span>(component.count()).<span class="fn">toBe</span>(<span class="num">1</span>);
+  });
+});
+            </pre>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<footer>
+  <p>Angular <span>v21</span> — Guía Progresiva · De Básico a Avanzado · 16 Capítulos</p>
+  <p style="margin-top:6px;color:#5c6bc0">Cap.1–3: Fundamentos &nbsp;·&nbsp; Cap.4–6: Intermedio Bajo &nbsp;·&nbsp; Cap.7–9: Intermedio &nbsp;·&nbsp; Cap.10–12: Intermedio Alto &nbsp;·&nbsp; Cap.13–16: Avanzado</p>
+</footer>
+
+</body>
+</html>

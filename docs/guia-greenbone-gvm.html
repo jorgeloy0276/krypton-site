@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chuleta Greenbone (GVM / OpenVAS) en Kali Linux</title>
+<meta name="description" content="Chuleta de comandos manuales para instalar, verificar, reparar y actualizar Greenbone Community (GVM/OpenVAS) en Kali Linux.">
+<style>
+:root{--bg:#f2f5f6;--panel:#ffffff;--ink:#16262d;--muted:#52666f;--line:#d3dde1;--accent:#0a6c74;--accent-ink:#ffffff;
+--code-bg:#13262e;--code-ink:#e3eef0;--inline:#e3edef;--warn-bg:#fff4dc;--warn-line:#c98a12;
+--serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+--sans:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+--mono:ui-monospace,"SF Mono",Menlo,Consolas,"Liberation Mono",monospace}
+@media (prefers-color-scheme:dark){:root{--bg:#10202a;--panel:#17303c;--ink:#e4eef1;--muted:#9bb2bb;--line:#2a4552;
+--accent:#5fc3c9;--accent-ink:#0b1c23;--code-bg:#0b1a22;--code-ink:#dcebee;--inline:#21404d;--warn-bg:#3a3017;--warn-line:#d9a441}}
+*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:1rem}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+body{margin:0;background:var(--bg);color:var(--ink);font:1.05rem/1.7 var(--serif)}
+.layout{display:grid;grid-template-columns:17rem minmax(0,1fr);gap:2.5rem;max-width:78rem;margin:0 auto;padding:0 1.5rem}
+aside{position:sticky;top:0;align-self:start;max-height:100vh;overflow:auto;padding:2rem 0}
+aside strong{display:block;font:700 .95rem/1.3 var(--sans);margin-bottom:.8rem}
+aside ol{list-style:none;margin:0;padding:0;font:.9rem/1.35 var(--sans)}
+aside li{margin:0}
+aside a{display:block;padding:.4rem .7rem;border-left:3px solid var(--line);color:var(--muted);text-decoration:none}
+aside a:hover,aside a:focus-visible{border-left-color:var(--accent);color:var(--ink);background:var(--panel)}
+main{padding:2rem 0 4rem;min-width:0}
+header.top{margin-bottom:1.5rem}
+h1{font:800 clamp(1.8rem,4vw,2.6rem)/1.15 var(--sans);margin:0 0 .6rem;letter-spacing:-.02em}
+header.top p{margin:.2rem 0;color:var(--muted)}
+h2{font:700 1.5rem/1.25 var(--sans);margin:3rem 0 1rem;padding-top:1.4rem;border-top:2px solid var(--accent)}
+h3{font:700 1.15rem/1.3 var(--sans);margin:2rem 0 .6rem}
+p,li{max-width:74ch}
+a{color:var(--accent)}
+code{font:.88em var(--mono);background:var(--inline);padding:.12em .35em;border-radius:4px}
+pre{position:relative;background:var(--code-bg);color:var(--code-ink);border-radius:8px;padding:1rem 1.1rem;overflow-x:auto;margin:1rem 0 .6rem;
+border-left:4px solid var(--accent);font:.88rem/1.55 var(--mono)}
+pre code{background:none;padding:0;font:inherit;color:inherit}
+.copy{position:absolute;top:.5rem;right:.5rem;font:600 .75rem var(--sans);padding:.3rem .65rem;border-radius:5px;border:1px solid var(--accent);
+background:var(--accent);color:var(--accent-ink);cursor:pointer}
+.copy:focus-visible,aside a:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+pre .copy{opacity:.0}pre:hover .copy,pre:focus-within .copy,.copy:focus-visible{opacity:1}
+@media (hover:none){pre .copy{opacity:1}}
+blockquote{margin:1.2rem 0;padding:.7rem 1.1rem;background:var(--warn-bg);border-left:4px solid var(--warn-line);border-radius:0 6px 6px 0}
+blockquote p{margin:.3rem 0}
+.table-wrap{overflow-x:auto;margin:1.2rem 0;border:1px solid var(--line);border-radius:8px;background:var(--panel)}
+table{border-collapse:collapse;width:100%;font:.9rem/1.5 var(--sans)}
+th,td{padding:.6rem .8rem;text-align:left;vertical-align:top;border-bottom:1px solid var(--line)}
+th{background:var(--inline);font-weight:700}tr:last-child td{border-bottom:0}
+hr{border:0;border-top:1px solid var(--line);margin:2.5rem 0}
+footer{margin-top:3rem;color:var(--muted);font:.85rem var(--sans)}
+@media (max-width:60rem){.layout{grid-template-columns:1fr;gap:0}aside{position:static;max-height:none;padding:1.5rem 0 0}
+aside ol{columns:2}}
+@media (max-width:34rem){aside ol{columns:1}body{font-size:1rem}}
+@media print{aside,.copy{display:none}.layout{display:block}pre{white-space:pre-wrap}}
+</style>
+</head>
+<body>
+<div class="layout">
+<aside aria-label="Índice"><strong>Contenido</strong><nav><ol><li><a href="#1-instalacion-inicial">Instalación inicial</a></li><li><a href="#2-servicios-levantar-detener-estado">Servicios: levantar, detener, estado</a></li><li><a href="#3-actualizar-feeds-manualmente-uno-por-uno">Actualizar feeds manualmente (uno por uno)</a></li><li><a href="#4-verificacion-del-sistema">Verificación del sistema</a></li><li><a href="#5-usuarios">Usuarios</a></li><li><a href="#6-certificados-tls">Certificados TLS</a></li><li><a href="#7-base-de-datos">Base de datos</a></li><li><a href="#8-reparacion-problema-solucion">Reparación: problema → solución</a></li><li><a href="#9-logs">Logs</a></li><li><a href="#10-acceso-remoto-a-la-web-opcional">Acceso remoto a la web (opcional)</a></li><li><a href="#11-reinicio-total-desinstalacion">Reinicio total / desinstalación</a></li><li><a href="#12-rutas-importantes">Rutas importantes</a></li><li><a href="#13-flujo-rapido-de-un-dia-normal">Flujo rápido de un día normal</a></li></ol></nav></aside>
+<main>
+<header class="top"><h1>Chuleta Greenbone (GVM / OpenVAS) en Kali Linux</h1>
+<p>Instalación, servicios, actualización de feeds, verificación y reparación.</p></header>
+<p>Referencia: metapaquete Kali <code>gvm</code> 25.04.x (septiembre 2026).
+Todos los comandos se ejecutan en una terminal de Kali.</p>
+<p><strong>Convenciones</strong></p>
+<ul>
+<li><code>sudo runuser -u _gvm -- COMANDO</code> = ejecuta el comando como el usuario del servicio <code>_gvm</code> (el que debe ser dueño de los datos de GVM). Es la forma segura de correr las herramientas de GVM.</li>
+<li>Cuando uses <code>sudo</code> directamente con <code>greenbone-feed-sync</code>, el programa cambia solo a <code>_gvm</code>; ambas formas funcionan.</li>
+<li>Web UI: <code>https://127.0.0.1:9392</code> (certificado autofirmado, acepta la advertencia).</li>
+<li>Ante cualquier duda de opciones: <code>COMANDO --help</code> es la fuente de verdad de tu versión instalada.</li>
+</ul>
+<hr />
+<h2 id="1-instalacion-inicial">1. Instalación inicial</h2>
+<pre><code class="language-bash">sudo apt update &amp;&amp; sudo apt full-upgrade -y
+</code></pre>
+<p>Actualiza Kali antes de instalar (evita conflictos de versiones).</p>
+<pre><code class="language-bash">sudo apt install gvm -y
+</code></pre>
+<p>Instala el metapaquete: <code>gsad</code> (web), <code>gvmd</code> (gestor), <code>openvas-scanner</code> (motor de escaneo), <code>ospd-openvas</code> (puente entre gvmd y el scanner), <code>notus-scanner</code> y utilidades.</p>
+<pre><code class="language-bash">sudo gvm-setup
+</code></pre>
+<p>Configura todo: arranca PostgreSQL, crea certificados, crea la base de datos <code>gvmd</code>, crea el usuario <code>admin</code> <strong>con contraseña aleatoria (anótala)</strong> y lanza la primera sincronización de feeds. Tarda de 20 a 60+ minutos. Es seguro volver a ejecutarlo: si algo ya existe, lo detecta y lo omite.</p>
+<pre><code class="language-bash">sudo gvm-check-setup
+</code></pre>
+<p>Revisa que la instalación esté completa. Si algo falta, imprime líneas <code>FIX:</code> con el comando exacto para corregirlo; aplícalo y vuelve a ejecutar el chequeo hasta que diga que está OK.</p>
+<pre><code class="language-bash">sudo gvm-start
+</code></pre>
+<p>Levanta los servicios y abre el navegador en la web UI.</p>
+<blockquote>
+<p>Nota: <code>gvm-setup</code> termina antes de que <code>gvmd</code> termine de <strong>importar</strong> los feeds a la base de datos. Hasta que termine, no existen scan configs como "Full and Fast". Mira la sección 4 ("Contenido importado en la base de datos") para comprobarlo.</p>
+</blockquote>
+<hr />
+<h2 id="2-servicios-levantar-detener-estado">2. Servicios: levantar, detener, estado</h2>
+<h3 id="atajos-de-kali">Atajos de Kali</h3>
+<pre><code class="language-bash">sudo gvm-start      # levanta los servicios de GVM
+sudo gvm-stop       # detiene gsad, gvmd, ospd-openvas y notus-scanner
+</code></pre>
+<h3 id="con-systemctl-control-fino">Con systemctl (control fino)</h3>
+<p>Servicios de GVM: <code>gsad</code>, <code>gvmd</code>, <code>ospd-openvas</code>, <code>notus-scanner</code>.
+Dependencias: <code>postgresql</code>, <code>redis-server@openvas</code>, <code>mosquitto</code> (los nombres de Redis/MQTT pueden variar según tu Kali; revisa con <code>systemctl list-units | grep -Ei 'redis|valkey|mosquitto'</code>).</p>
+<pre><code class="language-bash">sudo systemctl start postgresql
+sudo systemctl start redis-server@openvas
+sudo systemctl start mosquitto
+sudo systemctl start ospd-openvas notus-scanner gvmd gsad
+</code></pre>
+<p>Orden recomendado de arranque: primero base de datos y mensajería, luego el scanner, luego gvmd, al final la web.</p>
+<pre><code class="language-bash">sudo systemctl stop gsad gvmd notus-scanner ospd-openvas
+</code></pre>
+<p>Detiene en orden inverso (web primero, scanner al final).</p>
+<pre><code class="language-bash">sudo systemctl restart ospd-openvas gvmd
+</code></pre>
+<p>Reinicia scanner y gestor; útil después de actualizar feeds. <strong>Interrumpe los escaneos en curso.</strong></p>
+<pre><code class="language-bash">systemctl status gvmd ospd-openvas gsad notus-scanner
+systemctl is-active gvmd ospd-openvas gsad notus-scanner
+</code></pre>
+<p>Estado detallado / estado resumido (<code>active</code> o <code>inactive</code>).</p>
+<pre><code class="language-bash">sudo systemctl enable postgresql redis-server@openvas mosquitto ospd-openvas notus-scanner gvmd gsad
+sudo systemctl disable ospd-openvas notus-scanner gvmd gsad
+</code></pre>
+<p>Activa o desactiva el arranque automático con el sistema (por defecto en Kali están desactivados).</p>
+<hr />
+<h2 id="3-actualizar-feeds-manualmente-uno-por-uno">3. Actualizar feeds manualmente (uno por uno)</h2>
+<p>Todo se hace con <strong><code>greenbone-feed-sync</code></strong> y su opción <code>--type</code>.
+Los scripts viejos (<code>greenbone-nvt-sync</code>, <code>greenbone-scapdata-sync</code>, <code>greenbone-certdata-sync</code>) están <strong>obsoletos</strong>; si los viste en guías antiguas, esta es la equivalencia:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Comando viejo (obsoleto)</th>
+<th>Comando actual</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>greenbone-nvt-sync</code></td>
+<td><code>greenbone-feed-sync --type nvt</code></td>
+</tr>
+<tr>
+<td><code>greenbone-scapdata-sync</code></td>
+<td><code>greenbone-feed-sync --type scap</code></td>
+</tr>
+<tr>
+<td><code>greenbone-certdata-sync</code></td>
+<td><code>greenbone-feed-sync --type cert</code></td>
+</tr>
+<tr>
+<td><code>gvm-feed-update</code> (wrapper de Debian/Kali, no mantenido por Greenbone)</td>
+<td><code>greenbone-feed-sync</code> (sin argumentos = todo)</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="todos-los-feeds-de-una-vez">Todos los feeds de una vez</h3>
+<pre><code class="language-bash">sudo runuser -u _gvm -- greenbone-feed-sync
+</code></pre>
+<p>Equivale a <code>--type all</code>. Descarga todo en el orden correcto.</p>
+<h3 id="cada-feed-por-separado">Cada feed por separado</h3>
+<pre><code class="language-bash">sudo runuser -u _gvm -- greenbone-feed-sync --type nvt
+</code></pre>
+<p><strong>NVT</strong> = los tests de vulnerabilidad (agrupa <code>nasl</code> + <code>notus</code>). Reemplaza al viejo <code>greenbone-nvt-sync</code>.</p>
+<pre><code class="language-bash">sudo runuser -u _gvm -- greenbone-feed-sync --type nasl
+</code></pre>
+<p>Solo los scripts <strong>NASL</strong> (los tests clásicos de detección). Destino: <code>/var/lib/openvas/plugins</code>.</p>
+<pre><code class="language-bash">sudo runuser -u _gvm -- greenbone-feed-sync --type notus
+</code></pre>
+<p>Solo datos de <strong>Notus</strong> (detección rápida de paquetes vulnerables del sistema operativo, sin escaneo activo). Destino: <code>/var/lib/notus</code>. Si falta, <code>notus-scanner</code> falla con "<code>/var/lib/notus/products</code> is not a directory".</p>
+<pre><code class="language-bash">sudo runuser -u _gvm -- greenbone-feed-sync --type scap
+</code></pre>
+<p><strong>SCAP</strong>: base de CVE, CPE y puntuaciones CVSS. Destino: <code>/var/lib/gvm/scap-data</code>. Sin esto los reportes no traen datos de CVE.</p>
+<pre><code class="language-bash">sudo runuser -u _gvm -- greenbone-feed-sync --type cert
+</code></pre>
+<p><strong>CERT</strong>: avisos de seguridad CERT-Bund y DFN-CERT. Destino: <code>/var/lib/gvm/cert-data</code>.</p>
+<pre><code class="language-bash">sudo runuser -u _gvm -- greenbone-feed-sync --type gvmd-data
+</code></pre>
+<p><strong>Datos de gvmd</strong>: listas de puertos, scan configs ("Full and Fast", etc.) y formatos de reporte. Destino: <code>/var/lib/gvm/data-objects/gvmd</code>. <strong>Si "Full and Fast" no aparece, es este.</strong></p>
+<p>Subconjuntos de <code>gvmd-data</code> (si solo necesitas una parte):</p>
+<pre><code class="language-bash">sudo runuser -u _gvm -- greenbone-feed-sync --type scan-config
+sudo runuser -u _gvm -- greenbone-feed-sync --type port-list
+sudo runuser -u _gvm -- greenbone-feed-sync --type report-format
+</code></pre>
+<p>Scan configs / listas de puertos / formatos de reporte, por separado.</p>
+<blockquote>
+<p>Algunas guías escriben los tipos en mayúsculas (<code>--type SCAP</code>, <code>--type GVMD_DATA</code>). Si uno da error de "invalid choice", prueba la otra forma. Valores válidos según la documentación: <code>all</code>, <code>nvt</code>, <code>nasl</code>, <code>notus</code>, <code>scap</code>, <code>cert</code>, <code>gvmd-data</code>, <code>scan-config</code>, <code>port-list</code>, <code>report-format</code>.</p>
+</blockquote>
+<h3 id="orden-sugerido-si-actualizas-a-mano-por-partes">Orden sugerido si actualizas a mano por partes</h3>
+<ol>
+<li><code>--type nvt</code> (o <code>nasl</code> y <code>notus</code>)</li>
+<li><code>--type scap</code></li>
+<li><code>--type cert</code></li>
+<li><code>--type gvmd-data</code></li>
+</ol>
+<h3 id="opciones-utiles-de-greenbone-feed-sync">Opciones útiles de <code>greenbone-feed-sync</code></h3>
+<pre><code class="language-bash">sudo runuser -u _gvm -- greenbone-feed-sync --help          # todas las opciones
+sudo runuser -u _gvm -- greenbone-feed-sync -vvv            # modo muy detallado (depurar)
+sudo runuser -u _gvm -- greenbone-feed-sync --quiet         # sin salida (para automatizar)
+greenbone-feed-sync --version                               # versión de la herramienta
+</code></pre>
+<p>Archivos de configuración opcionales (para cambiar URLs o destinos): <code>/etc/gvm/greenbone-feed-sync.toml</code> o <code>~/.config/greenbone-feed-sync.toml</code>.</p>
+<h3 id="despues-de-sincronizar">Después de sincronizar</h3>
+<pre><code class="language-bash">sudo systemctl restart ospd-openvas gvmd
+</code></pre>
+<p>Fuerza a recargar los VTs nuevos. Normalmente se recargan solos; usa esto si la web sigue mostrando datos viejos. Recuerda que <code>gvmd</code> <strong>importa los datos a la base de datos en segundo plano</strong>, y puede tardar un buen rato (Administration → Feed Status en la web muestra el avance).</p>
+<h3 id="problemas-al-sincronizar">Problemas al sincronizar</h3>
+<pre><code class="language-bash">timeout 8 bash -c 'exec 3&lt;&gt;/dev/tcp/feed.community.greenbone.net/873' &amp;&amp; echo &quot;rsync alcanzable&quot; || echo &quot;puerto 873 bloqueado&quot;
+</code></pre>
+<p>Comprueba que sales por el puerto <strong>873/tcp (rsync)</strong>. Si está bloqueado por firewall o proxy, la sincronización falla.</p>
+<pre><code class="language-bash">pgrep -af greenbone-feed-sync
+</code></pre>
+<p>Si ya hay otra sincronización corriendo, la nueva se queda esperando o falla por el lock (<code>/var/lib/openvas/feed-update.lock</code>). Solo borra ese archivo si <strong>no</strong> hay ningún proceso corriendo:</p>
+<pre><code class="language-bash">sudo rm -f /var/lib/openvas/feed-update.lock
+</code></pre>
+<h3 id="automatizar-una-vez-al-dia">Automatizar una vez al día</h3>
+<pre><code class="language-bash">sudo tee /etc/cron.d/gvm-feed-sync &gt;/dev/null &lt;&lt;EOF
+30 3 * * * _gvm $(command -v greenbone-feed-sync) --quiet
+EOF
+</code></pre>
+<p>Sincroniza todos los feeds cada día a las 03:30 como usuario <code>_gvm</code> (requiere el servicio <code>cron</code> instalado y activo). Con systemd, el script <code>gvm-toolkit.sh autoupdate on</code> crea un timer equivalente. Una vez al día es suficiente; no abuses del servidor del feed.</p>
+<hr />
+<h2 id="4-verificacion-del-sistema">4. Verificación del sistema</h2>
+<pre><code class="language-bash">sudo gvm-check-setup
+</code></pre>
+<p>Chequeo oficial de Kali. Debe terminar diciendo que la instalación está OK.</p>
+<pre><code class="language-bash">sudo runuser -u _gvm -- gvmd --get-scanners
+</code></pre>
+<p>Lista los scanners registrados. Debe aparecer algo como:
+<code>08b69003-5fc2-4037-a479-93b440211c73  OpenVAS  /run/ospd/ospd-openvas.sock  0  OpenVAS Default</code></p>
+<pre><code class="language-bash">sudo runuser -u _gvm -- gvmd --verify-scanner=08b69003-5fc2-4037-a479-93b440211c73
+</code></pre>
+<p>Hace que <code>gvmd</code> hable realmente con el scanner. Si responde con la versión de OpenVAS, la cadena gvmd → ospd-openvas funciona. Si falla justo después de arrancar, espera unos minutos: <code>ospd-openvas</code> está cargando los VTs.</p>
+<pre><code class="language-bash">sudo runuser -u _gvm -- gvmd --get-users --verbose
+</code></pre>
+<p>Lista usuarios con su UUID.</p>
+<pre><code class="language-bash">curl -ks -o /dev/null -w '%{http_code}\n' https://127.0.0.1:9392/
+</code></pre>
+<p>Prueba que la web responde (esperado: <code>200</code>, <code>301</code>, <code>302</code> o <code>303</code>).</p>
+<pre><code class="language-bash">ss -ltnp | grep -E '9392|5432|1883'
+</code></pre>
+<p>Muestra qué escucha en: 9392 (web GSA), 5432 (PostgreSQL), 1883 (MQTT/Mosquitto).</p>
+<pre><code class="language-bash">ls -l /run/gvmd/gvmd.sock /run/ospd/ospd-openvas.sock
+</code></pre>
+<p>Comprueba que existen los sockets de <code>gvmd</code> y <code>ospd-openvas</code>.</p>
+<pre><code class="language-bash">redis-cli -s /run/redis-openvas/redis-server.sock ping
+</code></pre>
+<p>Debe responder <code>PONG</code>. Verifica el Redis que usa el scanner. (Si usas Valkey, el cliente es <code>valkey-cli</code>.)</p>
+<pre><code class="language-bash">pg_isready
+pg_lsclusters
+</code></pre>
+<p>Estado de PostgreSQL / lista de clústeres (versión, puerto, <code>online</code> o <code>down</code>). Si hay más de un clúster tras una actualización, GVM debe usar el del puerto 5432.</p>
+<h3 id="versiones">Versiones</h3>
+<pre><code class="language-bash">dpkg -l | grep -E 'gvm|gsad|openvas|ospd|notus'
+sudo runuser -u _gvm -- gvmd --version
+gsad --version
+openvas --version
+ospd-openvas --version
+</code></pre>
+<h3 id="contenido-importado-en-la-base-de-datos">Contenido importado en la base de datos</h3>
+<pre><code class="language-bash">sudo runuser -u _gvm -- psql -d gvmd -tAc &quot;SELECT count(*) FROM nvts;&quot;
+sudo runuser -u _gvm -- psql -d gvmd -tAc &quot;SELECT count(*) FROM configs;&quot;
+sudo runuser -u _gvm -- psql -d gvmd -tAc &quot;SELECT count(*) FROM port_lists;&quot;
+sudo runuser -u _gvm -- psql -d gvmd -tAc &quot;SELECT count(*) FROM scap.cves;&quot;
+sudo runuser -u _gvm -- psql -d gvmd -tAc &quot;SELECT count(*) FROM cert.cert_bund_advs;&quot;
+</code></pre>
+<p>Cuentan: VTs, scan configs, listas de puertos, CVEs y avisos CERT. Si alguno da <code>0</code>, ese feed aún no se sincronizó o importó (ver secciones 3 y 8).</p>
+<h3 id="fecha-del-feed-en-disco">Fecha del feed en disco</h3>
+<pre><code class="language-bash">grep PLUGIN_SET /var/lib/openvas/plugins/plugin_feed_info.inc
+</code></pre>
+<p>Muestra la versión del feed NASL en formato <code>AAAAMMDDhhmm</code>. Si tiene más de una semana, actualiza.</p>
+<pre><code class="language-bash">ls -la /var/lib/openvas/plugins /var/lib/notus /var/lib/gvm/scap-data /var/lib/gvm/cert-data /var/lib/gvm/data-objects/gvmd
+</code></pre>
+<p>Verifica que las carpetas de cada feed no estén vacías.</p>
+<hr />
+<h2 id="5-usuarios">5. Usuarios</h2>
+<pre><code class="language-bash">sudo runuser -u _gvm -- gvmd --user=admin --new-password='NUEVA_CONTRASEÑA'
+</code></pre>
+<p>Cambia la contraseña de un usuario existente.</p>
+<pre><code class="language-bash">sudo runuser -u _gvm -- gvmd --create-user=analista --password='CONTRASEÑA' --role=Admin
+</code></pre>
+<p>Crea un usuario (roles: <code>Admin</code>, <code>User</code>, etc.).</p>
+<pre><code class="language-bash">sudo runuser -u _gvm -- gvmd --delete-user=analista
+</code></pre>
+<p>Elimina un usuario.</p>
+<pre><code class="language-bash">sudo runuser -u _gvm -- gvmd --get-users --verbose
+</code></pre>
+<p>Lista usuarios y UUID (necesitas el UUID de <code>admin</code> en la sección 8).</p>
+<blockquote>
+<p>Las contraseñas pasadas por línea de comandos quedan visibles un instante en <code>ps</code> y en el historial del shell. Úsalo solo en equipos de confianza.</p>
+</blockquote>
+<hr />
+<h2 id="6-certificados-tls">6. Certificados TLS</h2>
+<pre><code class="language-bash">sudo runuser -u _gvm -- gvm-manage-certs -a -f
+</code></pre>
+<p>Regenera todos los certificados (CA, servidor, cliente) sobrescribiendo los existentes. Es el <code>FIX</code> típico cuando <code>gvm-check-setup</code> dice "No CA certificate file".</p>
+<pre><code class="language-bash">openssl x509 -in /var/lib/gvm/CA/servercert.pem -noout -dates
+openssl x509 -in /var/lib/gvm/CA/cacert.pem -noout -dates
+</code></pre>
+<p>Muestra la fecha de inicio y caducidad de los certificados.</p>
+<p>Después de regenerar: <code>sudo systemctl restart gvmd gsad</code>.</p>
+<hr />
+<h2 id="7-base-de-datos">7. Base de datos</h2>
+<pre><code class="language-bash">sudo runuser -u _gvm -- gvmd --migrate
+</code></pre>
+<p>Aplica migraciones de esquema de la base de datos. Necesario tras actualizar <code>gvmd</code> a una versión nueva. Ejecútalo con <code>gvmd</code> <strong>detenido</strong> (<code>sudo systemctl stop gvmd</code>).</p>
+<pre><code class="language-bash">sudo runuser -u _gvm -- gvmd --optimize=vacuum
+</code></pre>
+<p>Mantenimiento de la BD (compactar). Confirma las opciones disponibles con <code>gvmd --help</code>.</p>
+<h3 id="respaldo">Respaldo</h3>
+<pre><code class="language-bash">sudo mkdir -p /var/backups/gvm
+sudo runuser -u _gvm -- pg_dump -d gvmd | gzip | sudo tee /var/backups/gvm/gvmd-$(date +%F).sql.gz &gt;/dev/null
+</code></pre>
+<p>Guarda un dump comprimido (tareas, targets, reportes, usuarios).</p>
+<pre><code class="language-bash">sudo tar czf /var/backups/gvm/gvm-files-$(date +%F).tgz /var/lib/gvm/CA /var/lib/gvm/private /etc/gvm /etc/openvas
+</code></pre>
+<p>Respalda certificados y configuración.</p>
+<h3 id="restauracion-probar-antes-en-una-vm">Restauración (probar antes en una VM)</h3>
+<pre><code class="language-bash">sudo systemctl stop gsad gvmd notus-scanner ospd-openvas
+sudo runuser -u postgres -- dropdb gvmd
+sudo runuser -u postgres -- createdb -O _gvm gvmd
+gunzip -c /var/backups/gvm/gvmd-AAAA-MM-DD.sql.gz | sudo runuser -u postgres -- psql -d gvmd
+sudo runuser -u _gvm -- gvmd --migrate
+sudo gvm-start
+</code></pre>
+<p>Borra la base actual, la recrea y carga el respaldo.</p>
+<hr />
+<h2 id="8-reparacion-problema-solucion">8. Reparación: problema → solución</h2>
+<h3 id="reparacion-general-en-orden">Reparación general (en orden)</h3>
+<pre><code class="language-bash"># 1) parar los servicios de GVM
+sudo systemctl stop gsad gvmd notus-scanner ospd-openvas
+
+# 2) borrar residuos (pid y sockets viejos)
+sudo rm -f /run/gvmd/gvmd.pid /run/ospd/ospd-openvas.pid /run/gvmd/gvmd.sock /run/ospd/ospd-openvas.sock
+
+# 3) recrear carpetas de /run y corregir dueños
+sudo systemd-tmpfiles --create
+sudo chown -R _gvm:_gvm /var/lib/gvm /var/lib/openvas /var/lib/notus /var/log/gvm
+
+# 4) asegurar PostgreSQL, Redis y MQTT
+sudo systemctl start postgresql redis-server@openvas mosquitto
+
+# 5) migrar la BD y regenerar certificados
+sudo runuser -u _gvm -- gvmd --migrate
+sudo runuser -u _gvm -- gvm-manage-certs -a -f
+
+# 6) sincronizar feeds
+sudo runuser -u _gvm -- greenbone-feed-sync
+
+# 7) levantar y comprobar
+sudo gvm-start
+sudo gvm-check-setup
+</code></pre>
+<h3 id="fijar-el-feed-import-owner-si-los-scan-configs-no-se-importan">Fijar el "Feed Import Owner" (si los scan configs no se importan)</h3>
+<pre><code class="language-bash">ADMIN_UUID=$(sudo runuser -u _gvm -- gvmd --get-users --verbose | awk '$1==&quot;admin&quot;{print $2}')
+sudo runuser -u _gvm -- gvmd --modify-setting 78eceaec-3385-11ea-b237-28d24461215b --value &quot;$ADMIN_UUID&quot;
+</code></pre>
+<p>Indica a <code>gvmd</code> qué usuario será dueño de los datos importados del feed (configs, listas de puertos, formatos de reporte). Sin esto, esos datos pueden no aparecer.</p>
+<h3 id="error-failed-to-find-config-daba56c8-73ec-11df-a475-002264764cea">Error: <code>Failed to find config 'daba56c8-73ec-11df-a475-002264764cea'</code></h3>
+<p><strong>Qué significa:</strong> ese UUID es el scan config <strong>"Full and fast"</strong>, el que GSA deja preseleccionado al crear una tarea. El mensaje dice que <code>gvmd</code> no lo encuentra en su base de datos, es decir, <strong>los scan configs todavía no se han importado del feed</strong> (o nunca se importaron). El foro de Greenbone apunta además a que la base SCAP debe estar disponible.</p>
+<p><strong>Causas habituales:</strong> feed <code>gvmd-data</code> sin sincronizar, importación aún en curso, "Feed Import Owner" sin fijar, o feeds <code>scap</code>/<code>nvt</code> incompletos.</p>
+<p><strong>Diagnóstico:</strong></p>
+<pre><code class="language-bash">sudo runuser -u _gvm -- psql -d gvmd -c &quot;SELECT uuid, name FROM configs;&quot;
+sudo runuser -u _gvm -- psql -d gvmd -tAc &quot;SELECT count(*) FROM nvts;&quot;
+sudo runuser -u _gvm -- psql -d gvmd -tAc &quot;SELECT count(*) FROM scap.cves;&quot;
+</code></pre>
+<p>Si la primera consulta no devuelve filas (o no aparece <code>daba56c8-...</code>), es esto. Si <code>nvts</code> o <code>scap.cves</code> dan <code>0</code>, esos feeds tampoco se han importado.</p>
+<p><strong>Solución, en orden:</strong></p>
+<pre><code class="language-bash"># 1) fijar el dueño de los datos del feed
+ADMIN_UUID=$(sudo runuser -u _gvm -- gvmd --get-users --verbose | awk '$1==&quot;admin&quot;{print $2}')
+sudo runuser -u _gvm -- gvmd --modify-setting 78eceaec-3385-11ea-b237-28d24461215b --value &quot;$ADMIN_UUID&quot;
+
+# 2) sincronizar todos los feeds
+sudo runuser -u _gvm -- greenbone-feed-sync
+
+# 3) reiniciar para que gvmd detecte los datos
+sudo systemctl restart ospd-openvas gvmd
+
+# 4) esperar la importación (Ctrl+C para salir)
+while true; do sudo runuser -u _gvm -- psql -d gvmd -tAc &quot;SELECT (SELECT count(*) FROM nvts) AS nvts, (SELECT count(*) FROM configs) AS configs, (SELECT count(*) FROM scap.cves) AS cves;&quot;; sleep 30; done
+</code></pre>
+<p>Cuando <code>configs</code> sea mayor que 0 y la consulta de arriba muestre "Full and fast", cierra sesión en GSA y recarga con Ctrl+F5.</p>
+<p><strong>Si <code>configs</code> ya tiene filas pero el error sigue:</strong> el ajuste de usuario del scan config por defecto apunta a uno inexistente. En GSA entra a los ajustes del usuario (My Settings → Defaults) y elige un Scan Config que exista.</p>
+<p><strong>Si pasada más de una hora sigue vacía:</strong> revisa <code>sudo tail -n 100 /var/log/gvm/gvmd.log</code> y, como último recurso, la sección 11 (reinicio de la base de datos).</p>
+<h3 id="tabla-de-sintomas">Tabla de síntomas</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Síntoma</th>
+<th>Causa probable</th>
+<th>Solución</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>gvm-check-setup</code>: "No CA certificate file"</td>
+<td>Faltan certificados</td>
+<td><code>sudo runuser -u _gvm -- gvm-manage-certs -a -f</code></td>
+</tr>
+<tr>
+<td><code>Failed to find config 'daba56c8-...'</code> al crear un scan</td>
+<td>Igual que la fila siguiente: el config "Full and fast" no está importado</td>
+<td>Ver el subapartado de este error, justo arriba</td>
+</tr>
+<tr>
+<td>No existe "Full and Fast"</td>
+<td>Feed <code>gvmd-data</code> sin sincronizar o sin importar</td>
+<td><code>greenbone-feed-sync --type gvmd-data</code>, fijar Feed Import Owner, esperar importación</td>
+</tr>
+<tr>
+<td><code>notus-scanner</code> falla: "/var/lib/notus/products is not a directory"</td>
+<td>Feed Notus sin descargar</td>
+<td><code>greenbone-feed-sync --type notus</code></td>
+</tr>
+<tr>
+<td>Web no abre</td>
+<td><code>gsad</code> caído o puerto distinto</td>
+<td><code>systemctl status gsad</code>, <code>ss -ltnp | grep 9392</code>, <code>gvm-start</code></td>
+</tr>
+<tr>
+<td>"Scanner not reachable" / <code>--verify-scanner</code> falla</td>
+<td><code>ospd-openvas</code> caído o cargando VTs</td>
+<td><code>systemctl restart ospd-openvas</code>, espera unos minutos, repite <code>--verify-scanner</code></td>
+</tr>
+<tr>
+<td><code>gvmd</code> no arranca tras actualizar</td>
+<td>Esquema de BD desactualizado</td>
+<td>Con <code>gvmd</code> parado: <code>gvmd --migrate</code></td>
+</tr>
+<tr>
+<td>PostgreSQL no responde / "port 5433"</td>
+<td>Dos clústeres tras actualizar PostgreSQL</td>
+<td><code>pg_lsclusters</code>, <code>sudo pg_ctlcluster &lt;ver&gt; main start</code>; revisar cuál usa el puerto 5432</td>
+</tr>
+<tr>
+<td><code>greenbone-feed-sync</code> falla</td>
+<td>Puerto 873 bloqueado o lock colgado</td>
+<td>Probar conexión rsync y revisar <code>/var/lib/openvas/feed-update.lock</code> (sección 3)</td>
+</tr>
+<tr>
+<td>CVE vacíos en reportes</td>
+<td>Feed SCAP sin sincronizar/importar</td>
+<td><code>greenbone-feed-sync --type scap</code></td>
+</tr>
+<tr>
+<td>Todo roto tras muchos cambios</td>
+<td>Estado inconsistente</td>
+<td>Sección 11 (reinicio total)</td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<h2 id="9-logs">9. Logs</h2>
+<pre><code class="language-bash">journalctl -u gvmd -u ospd-openvas -u gsad -u notus-scanner -n 100 --no-pager
+</code></pre>
+<p>Últimas 100 líneas de los cuatro servicios.</p>
+<pre><code class="language-bash">journalctl -u gvmd -f
+</code></pre>
+<p>Sigue el log de un servicio en vivo (Ctrl+C para salir).</p>
+<pre><code class="language-bash">sudo tail -n 50 /var/log/gvm/gvmd.log
+sudo tail -n 50 /var/log/gvm/ospd-openvas.log
+sudo tail -n 50 /var/log/gvm/gsad.log
+sudo tail -n 50 /var/log/gvm/openvas.log
+</code></pre>
+<p>Logs propios de cada componente (la ubicación puede variar ligeramente según la versión).</p>
+<hr />
+<h2 id="10-acceso-remoto-a-la-web-opcional">10. Acceso remoto a la web (opcional)</h2>
+<p>Por defecto <code>gsad</code> solo escucha en <code>127.0.0.1</code>.</p>
+<pre><code class="language-bash">systemctl cat gsad
+</code></pre>
+<p>Copia la línea <code>ExecStart=</code> original.</p>
+<pre><code class="language-bash">sudo systemctl edit gsad
+</code></pre>
+<p>Pega esto, cambiando <strong>solo</strong> la dirección de escucha en tu línea original:</p>
+<pre><code>[Service]
+ExecStart=
+ExecStart=&lt;tu línea original, con --listen=0.0.0.0&gt;
+</code></pre>
+<p>Luego: <code>sudo systemctl restart gsad</code>.
+<strong>Solo en redes de confianza</strong>; no expongas GSA a Internet. Si no quieres abrir el puerto, usa un túnel SSH: <code>ssh -L 9392:127.0.0.1:9392 usuario@kali</code>.</p>
+<hr />
+<h2 id="11-reinicio-total-desinstalacion">11. Reinicio total / desinstalación</h2>
+<h3 id="reiniciar-solo-la-base-de-datos-conserva-los-paquetes">Reiniciar solo la base de datos (conserva los paquetes)</h3>
+<pre><code class="language-bash">sudo systemctl stop gsad gvmd notus-scanner ospd-openvas
+sudo runuser -u postgres -- psql -c 'DROP DATABASE IF EXISTS gvmd;'
+sudo gvm-setup
+</code></pre>
+<p><strong>Borra tareas, targets, reportes y usuarios.</strong> <code>gvm-setup</code> recrea todo y genera una contraseña nueva de <code>admin</code>.</p>
+<h3 id="desinstalar-por-completo">Desinstalar por completo</h3>
+<pre><code class="language-bash">sudo systemctl stop gsad gvmd notus-scanner ospd-openvas
+sudo runuser -u postgres -- psql -c 'DROP DATABASE IF EXISTS gvmd;'
+sudo apt purge gvm gvmd gsad openvas-scanner ospd-openvas notus-scanner
+sudo apt autoremove --purge
+sudo rm -rf /var/lib/gvm /var/lib/openvas /var/lib/notus /var/log/gvm
+</code></pre>
+<p>Elimina paquetes, base de datos y datos. Es destructivo e irreversible.</p>
+<hr />
+<h2 id="12-rutas-importantes">12. Rutas importantes</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Qué</th>
+<th>Dónde</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Feed NASL (VTs)</td>
+<td><code>/var/lib/openvas/plugins</code></td>
+</tr>
+<tr>
+<td>Feed Notus</td>
+<td><code>/var/lib/notus</code></td>
+</tr>
+<tr>
+<td>Feed SCAP (CVE/CPE)</td>
+<td><code>/var/lib/gvm/scap-data</code></td>
+</tr>
+<tr>
+<td>Feed CERT</td>
+<td><code>/var/lib/gvm/cert-data</code></td>
+</tr>
+<tr>
+<td>Datos de gvmd (configs, puertos, formatos)</td>
+<td><code>/var/lib/gvm/data-objects/gvmd</code></td>
+</tr>
+<tr>
+<td>Certificados</td>
+<td><code>/var/lib/gvm/CA</code> y <code>/var/lib/gvm/private</code></td>
+</tr>
+<tr>
+<td>Lock de sincronización</td>
+<td><code>/var/lib/openvas/feed-update.lock</code></td>
+</tr>
+<tr>
+<td>Socket de gvmd</td>
+<td><code>/run/gvmd/gvmd.sock</code></td>
+</tr>
+<tr>
+<td>Socket de ospd-openvas</td>
+<td><code>/run/ospd/ospd-openvas.sock</code></td>
+</tr>
+<tr>
+<td>Logs</td>
+<td><code>/var/log/gvm/</code> y <code>journalctl</code></td>
+</tr>
+<tr>
+<td>Config de feed-sync (opcional)</td>
+<td><code>/etc/gvm/greenbone-feed-sync.toml</code></td>
+</tr>
+<tr>
+<td>Web UI</td>
+<td><code>https://127.0.0.1:9392</code></td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<h2 id="13-flujo-rapido-de-un-dia-normal">13. Flujo rápido de un día normal</h2>
+<pre><code class="language-bash">sudo gvm-start                                              # 1. levantar
+sudo runuser -u _gvm -- greenbone-feed-sync                 # 2. actualizar feeds
+sudo gvm-check-setup                                        # 3. comprobar
+# ... trabajar en https://127.0.0.1:9392 ...
+sudo gvm-stop                                               # 4. al terminar
+</code></pre>
+<blockquote>
+<p>Escanea únicamente sistemas que sean tuyos o para los que tengas autorización por escrito.</p>
+</blockquote>
+<footer>Pulsa «Copiar» en cualquier bloque de código. Escanea únicamente sistemas con autorización.</footer>
+</main>
+</div>
+<script>
+document.querySelectorAll('pre').forEach(function(pre){
+  var b=document.createElement('button');b.className='copy';b.type='button';b.textContent='Copiar';
+  b.addEventListener('click',function(){
+    var t=pre.querySelector('code').innerText;
+    var done=function(){b.textContent='Copiado';setTimeout(function(){b.textContent='Copiar'},1500)};
+    if(navigator.clipboard&&window.isSecureContext){navigator.clipboard.writeText(t).then(done)}
+    else{var a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();
+      try{document.execCommand('copy');done()}catch(e){}document.body.removeChild(a)}
+  });
+  pre.appendChild(b);
+});
+</script>
+</body>
+</html>

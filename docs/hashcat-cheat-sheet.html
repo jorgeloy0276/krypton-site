@@ -1,0 +1,352 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hashcat Ethical Hacking Cheat Sheet</title>
+<style>
+:root {
+  --bg: #10151d;
+  --panel: #192331;
+  --text: #e8eef7;
+  --muted: #a5b4c8;
+  --accent: #64dfbd;
+  --code: #0b1118;
+  --border: #344256;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: 16px/1.65 system-ui, sans-serif;
+}
+header {
+  padding: 38px 22px;
+  background: #172b37;
+  border-bottom: 3px solid var(--accent);
+}
+header, main { max-width: 1100px; margin: auto; }
+main { padding: 24px 20px 60px; }
+h1 { margin: 0; font-size: clamp(27px, 5vw, 42px); }
+h2 { margin-top: 38px; color: var(--accent); }
+h3 { margin-top: 25px; }
+p, li { color: var(--muted); }
+a { color: var(--accent); }
+nav, .panel {
+  background: var(--panel);
+  padding: 18px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  margin: 18px 0;
+}
+nav ul { columns: 2; padding-left: 22px; }
+code, pre {
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+}
+code { color: #a7e8d7; overflow-wrap: anywhere; }
+pre {
+  background: var(--code);
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow-x: auto;
+  color: #d5e7f4;
+  white-space: pre;
+}
+table { width: 100%; border-collapse: collapse; margin: 15px 0; }
+th, td {
+  text-align: left;
+  vertical-align: top;
+  padding: 11px;
+  border: 1px solid var(--border);
+}
+th { background: #233346; color: var(--accent); }
+td { color: var(--muted); }
+input {
+  width: 100%;
+  padding: 12px;
+  margin: 12px 0;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  background: var(--code);
+  color: var(--text);
+  font-size: 16px;
+}
+.small { font-size: 14px; }
+.warning { border-left: 4px solid #e5b567; }
+footer { border-top: 1px solid var(--border); padding-top: 20px; }
+@media (max-width: 650px) {
+  nav ul { columns: 1; }
+  table { font-size: 14px; }
+  th, td { padding: 7px; }
+}
+</style>
+</head>
+<body>
+<header>
+  <h1>Hashcat Cheat Sheet</h1>
+  <p>Ethical Hacking · Password Auditing · Command Reference</p>
+  <p class="small">Organized by practical workflow, from setup to reporting.</p>
+</header>
+
+<main>
+<div class="panel warning">
+  <strong>Authorized use only</strong>
+  <p>Use Hashcat only on hashes you own or have explicit permission
+  to audit. Keep recovered passwords confidential. Use synthetic
+  training data for practice.</p>
+</div>
+
+<nav>
+  <h2>Contents</h2>
+  <ul>
+    <li><a href="#workflow">1. Workflow</a></li>
+    <li><a href="#setup">2. Setup and diagnostics</a></li>
+    <li><a href="#syntax">3. Basic syntax</a></li>
+    <li><a href="#hashes">4. Hash modes</a></li>
+    <li><a href="#attacks">5. Attack modes</a></li>
+    <li><a href="#rules">6. Rules and masks</a></li>
+    <li><a href="#execution">7. Running audits</a></li>
+    <li><a href="#results">8. Results and recovery</a></li>
+    <li><a href="#troubleshooting">9. Troubleshooting</a></li>
+    <li><a href="#reference">10. Official references</a></li>
+  </ul>
+</nav>
+
+<section id="workflow">
+<h2>1. Recommended workflow</h2>
+<ol>
+  <li>Confirm authorization and prepare a test hash file.</li>
+  <li>Check the Hashcat version and available compute devices.</li>
+  <li>Identify the hash algorithm and the required input format.</li>
+  <li>Choose the correct hash mode with <code>-m</code>.</li>
+  <li>Choose an attack mode with <code>-a</code>.</li>
+  <li>Run a small, controlled test against a lab hash.</li>
+  <li>Monitor the session and save the results securely.</li>
+  <li>Document findings and recommend stronger password storage.</li>
+</ol>
+</section>
+
+<section id="setup">
+<h2>2. Setup and diagnostics</h2>
+<pre><code>hashcat --version
+hashcat --help
+hashcat -I
+hashcat -b
+hashcat -hh</code></pre>
+<table>
+<tr><th>Command</th><th>Purpose</th></tr>
+<tr><td><code>--version</code></td><td>Displays the installed version.</td></tr>
+<tr><td><code>--help</code></td><td>Displays the primary command-line options.</td></tr>
+<tr><td><code>-I</code></td><td>Lists detected compute devices.</td></tr>
+<tr><td><code>-b</code></td><td>Runs a benchmark.</td></tr>
+<tr><td><code>-hh</code></td><td>Displays extended help, including hash-mode information where supported.</td></tr>
+</table>
+<p>Run <code>hashcat --help</code> on your installed version to confirm
+which options are available.</p>
+</section>
+
+<section id="syntax">
+<h2>3. Basic command syntax</h2>
+<pre><code>hashcat [options] HASH_FILE [WORDLIST|MASK|OTHER_INPUT]</code></pre>
+<table>
+<tr><th>Argument</th><th>Meaning</th></tr>
+<tr><td><code>-m MODE</code></td><td>Hash type / algorithm mode.</td></tr>
+<tr><td><code>-a MODE</code></td><td>Attack mode.</td></tr>
+<tr><td><code>-r FILE</code></td><td>Apply a rule file where supported.</td></tr>
+<tr><td><code>-o FILE</code></td><td>Write recovered results to a file.</td></tr>
+<tr><td><code>--session NAME</code></td><td>Name a session for tracking and recovery.</td></tr>
+<tr><td><code>--status</code></td><td>Display status information.</td></tr>
+<tr><td><code>--status-timer N</code></td><td>Set the status update interval in seconds.</td></tr>
+<tr><td><code>--show</code></td><td>Display hashes already recovered in the potfile.</td></tr>
+<tr><td><code>--left</code></td><td>Display hashes not yet recovered, based on the potfile.</td></tr>
+<tr><td><code>--restore</code></td><td>Resume a saved session.</td></tr>
+<tr><td><code>--potfile-path FILE</code></td><td>Specify a potfile location.</td></tr>
+<tr><td><code>--outfile-format N</code></td><td>Choose output fields; consult help for supported format numbers.</td></tr>
+<tr><td><code>--identify FILE</code></td><td>Identify possible hash types when supported by your version.</td></tr>
+</table>
+<p class="small">Options may change between releases. Consult the installed
+help for exact syntax and compatibility.</p>
+</section>
+
+<section id="hashes">
+<h2>4. Hash types and modes</h2>
+<p>The <code>-m</code> option selects a hash mode. The following are common
+examples, not a complete list.</p>
+<table>
+<tr><th>Mode</th><th>Hash type</th><th>Notes</th></tr>
+<tr><td><code>0</code></td><td>MD5</td><td>Fast legacy hash; unsuitable for password storage.</td></tr>
+<tr><td><code>100</code></td><td>SHA-1</td><td>General-purpose legacy hash.</td></tr>
+<tr><td><code>1400</code></td><td>SHA-256</td><td>Raw SHA-256 digest.</td></tr>
+<tr><td><code>1700</code></td><td>SHA-512</td><td>Raw SHA-512 digest.</td></tr>
+<tr><td><code>1000</code></td><td>NTLM</td><td>Windows NT password hash format.</td></tr>
+<tr><td><code>3200</code></td><td>bcrypt</td><td>Adaptive password hash.</td></tr>
+<tr><td><code>1800</code></td><td>sha512crypt</td><td>Unix/Linux password hash format.</td></tr>
+<tr><td><code>22000</code></td><td>WPA-PBKDF2-PMKID+EAPOL</td><td>Wi-Fi capture format, requiring compatible input.</td></tr>
+</table>
+<div class="panel">
+<strong>Important:</strong>
+<p>A hash's appearance alone does not always uniquely identify its
+algorithm. Salts, iterations, encodings, and application-specific formats
+matter. Verify the format before choosing a mode.</p>
+</div>
+<pre><code># Show the available hash modes in your installed help
+hashcat --help
+
+# Consult the official example-hash catalog
+# https://hashcat.net/wiki/doku.php?id=example_hashes</code></pre>
+</section>
+
+<section id="attacks">
+<h2>5. Attack modes</h2>
+<table>
+<tr><th>Mode</th><th>Name</th><th>Explanation</th></tr>
+<tr><td><code>-a 0</code></td><td>Straight</td><td>Tests candidates from a wordlist.</td></tr>
+<tr><td><code>-a 1</code></td><td>Combination</td><td>Combines entries from two wordlists.</td></tr>
+<tr><td><code>-a 3</code></td><td>Mask</td><td>Generates candidates from a defined character pattern.</td></tr>
+<tr><td><code>-a 6</code></td><td>Wordlist + mask</td><td>Adds a mask-generated suffix to wordlist candidates.</td></tr>
+<tr><td><code>-a 7</code></td><td>Mask + wordlist</td><td>Adds mask-generated characters before wordlist candidates.</td></tr>
+</table>
+
+<h3>Mode 0: Wordlist</h3>
+<pre><code>hashcat -m 0 -a 0 lab.hash lab-wordlist.txt</code></pre>
+<p>Uses each candidate from the supplied wordlist.</p>
+
+<h3>Mode 1: Combination</h3>
+<pre><code>hashcat -m 0 -a 1 lab.hash words-a.txt words-b.txt</code></pre>
+<p>Combines words from two lists. Use only in a controlled lab.</p>
+
+<h3>Mode 3: Mask</h3>
+<pre><code>hashcat -m 0 -a 3 lab.hash '?d?d?d?d'</code></pre>
+<p>Demonstrates a four-digit candidate pattern against a synthetic
+training hash.</p>
+
+<h3>Mode 6: Wordlist plus mask</h3>
+<pre><code>hashcat -m 0 -a 6 lab.hash lab-wordlist.txt '?d?d'</code></pre>
+<p>Appends two digits to each wordlist candidate.</p>
+
+<h3>Mode 7: Mask plus wordlist</h3>
+<pre><code>hashcat -m 0 -a 7 lab.hash '?d?d' lab-wordlist.txt</code></pre>
+<p>Prepends two digits to each wordlist candidate.</p>
+</section>
+
+<section id="rules">
+<h2>6. Rules and masks</h2>
+
+<h3>Rule-based candidate transformation</h3>
+<pre><code>hashcat -m 0 -a 0 lab.hash lab-wordlist.txt \
+  -r rules/best66.rule</code></pre>
+<p>Rules transform candidate words, for example by changing case or
+adding characters. Rule files must exist at the specified path.</p>
+
+<h3>Built-in mask character sets</h3>
+<table>
+<tr><th>Token</th><th>Character set</th></tr>
+<tr><td><code>?l</code></td><td>Lowercase letters: a-z</td></tr>
+<tr><td><code>?u</code></td><td>Uppercase letters: A-Z</td></tr>
+<tr><td><code>?d</code></td><td>Digits: 0-9</td></tr>
+<tr><td><code>?h</code></td><td>Lowercase hexadecimal: 0-9, a-f</td></tr>
+<tr><td><code>?H</code></td><td>Uppercase hexadecimal: 0-9, A-F</td></tr>
+<tr><td><code>?s</code></td><td>Special characters in Hashcat's built-in set</td></tr>
+<tr><td><code>?a</code></td><td>Combined lowercase, uppercase, digits, and special characters</td></tr>
+<tr><td><code>?b</code></td><td>Any byte value</td></tr>
+</table>
+<p>Custom character sets can be defined using <code>-1</code>, <code>-2</code>,
+<code>-3</code>, or <code>-4</code>. Check <code>hashcat --help</code> for syntax.</p>
+</section>
+
+<section id="execution">
+<h2>7. Running and monitoring an audit</h2>
+<h3>Named session</h3>
+<pre><code>hashcat -m 0 -a 0 lab.hash lab-wordlist.txt \
+  --session lab-session --status --status-timer 30</code></pre>
+
+<h3>Request status during a running session</h3>
+<pre><code>s</code></pre>
+<p>In the interactive Hashcat terminal, <code>s</code> requests status.
+Other interactive commands are version-dependent; consult the official
+documentation.</p>
+
+<h3>Stop gracefully</h3>
+<pre><code>q</code></pre>
+<p>In an interactive session, <code>q</code> requests a quit. A resumable
+restore file may be written unless restore functionality has been disabled.
+Avoid terminating the process abruptly.</p>
+</section>
+
+<section id="results">
+<h2>8. Results, potfiles, and restore</h2>
+
+<h3>Write recovered results to a file</h3>
+<pre><code>hashcat -m 0 -a 0 lab.hash lab-wordlist.txt \
+  -o recovered-lab.txt</code></pre>
+
+<h3>Display previously recovered hashes</h3>
+<pre><code>hashcat -m 0 lab.hash --show</code></pre>
+
+<h3>List hashes that remain unrecovered</h3>
+<pre><code>hashcat -m 0 lab.hash --left</code></pre>
+
+<h3>Resume a named session</h3>
+<pre><code>hashcat --session lab-session --restore</code></pre>
+<p>Restore files depend on the session and execution environment. Use
+the same working directory and configuration where possible.</p>
+
+<h3>Choose a custom potfile</h3>
+<pre><code>hashcat -m 0 -a 0 lab.hash lab-wordlist.txt \
+  --potfile-path lab.potfile</code></pre>
+<p>The potfile stores recovered hash/password associations. Protect it as
+sensitive data and do not publish it with your lab report.</p>
+</section>
+
+<section id="troubleshooting">
+<h2>9. Troubleshooting checklist</h2>
+<ul>
+<li><strong>Token or line-length errors:</strong> Check the selected hash
+mode, salt format, separators, and input encoding.</li>
+<li><strong>No devices found:</strong> Inspect <code>hashcat -I</code>,
+then check the relevant GPU/CPU runtime and driver installation.</li>
+<li><strong>Zero recovered hashes:</strong> Confirm the hash and mode,
+candidate list, rule path, and attack assumptions.</li>
+<li><strong>Unexpected output:</strong> Review outfile formatting and
+whether the potfile already contains the hash.</li>
+<li><strong>Session won't resume:</strong> Verify the session name,
+restore file, and working directory.</li>
+<li><strong>Very slow performance:</strong> Compare benchmark results,
+algorithm cost, device support, and workload size.</li>
+</ul>
+</section>
+
+<section id="reference">
+<h2>10. Official documentation</h2>
+<ul>
+<li><a href="https://hashcat.net/hashcat/">Hashcat official website</a></li>
+<li><a href="https://hashcat.net/wiki/doku.php">
+Hashcat wiki</a></li>
+<li><a href="https://hashcat.net/wiki/doku.php?id=example_hashes">
+Example hashes and hash-mode catalog</a></li>
+<li><a href="https://github.com/hashcat/hashcat/blob/master/docs/hashcat-help.md">
+Command-line help reference</a></li>
+<li><a href="https://github.com/hashcat/hashcat">
+Source code, releases, and documentation</a></li>
+</ul>
+<p>For a genuinely exhaustive command reference, use the installed
+version's <code>hashcat --help</code> and <code>hashcat -hh</code>.
+The complete option set and supported hash modes are too extensive to
+reliably reproduce in a short cheat sheet.</p>
+</section>
+
+<footer>
+<h2>Lab notes</h2>
+<p>Hashcat version: ____________________</p>
+<p>Operating system: ____________________</p>
+<p>Lab objective: _______________________</p>
+<p>Authorized data source: _______________</p>
+<p>Findings and recommendations: __________</p>
+<p class="small">For education and authorized password-security auditing.</p>
+</footer>
+</main>
+</body>
+</html>

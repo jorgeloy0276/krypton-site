@@ -1,0 +1,33 @@
+["fa-brands fa-linux", "Linux: comandos esenciales", "Administración diaria desde la terminal.", "/docs/guia-comandos-linux.html"],
+                ["fa-solid fa-terminal", "Bash scripting", "Automatiza tareas con scripts de shell.", "/docs/bash-scripting.html"],
+                ["fa-solid fa-server", "Nginx y Apache", "Servidores web, virtual hosts y proxy inverso.", "/docs/nginx-apache.html"],
+                ["fa-solid fa-network-wired", "Redes y diagnóstico", "IP, DNS, puertos y herramientas de diagnóstico.", "/docs/redes-diagnostico.html"],
+                ["fa-solid fa-database", "PostgreSQL y SQL", "Consultas, índices, respaldos y administración.", "/docs/postgresql-sql.html"],
+                ["fa-brands fa-python", "Python", "Fundamentos, entornos virtuales y scripts útiles.", "/docs/python.html"],
+                ["fa-brands fa-js", "JavaScript y TypeScript", "Del lenguaje base a tipado avanzado.", "/docs/javascript-typescript.html"],
+                ["fa-brands fa-node-js", "Node.js y APIs", "Servicios REST, autenticación y despliegue.", "/docs/nodejs-apis.html"],
+                ["fa-solid fa-satellite-dish", "Nmap y reconocimiento", "Descubrimiento de hosts y servicios en tu red.", "/docs/nmap.html"],
+                ["fa-solid fa-lock", "Hardening y buenas prácticas", "Asegura servidores y equipos paso a paso.", "/docs/hardening.html"],
+                ["fa-solid fa-hard-drive", "Recuperación de datos", "Procedimientos y herramientas de recuperación.", "/docs/recuperacion-datos.html"],
+                ["fa-solid fa-screwdriver-wrench", "Mantenimiento de equipos", "Limpieza, diagnóstico y optimización de hardware.", "/docs/mantenimiento-equipos.html"],
+                ["fa-brands fa-windows", "Windows: administración", "Configuración, PowerShell y resolución de problemas.", "/docs/windows-admin.html"],
+                ["fa-solid fa-cloud-arrow-up", "Respaldos y copias de seguridad", "Estrategias 3-2-1, automatización y verificación.", "/docs/respaldos.html"],
+                ["fa-solid fa-key", "VPN y WireGuard", "Acceso remoto seguro, instalación y clientes.", "/docs/wireguard-vpn.html"],
+                ["fa-brands fa-docker", "Docker y Compose", "Imágenes, contenedores, redes y volúmenes.", "/docs/docker-compose.html"],
+                 ["fa-brands fa-github", "GitHub Actions y CI/CD", "Pipelines de pruebas y despliegue automático.", "/docs/github-actions.html"]
+
+["fa-brands fa-docker", "Docker y Compose", "Imágenes, contenedores, redes y volúmenes.", "/docs/docker-compose.html"],
+
+<i class="fa-brands fa-linux"></i>
+
+                 61968 bettercap-command-reference.html                                   
+-a----         6/17/2026   4:59 PM         123375 guai-book-angular21.html                                           
+-a----        10/26/2026   3:32 PM          13026 guia-aircrack-ng-suite.html                                        
+-a----         7/26/2026  10:05 PM          32436 guia-animaciones.html                                              
+-a----        10/26/2026   3:35 PM          11907 guia-comandos-linux.html                                           
+-a----         10/8/2026   8:29 PM          17914 guia-git-instalacion-a-avanzado.html                               
+-a----         10/2/2026   1:40 PM          35082 guia-greenbone-gvm.html                                            
+-a----        10/15/2026   7:42 PM          25495 guia-sdd-flask-mysql_claude_code.html                              
+-a----        10/15/2026   7:45 PM          27126 guia-sdd-flask-mysq_opencodel.html                                 
+-a----        10/25/2026  12:47 PM          23121 guia_migracion_xampp.html                                          
+-a----        10/26/2026   8:15 PM          14066 hashcat-cheat-sheet.html      

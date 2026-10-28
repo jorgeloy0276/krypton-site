@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chuleta: migrar XAMPP a una versión nueva</title>
+<style>
+:root{--bg:#eef2f4;--sf:#fff;--ink:#14232b;--mut:#51636c;--ln:#cfd9de;--ac:#0b6e6e;--acbg:#dff1ef;--wn:#8a4a05;--wnbg:#fff1dc;--cd:#0f1e25;--cdt:#d8e6ea}
+@media (prefers-color-scheme:dark){:root{--bg:#0d1519;--sf:#142026;--ink:#e3edf0;--mut:#9bb0b8;--ln:#27393f;--ac:#5cc9c0;--acbg:#12312f;--wn:#f0b46a;--wnbg:#3a2a12;--cd:#081014;--cdt:#d8e6ea}}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 "Segoe UI",system-ui,-apple-system,sans-serif}
+.wrap{display:grid;grid-template-columns:240px minmax(0,1fr);gap:32px;max-width:1120px;margin:0 auto;padding:24px 20px 64px}
+nav{position:sticky;top:16px;align-self:start;font-size:14px}
+nav h1{font-size:17px;line-height:1.3;margin:0 0 12px}
+nav ol{list-style:none;margin:0;padding:0;border-left:2px solid var(--ln)}
+nav a{display:block;padding:5px 12px;color:var(--mut);text-decoration:none}
+nav a:hover,nav a:focus-visible{color:var(--ac);outline:none;background:var(--acbg)}
+#prog{margin:14px 0 8px;color:var(--mut);font-size:13px}
+#reset{font:inherit;font-size:13px;background:none;border:1px solid var(--ln);color:var(--mut);padding:3px 10px;border-radius:4px;cursor:pointer}
+main{min-width:0}
+.intro{background:var(--sf);border:1px solid var(--ln);border-radius:6px;padding:16px 20px;margin-bottom:28px}
+.intro p{margin:.3em 0}
+section{background:var(--sf);border:1px solid var(--ln);border-radius:6px;padding:20px 22px;margin-bottom:20px}
+h2{font-size:21px;margin:0 0 4px;display:flex;gap:12px;align-items:baseline}
+h2 .n{color:var(--ac);font-weight:700;min-width:1.2em}
+.lead{color:var(--mut);margin:0 0 12px}
+ul.chk{list-style:none;padding:0;margin:0}
+ul.chk>li{padding:8px 0;border-top:1px solid var(--ln)}
+ul.chk>li:first-child{border-top:0}
+label{display:flex;gap:10px;align-items:flex-start;cursor:pointer}
+input[type=checkbox]{margin-top:6px;width:17px;height:17px;accent-color:var(--ac);flex:none}
+input:checked+span{color:var(--mut);text-decoration:line-through;text-decoration-color:var(--ln)}
+pre{position:relative;margin:8px 0 4px 27px;background:var(--cd);color:var(--cdt);border-radius:5px;padding:12px 14px;overflow-x:auto;font:13.5px/1.55 ui-monospace,Consolas,"Cascadia Mono",monospace}
+code{font-family:ui-monospace,Consolas,"Cascadia Mono",monospace}
+p code,li>label code,td code,span code{background:var(--acbg);padding:1px 5px;border-radius:3px;font-size:.88em}
+.cp{position:absolute;top:6px;right:6px;font:12px/1 "Segoe UI",sans-serif;background:#25404a;color:#d8e6ea;border:0;border-radius:3px;padding:5px 8px;cursor:pointer}
+.cp:hover,.cp:focus-visible{background:#2f5360;outline:2px solid var(--ac)}
+.note,.warn{margin:8px 0 4px 27px;padding:8px 12px;border-radius:4px;font-size:14.5px}
+.note{background:var(--acbg);border-left:4px solid var(--ac)}
+.warn{background:var(--wnbg);border-left:4px solid var(--wn)}
+.warn b{color:var(--wn)}
+table{width:100%;border-collapse:collapse;font-size:14.5px}
+.tw{overflow-x:auto}
+th,td{text-align:left;padding:7px 10px;border-top:1px solid var(--ln);vertical-align:top}
+th{color:var(--mut);font-weight:600}
+td:first-child{white-space:nowrap}
+dl{margin:0}dt{font-weight:600;margin-top:10px}dd{margin:2px 0 0;color:var(--mut)}
+a:focus-visible,button:focus-visible,input:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
+@media (max-width:820px){.wrap{grid-template-columns:1fr}nav{position:static}nav ol{display:flex;flex-wrap:wrap;border-left:0;gap:4px}nav a{border:1px solid var(--ln);border-radius:4px;padding:3px 9px}pre,.note,.warn{margin-left:0}}
+@media print{nav,.cp,#reset{display:none}.wrap{display:block}body{background:#fff}section{break-inside:avoid;border-color:#bbb}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav aria-label="Índice">
+<h1>Migrar XAMPP a una versión nueva</h1>
+<ol>
+<li><a href="#s1">1. Antes de empezar</a></li>
+<li><a href="#s2">2. Respaldar bases de datos</a></li>
+<li><a href="#s3">3. Respaldar sitios y config</a></li>
+<li><a href="#s4">4. Apartar la versión vieja</a></li>
+<li><a href="#s5">5. Instalar la nueva</a></li>
+<li><a href="#s6">6. Restaurar sitios y BD</a></li>
+<li><a href="#s7">7. Reaplicar configuración</a></li>
+<li><a href="#s8">8. Verificar</a></li>
+<li><a href="#s9">9. Reversa y limpieza</a></li>
+<li><a href="#ap">Rutas y problemas comunes</a></li>
+</ol>
+<div id="prog" aria-live="polite"></div>
+<button id="reset" type="button">Desmarcar todo</button>
+</nav>
+
+<main>
+<div class="intro">
+<p><b>Idea central:</b> nunca instales encima de la versión vieja. Respalda, aparta la carpeta antigua, instala limpio y restaura solo lo tuyo (sitios, bases de datos y ajustes).</p>
+<p>Los comandos asumen <b>Windows</b>, XAMPP en <code>C:\xampp</code> y respaldos en <code>C:\backup_xampp</code>. Ajusta las rutas si las tuyas difieren. La versión de destino es la más reciente que aparezca en <b>apachefriends.org</b>; elige la serie de PHP que soporten tus proyectos. Marca los pasos según avances; el progreso queda guardado en este navegador.</p>
+</div>
+
+<section id="s1">
+<h2><span class="n">1</span>Antes de empezar</h2>
+<p class="lead">Documenta cómo está todo hoy para poder compararlo después.</p>
+<ul class="chk">
+<li><label><input type="checkbox"><span>Crea la carpeta de respaldos y guarda las versiones actuales y los módulos de PHP.</span></label>
+<pre><code>mkdir C:\backup_xampp
+C:\xampp\php\php.exe -v &gt; C:\backup_xampp\versiones.txt
+C:\xampp\apache\bin\httpd.exe -v &gt;&gt; C:\backup_xampp\versiones.txt
+C:\xampp\mysql\bin\mysql.exe --version &gt;&gt; C:\backup_xampp\versiones.txt
+C:\xampp\php\php.exe -m &gt; C:\backup_xampp\modulos_php.txt</code></pre></li>
+<li><label><input type="checkbox"><span>Lista dónde viven tus sitios. Revisa <code>htdocs</code> <b>y</b> cualquier <code>DocumentRoot</code> de <code>apache\conf\extra\httpd-vhosts.conf</code> que apunte fuera de <code>htdocs</code>.</span></label></li>
+<li><label><input type="checkbox"><span>Anota ajustes no estándar: puertos de Apache y MySQL, extensiones extra (Xdebug, ionCube, SQL Server, Redis…), servicios de Windows instalados, tareas programadas que usen rutas de XAMPP.</span></label></li>
+<li><label><input type="checkbox"><span>Revisa la compatibilidad de tus proyectos con la PHP nueva. Si saltas de serie mayor (por ejemplo 7.x a 8.x), actualiza antes frameworks, CMS y plugins, y prueba con <code>error_reporting = E_ALL</code>.</span></label></li>
+<li><label><input type="checkbox"><span>Descarga el instalador solo desde apachefriends.org y guárdalo sin ejecutarlo. Opcional: verifica el hash.</span></label>
+<pre><code>certutil -hashfile C:\ruta\xampp-installer.exe SHA256</code></pre>
+<p class="note">Compara con el hash que muestre la página de descarga. Si publican MD5 o SHA1, cambia el algoritmo en el comando.</p></li>
+</ul>
+</section>
+
+<section id="s2">
+<h2><span class="n">2</span>Respaldar bases de datos</h2>
+<p class="lead">Con MySQL/MariaDB encendido y Apache detenido, para que nada escriba durante el volcado.</p>
+<ul class="chk">
+<li><label><input type="checkbox"><span>Vuelca <b>solo tus bases de datos</b>. Este será tu respaldo principal para restaurar. Reemplaza <code>bd1 bd2</code> por los nombres reales.</span></label>
+<pre><code>cd C:\xampp\mysql\bin
+mysqldump.exe -u root -p --databases bd1 bd2 --routines --triggers --events --result-file=C:\backup_xampp\bd_usuario.sql</code></pre>
+<p class="warn"><b>Usa --result-file, no &gt;.</b> En PowerShell el redireccionamiento guarda el archivo en UTF-16 y el volcado queda inservible al importar.</p></li>
+<li><label><input type="checkbox"><span>Haz además un volcado completo, solo como archivo de seguridad (incluye usuarios y permisos).</span></label>
+<pre><code>mysqldump.exe -u root -p --all-databases --routines --triggers --events --result-file=C:\backup_xampp\bd_todas.sql</code></pre></li>
+<li><label><input type="checkbox"><span>Anota usuarios y permisos para recrearlos después.</span></label>
+<pre><code>mysql.exe -u root -p -e "SELECT user,host FROM mysql.user;"
+mysql.exe -u root -p -e "SHOW GRANTS FOR 'usuario'@'localhost';"</code></pre></li>
+<li><label><input type="checkbox"><span>Comprueba que cada volcado terminó bien: la última línea debe decir <code>Dump completed</code>.</span></label>
+<pre><code>powershell -c "Get-Content C:\backup_xampp\bd_usuario.sql -Tail 2"</code></pre></li>
+<li><label><input type="checkbox"><span>Detén MySQL desde el panel y copia en frío la carpeta de datos, solo como último recurso.</span></label>
+<pre><code>robocopy C:\xampp\mysql\data C:\backup_xampp\mysql_data /E /R:1 /W:1</code></pre>
+<p class="warn"><b>No copies esta carpeta a la instalación nueva.</b> Si cambia la versión mayor de MariaDB, los archivos internos son incompatibles y MySQL deja de arrancar. Se restaura con los volcados .sql.</p></li>
+</ul>
+</section>
+
+<section id="s3">
+<h2><span class="n">3</span>Respaldar sitios y configuración</h2>
+<ul class="chk">
+<li><label><input type="checkbox"><span>Copia los sitios (y los que estén fuera de <code>htdocs</code>, según el paso 1).</span></label>
+<pre><code>robocopy C:\xampp\htdocs C:\backup_xampp\htdocs /E /R:1 /W:1</code></pre></li>
+<li><label><input type="checkbox"><span>Copia los archivos de configuración que hayas modificado.</span></label>
+<pre><code>mkdir C:\backup_xampp\config
+robocopy C:\xampp\apache\conf C:\backup_xampp\config\apache_conf /E
+copy C:\xampp\php\php.ini C:\backup_xampp\config\
+copy C:\xampp\mysql\bin\my.ini C:\backup_xampp\config\
+copy C:\xampp\phpMyAdmin\config.inc.php C:\backup_xampp\config\
+copy C:\xampp\sendmail\sendmail.ini C:\backup_xampp\config\
+copy C:\xampp\xampp-control.ini C:\backup_xampp\config\
+copy C:\Windows\System32\drivers\etc\hosts C:\backup_xampp\config\hosts.txt</code></pre>
+<p class="note">La carpeta <code>apache\conf</code> ya incluye <code>extra\httpd-vhosts.conf</code> y los certificados de <code>ssl.crt</code> y <code>ssl.key</code>.</p></li>
+<li><label><input type="checkbox"><span>Si instalaste DLL de extensiones a mano, guarda una copia de <code>C:\xampp\php\ext</code> y anota de dónde las bajaste.</span></label></li>
+<li><label><input type="checkbox"><span>Copia lo que hayas añadido por tu cuenta: carpetas de Composer global, proyectos de Tomcat, Mercury, FileZilla, scripts propios en <code>C:\xampp</code>.</span></label></li>
+</ul>
+</section>
+
+<section id="s4">
+<h2><span class="n">4</span>Apartar la versión vieja</h2>
+<p class="lead">Renombrar la carpeta es el mejor respaldo: la reversa tarda un minuto.</p>
+<ul class="chk">
+<li><label><input type="checkbox"><span>En el Panel de Control de XAMPP detén todos los módulos y, si algún módulo tiene instalado el servicio (casilla verde), desinstálalo. Cierra el panel con <b>Quit</b>.</span></label></li>
+<li><label><input type="checkbox"><span>En el Administrador de tareas confirma que no queden <code>httpd.exe</code> ni <code>mysqld.exe</code>.</span></label></li>
+<li><label><input type="checkbox"><span>Opcional, si tienes espacio: copia completa de la carpeta con todo detenido.</span></label>
+<pre><code>robocopy C:\xampp C:\backup_xampp\xampp_completo /E /R:1 /W:1</code></pre></li>
+<li><label><input type="checkbox"><span>Renombra la carpeta vieja.</span></label>
+<pre><code>ren C:\xampp xampp_old</code></pre>
+<p class="note">Si Windows dice que está en uso, cierra editores y terminales abiertos en esa carpeta, o reinicia el equipo y vuelve a intentarlo.</p></li>
+</ul>
+</section>
+
+<section id="s5">
+<h2><span class="n">5</span>Instalar la versión nueva</h2>
+<ul class="chk">
+<li><label><input type="checkbox"><span>Ejecuta el instalador como administrador. Si el antivirus interfiere, desactívalo solo durante la instalación.</span></label></li>
+<li><label><input type="checkbox"><span>Elige los mismos componentes que usabas (Apache, MySQL, PHP, phpMyAdmin y los extras que necesites).</span></label></li>
+<li><label><input type="checkbox"><span>Instala en <code>C:\xampp</code>. Evita <code>Program Files</code> por los permisos de Windows (UAC).</span></label></li>
+<li><label><input type="checkbox"><span>Abre el panel, inicia Apache y MySQL <b>sin restaurar nada todavía</b> y comprueba que la base limpia funciona: <code>http://localhost</code> y <code>http://localhost/phpmyadmin</code>.</span></label>
+<p class="note">Si un puerto está ocupado, mira la sección de problemas comunes al final.</p></li>
+<li><label><input type="checkbox"><span>Anota las versiones nuevas.</span></label>
+<pre><code>C:\xampp\php\php.exe -v
+C:\xampp\mysql\bin\mysql.exe --version</code></pre></li>
+</ul>
+</section>
+
+<section id="s6">
+<h2><span class="n">6</span>Restaurar sitios y bases de datos</h2>
+<ul class="chk">
+<li><label><input type="checkbox"><span>Copia tus proyectos a la instalación nueva (no borra nada de lo que ya hay).</span></label>
+<pre><code>robocopy C:\backup_xampp\htdocs C:\xampp\htdocs /E /R:1 /W:1</code></pre>
+<p class="note">Si no quieres pisar el <code>dashboard</code> ni el <code>index.php</code> de la versión nueva, copia solo las carpetas de tus proyectos.</p></li>
+<li><label><input type="checkbox"><span>Importa tus bases de datos. Con <code>source</code> funciona igual en CMD y PowerShell, y usa barras normales en la ruta.</span></label>
+<pre><code>cd C:\xampp\mysql\bin
+mysql.exe -u root -p -e "source C:/backup_xampp/bd_usuario.sql"</code></pre>
+<p class="warn"><b>No importes bd_todas.sql</b> en la instalación nueva. Trae las tablas internas del sistema (<code>mysql</code>) de la versión anterior y puede romperla. Sirve solo como archivo.</p></li>
+<li><label><input type="checkbox"><span>Recrea usuarios y permisos con tus notas del paso 2.</span></label>
+<pre><code>CREATE USER 'usuario'@'localhost' IDENTIFIED BY 'clave';
+GRANT ALL PRIVILEGES ON bd1.* TO 'usuario'@'localhost';
+FLUSH PRIVILEGES;</code></pre></li>
+<li><label><input type="checkbox"><span>Si defines contraseña para <code>root</code>, actualiza también <code>C:\xampp\phpMyAdmin\config.inc.php</code> y la conexión de tus proyectos.</span>
+<pre><code>ALTER USER 'root'@'localhost' IDENTIFIED BY 'nueva_clave';</code></pre></label></li>
+<li><label><input type="checkbox"><span>Comprueba que las tablas llegaron completas.</span></label>
+<pre><code>mysql.exe -u root -p -e "SELECT table_schema, COUNT(*) AS tablas FROM information_schema.tables GROUP BY table_schema;"</code></pre></li>
+</ul>
+</section>
+
+<section id="s7">
+<h2><span class="n">7</span>Reaplicar configuración</h2>
+<p class="lead">No sobrescribas los archivos nuevos con los viejos: compáralos y traslada solo tus cambios (WinMerge, Notepad++ con Compare, o <code>fc</code>).</p>
+<ul class="chk">
+<li><label><input type="checkbox"><span><b>php.ini</b>: <code>memory_limit</code>, <code>upload_max_filesize</code>, <code>post_max_size</code>, <code>max_execution_time</code>, <code>date.timezone</code> (tu zona, por ejemplo <code>America/Bogota</code>), <code>display_errors</code>, y las líneas <code>extension=</code> que habilitaste.</span></label></li>
+<li><label><input type="checkbox"><span><b>Extensiones externas</b> (Xdebug, ionCube, drivers de SQL Server…): las DLL viejas <b>no sirven</b>. Descarga la que corresponda a tu PHP nueva (versión, x64/x86 y TS/NTS, que sale en <code>phpinfo()</code>) y actualiza su línea en <code>php.ini</code>.</span></label></li>
+<li><label><input type="checkbox"><span><b>my.ini</b>: <code>port</code>, <code>max_allowed_packet</code>, <code>innodb_buffer_pool_size</code>, charset/collation por defecto y cualquier otro ajuste propio.</span></label></li>
+<li><label><input type="checkbox"><span><b>httpd.conf</b>: <code>Listen</code> y <code>ServerName</code> si cambiaste el puerto, módulos activados (<code>mod_rewrite</code> y similares) y <code>AllowOverride All</code> donde lo necesiten tus proyectos.</span></label></li>
+<li><label><input type="checkbox"><span><b>Virtual hosts</b>: copia tus bloques a <code>apache\conf\extra\httpd-vhosts.conf</code>, confirma que <code>httpd.conf</code> tenga activo <code>Include conf/extra/httpd-vhosts.conf</code> y que cada <code>&lt;Directory&gt;</code> use <code>Require all granted</code>. Verifica que el archivo <code>hosts</code> conserve tus dominios locales.</span></label></li>
+<li><label><input type="checkbox"><span><b>SSL</b>: devuelve tus certificados a <code>apache\conf\ssl.crt</code> y <code>ssl.key</code> y revisa <code>extra\httpd-ssl.conf</code>.</span></label></li>
+<li><label><input type="checkbox"><span><b>phpMyAdmin</b> y <b>sendmail.ini</b>: reaplica tus cambios de <code>config.inc.php</code> y de correo.</span></label></li>
+<li><label><input type="checkbox"><span>Valida la sintaxis de Apache y reinicia los módulos.</span>
+<pre><code>C:\xampp\apache\bin\httpd.exe -t</code></pre></label></li>
+</ul>
+</section>
+
+<section id="s8">
+<h2><span class="n">8</span>Verificar</h2>
+<ul class="chk">
+<li><label><input type="checkbox"><span>Abre cada sitio y recorre sus funciones críticas: login, formularios, subida de archivos, envío de correo, exportaciones.</span></label></li>
+<li><label><input type="checkbox"><span>Revisa los logs en busca de errores o avisos de funciones obsoletas:</span></label>
+<pre><code>C:\xampp\apache\logs\error.log
+C:\xampp\php\logs\php_error_log
+C:\xampp\mysql\data\mysql_error.log</code></pre></li>
+<li><label><input type="checkbox"><span>En proyectos con Composer, ejecuta <code>composer install</code> (o <code>composer update</code> si cambió la serie de PHP) y borra cachés del framework.</span></label></li>
+<li><label><input type="checkbox"><span>Comprueba la PHP de consola: que <code>php -v</code> muestre la versión nueva y que el <code>PATH</code> apunte a <code>C:\xampp\php</code>.</span></label></li>
+<li><label><input type="checkbox"><span>Si usabas XAMPP como servicio de Windows, vuelve a instalarlo desde el panel. Revisa también tareas programadas y scripts que usen rutas de XAMPP.</span></label></li>
+<li><label><input type="checkbox"><span>Crea un respaldo nuevo de la instalación ya migrada y funcionando.</span></label></li>
+</ul>
+</section>
+
+<section id="s9">
+<h2><span class="n">9</span>Reversa y limpieza</h2>
+<ul class="chk">
+<li><label><input type="checkbox"><span><b>Si algo falla y necesitas volver atrás:</b> detén y desinstala servicios de la nueva, cierra el panel, y cambia los nombres de carpeta.</span></label>
+<pre><code>ren C:\xampp xampp_nueva_fallida
+ren C:\xampp_old xampp</code></pre>
+<p class="note">Con la vieja de vuelta en su sitio, inicia los módulos desde su panel. Si MySQL no abre, los volcados .sql del paso 2 siguen siendo tu respaldo.</p></li>
+<li><label><input type="checkbox"><span>Cuando lleves 1 o 2 semanas sin problemas, elimina <code>C:\xampp_old</code>. Conserva <code>C:\backup_xampp</code> (al menos los volcados .sql y la carpeta <code>config</code>) algunos meses más.</span></label></li>
+</ul>
+</section>
+
+<section id="ap">
+<h2>Rutas y problemas comunes</h2>
+<p class="lead">Referencia rápida para consultar sin seguir los pasos.</p>
+<div class="tw"><table>
+<thead><tr><th>Qué</th><th>Dónde</th></tr></thead>
+<tbody>
+<tr><td>Sitios</td><td><code>C:\xampp\htdocs</code></td></tr>
+<tr><td>Apache</td><td><code>C:\xampp\apache\conf\httpd.conf</code> · <code>conf\extra\httpd-vhosts.conf</code> · <code>conf\extra\httpd-ssl.conf</code></td></tr>
+<tr><td>PHP</td><td><code>C:\xampp\php\php.ini</code> · extensiones en <code>php\ext</code></td></tr>
+<tr><td>MySQL/MariaDB</td><td><code>C:\xampp\mysql\bin\my.ini</code> · datos en <code>mysql\data</code></td></tr>
+<tr><td>phpMyAdmin</td><td><code>C:\xampp\phpMyAdmin\config.inc.php</code></td></tr>
+<tr><td>Panel de control</td><td><code>C:\xampp\xampp-control.ini</code></td></tr>
+<tr><td>Correo</td><td><code>C:\xampp\sendmail\sendmail.ini</code></td></tr>
+<tr><td>Dominios locales</td><td><code>C:\Windows\System32\drivers\etc\hosts</code></td></tr>
+</tbody></table></div>
+<dl>
+<dt>Apache no inicia: puerto 80 o 443 ocupado</dt>
+<dd>Busca el proceso con <code>netstat -ano | findstr :80</code>. Suelen ser IIS, el servicio «World Wide Web Publishing», Skype o VMware. Detenlo o cambia <code>Listen</code> en <code>httpd.conf</code> (y el puerto SSL en <code>httpd-ssl.conf</code>).</dd>
+<dt>MySQL no inicia</dt>
+<dd>Lee <code>mysql\data\mysql_error.log</code>. Causas típicas: puerto 3306 ocupado por otra instancia, o carpeta <code>data</code> copiada desde otra versión. Si es lo segundo, borra los datos de la instalación nueva, reinstala limpio y restaura con los .sql.</dd>
+<dt>Access denied al abrir phpMyAdmin o desde un proyecto</dt>
+<dd>La contraseña de <code>root</code> no coincide con <code>config.inc.php</code> o con el archivo de conexión del proyecto.</dd>
+<dt>Unable to load dynamic library</dt>
+<dd>La DLL no corresponde a la versión de PHP, a su arquitectura o a TS/NTS. Descarga la correcta.</dd>
+<dt>Error de collation o sintaxis al importar un volcado</dt>
+<dd>El volcado viene de una versión de servidor más nueva que la de destino, o el archivo se guardó en UTF-16 (ver aviso del paso 2). Vuelve a generarlo con <code>--result-file</code>.</dd>
+<dt>Páginas con errores o avisos nuevos tras el cambio de PHP</dt>
+<dd>Revisa <code>php_error_log</code>: casi siempre son funciones eliminadas, parámetros nulos en funciones que ya no los aceptan o propiedades dinámicas obsoletas. Actualiza el código o las librerías.</dd>
+</dl>
+</section>
+</main>
+</div>
+
+<script>
+(function(){
+  var KEY='chuleta-xampp-v1', st={};
+  try{st=JSON.parse(localStorage.getItem(KEY)||'{}')}catch(e){}
+  var boxes=[].slice.call(document.querySelectorAll('input[type=checkbox]'));
+  var out=document.getElementById('prog');
+  function save(){try{localStorage.setItem(KEY,JSON.stringify(st))}catch(e){}}
+  function upd(){out.textContent=boxes.filter(function(b){return b.checked}).length+' de '+boxes.length+' pasos marcados'}
+  boxes.forEach(function(b,i){
+    b.checked=!!st[i];
+    b.addEventListener('change',function(){st[i]=b.checked;save();upd()});
+  });
+  document.getElementById('reset').addEventListener('click',function(){
+    st={};save();boxes.forEach(function(b){b.checked=false});upd();
+  });
+  upd();
+  function fallback(t){
+    var a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();
+    try{document.execCommand('copy')}catch(e){}
+    document.body.removeChild(a);
+  }
+  [].slice.call(document.querySelectorAll('pre')).forEach(function(p){
+    var b=document.createElement('button');
+    b.type='button';b.className='cp';b.textContent='Copiar';
+    b.addEventListener('click',function(){
+      var t=p.querySelector('code').innerText;
+      if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).catch(function(){fallback(t)})}else{fallback(t)}
+      b.textContent='Copiado';setTimeout(function(){b.textContent='Copiar'},1400);
+    });
+    p.appendChild(b);
+  });
+})();
+</script>
+</body>
+</html>

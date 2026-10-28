@@ -1,0 +1,12 @@
+<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="dark"><title>Contacto | Krypton Logic</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"><link rel="stylesheet" href="css/style.css"></head><body><header id="hdr"></header>
+<main><div class="wrap"><section class="page-head"><h1>Contacto</h1><p class="lead">Cuéntanos qué necesitas y te respondemos lo antes posible.</p></section>
+<section class="sec two" style="padding-top:0">
+<form id="f" class="card" style="transform:none"><div class="f"><label for="n">Nombre</label><input id="n" required></div><div class="f"><label for="e">Correo</label><input id="e" type="email" required></div>
+<div class="f"><label for="s">Servicio de interés</label><select id="s"><option>Mantenimiento de equipos</option><option>Hardware</option><option>Seguridad informática</option><option>Desarrollo web / software</option><option>Recuperación de información</option><option>Asesoría o compra de equipos</option></select></div>
+<div class="f"><label for="m">Mensaje</label><textarea id="m" rows="5" required></textarea></div><button class="btn" type="submit">Enviar mensaje</button></form>
+<div style="display:grid;gap:1rem;align-content:start">
+<div class="card"><div class="ico"><i class="fa-solid fa-envelope"></i></div><h3>Correo</h3><p>contacto@kryptonlogic.com</p></div>
+<div class="card"><div class="ico"><i class="fa-brands fa-whatsapp"></i></div><h3>WhatsApp</h3><p>+000 0000-0000</p></div>
+<div class="card"><div class="ico"><i class="fa-solid fa-clock"></i></div><h3>Horario</h3><p>Lunes a viernes, 8:00 a 17:00.</p></div></div></section></div>
+<script>f.onsubmit=e=>{e.preventDefault();location.href=`mailto:contacto@kryptonlogic.com?subject=${encodeURIComponent(s.value+' - '+n.value)}&body=${encodeURIComponent(m.value+'\n\n'+e2())}`};const e2=()=>document.getElementById('e').value</script></main>
+<footer id="ftr"></footer><script src="js/layout.js"></script></body></html>

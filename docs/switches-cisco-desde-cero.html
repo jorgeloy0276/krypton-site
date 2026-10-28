@@ -1,0 +1,1590 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Switches Cisco en Packet Tracer: curso práctico por laboratorios</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Public+Sans:wght@400;500;600;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f3f6f9; --panel:#ffffff; --ink:#132330; --muted:#556777; --line:#d3dde5;
+  --accent:#0b6fa4; --accent-soft:#e1eff7;
+  --warn:#8f5200; --warn-bg:#fdf0da;
+  --ok:#1b6e42; --ok-bg:#e2f3e9;
+  --con-bg:#10263a; --con-ink:#dce8f1; --con-dim:#84a0b4;
+  --p-user:#f2c96a; --p-priv:#6cc6ee; --p-cfg:#82de9b; --p-pc:#cfa9f5;
+  --font-body:"Public Sans",system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --font-mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0e1a24; --panel:#152431; --ink:#e4edf4; --muted:#93a8b8; --line:#28394a;
+    --accent:#5cb8e6; --accent-soft:#12303f;
+    --warn:#f0c070; --warn-bg:#33270f;
+    --ok:#7fd9a0; --ok-bg:#12301f;
+    --con-bg:#08141e; --con-ink:#dce8f1; --con-dim:#7690a4;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0e1a24; --panel:#152431; --ink:#e4edf4; --muted:#93a8b8; --line:#28394a;
+  --accent:#5cb8e6; --accent-soft:#12303f;
+  --warn:#f0c070; --warn-bg:#33270f;
+  --ok:#7fd9a0; --ok-bg:#12301f;
+  --con-bg:#08141e; --con-ink:#dce8f1; --con-dim:#7690a4;
+}
+html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 16px);scroll-behavior:smooth;background:var(--bg)}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 1.0625rem/1.62 var(--font-body);-webkit-text-size-adjust:100%}
+a{color:var(--accent)}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px;border-radius:3px}
+code,kbd{font-family:var(--font-mono);font-size:.86em;background:var(--accent-soft);color:var(--ink);padding:.1em .35em;border-radius:4px}
+h1,h2,h3,h4{line-height:1.2;margin:0}
+p{margin:.6em 0;max-width:70ch}
+
+/* ---------- hero ---------- */
+.hero{background:var(--con-bg);color:var(--con-ink);padding:44px 20px 40px}
+.hero-in{max-width:1120px;margin:0 auto;display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:36px;align-items:center}
+.hero h1{font-size:clamp(2rem,5.2vw,3.2rem);font-weight:800;letter-spacing:-.02em;line-height:1.06;color:#fff}
+.hero p.lead{font-size:1.1rem;color:#b9cddb;margin:16px 0 0}
+.hero .legend{margin-top:20px;display:flex;flex-wrap:wrap;gap:8px 18px;font:.82rem var(--font-mono);color:#b9cddb}
+.hero .legend b{font-weight:600}
+.demo{background:#0a1a29;border:1px solid #23415a;border-radius:10px;padding:16px 18px;font:.9rem/1.7 var(--font-mono)}
+.demo small{display:block;margin-top:10px;font:.8rem/1.4 var(--font-body);color:#8fa9bc}
+@media(max-width:820px){.hero-in{grid-template-columns:1fr}}
+
+/* ---------- layout ---------- */
+.shell{display:grid;grid-template-columns:250px minmax(0,1fr);gap:44px;max-width:1120px;margin:0 auto;padding:32px 20px 90px}
+.toc{position:sticky;top:calc(env(safe-area-inset-top,0px) + 16px);align-self:start;max-height:calc(100vh - 40px);overflow-y:auto;font-size:.93rem;padding-right:4px}
+.toc summary{cursor:pointer;font-weight:600;padding:10px 0}
+.toc .prog{font-size:.85rem;color:var(--muted);margin:0 0 10px}
+.toc .bar{height:5px;background:var(--line);border-radius:3px;overflow:hidden;margin:6px 0 14px}
+.toc .bar i{display:block;height:100%;width:0;background:var(--ok);transition:width .3s}
+.toc h5{margin:16px 0 4px;font-size:.85rem;font-weight:600;color:var(--muted)}
+.toc ul{list-style:none;margin:0;padding:0}
+.toc a{display:flex;gap:8px;align-items:baseline;padding:4px 8px;border-radius:5px;text-decoration:none;color:var(--ink);line-height:1.35}
+.toc a:hover{background:var(--accent-soft)}
+.toc a[aria-current="true"]{background:var(--accent-soft);font-weight:600}
+.toc .ck{flex:none;width:14px;height:14px;border:2px solid var(--line);border-radius:50%;position:relative;top:2px}
+.toc a.done .ck{background:var(--ok);border-color:var(--ok)}
+.toc a.done .ck::after{content:"";position:absolute;left:3px;top:0;width:3px;height:6px;border:solid #fff;border-width:0 2px 2px 0;transform:rotate(45deg)}
+.toc .nk{flex:none;width:14px}
+@media(min-width:901px){.toc summary{display:none}}
+@media(max-width:900px){
+  .shell{grid-template-columns:1fr;gap:12px;padding-top:16px}
+  .toc{position:static;max-height:none;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:0 14px 8px}
+}
+
+/* ---------- sections ---------- */
+main section{padding-top:44px;margin-top:8px;border-top:1px solid var(--line)}
+main section:first-child{border-top:0;padding-top:0}
+.tag{display:inline-block;font:600 .82rem var(--font-mono);background:var(--accent);color:#fff;padding:3px 10px;border-radius:4px;margin-bottom:10px}
+[data-theme="dark"] .tag{color:#04202e}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .tag{color:#04202e}}
+main h2{font-size:clamp(1.55rem,3.6vw,2.15rem);font-weight:800;letter-spacing:-.015em}
+main h3{font-size:1.18rem;font-weight:600;margin:32px 0 6px}
+main h4{font-size:1.05rem;font-weight:600;margin:0 0 2px}
+.goal{font-size:1.06rem;color:var(--muted);margin-top:10px}
+.facts{display:flex;flex-wrap:wrap;gap:6px 26px;margin:16px 0 0;font-size:.92rem;color:var(--muted)}
+.facts b{color:var(--ink);font-weight:600;margin-right:6px}
+
+ol.steps{list-style:none;counter-reset:s;padding:0;margin:14px 0 0}
+ol.steps>li{counter-increment:s;position:relative;padding:0 0 26px 46px}
+ol.steps>li::before{content:counter(s);position:absolute;left:0;top:0;width:30px;height:30px;border-radius:50%;background:var(--accent);color:#fff;display:grid;place-items:center;font:600 .9rem var(--font-mono)}
+[data-theme="dark"] ol.steps>li::before{color:#04202e}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) ol.steps>li::before{color:#04202e}}
+ol.steps>li::after{content:"";position:absolute;left:14px;top:36px;bottom:6px;width:2px;background:var(--line)}
+ol.steps>li:last-child::after{display:none}
+
+.cli-wrap{position:relative;margin:12px 0;max-width:100%}
+pre.cli{margin:0;background:var(--con-bg);color:var(--con-ink);border-radius:8px;padding:14px 16px;font:.85rem/1.6 var(--font-mono);overflow-x:auto}
+.ln{display:block;white-space:pre-wrap;overflow-wrap:anywhere;padding-right:64px}
+.ln:empty::before{content:" "}
+.pr{font-weight:600}
+.pr.u{color:var(--p-user)} .pr.p{color:var(--p-priv)} .pr.c{color:var(--p-cfg)} .pr.pc{color:var(--p-pc)}
+.out{color:var(--con-dim)} .cm{color:var(--con-dim);font-style:italic}
+.copy{position:absolute;top:8px;right:8px;font:.75rem var(--font-body);font-weight:600;background:#22425b;color:#dce8f1;border:0;border-radius:5px;padding:4px 10px;cursor:pointer}
+.copy:hover{background:#2e5878}
+.copy.ok{background:var(--ok);color:#fff}
+
+pre.topo{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:14px 16px;margin:10px 0;font:.8rem/1.35 var(--font-mono);overflow-x:auto;color:var(--ink);white-space:pre}
+
+.callout{margin:14px 0;padding:10px 14px;border-left:4px solid var(--accent);background:var(--accent-soft);border-radius:0 6px 6px 0;max-width:72ch}
+.callout p{margin:.3em 0}
+.callout.warn{border-color:var(--warn);background:var(--warn-bg)}
+.callout.warn strong:first-child{color:var(--warn)}
+.callout.ok{border-color:var(--ok);background:var(--ok-bg)}
+.callout.ok strong:first-child{color:var(--ok)}
+.callout.challenge{border-style:dashed;border-width:2px;border-left-width:4px;background:var(--panel);border-color:var(--accent)}
+
+.scroll{overflow-x:auto;margin:12px 0}
+table{border-collapse:collapse;font-size:.93rem;min-width:100%}
+th,td{text-align:left;padding:8px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-weight:600;background:var(--panel);border-bottom:2px solid var(--line);white-space:nowrap}
+td code{white-space:nowrap}
+
+.done-btn{margin-top:22px;font:600 .95rem var(--font-body);padding:10px 18px;border-radius:6px;border:2px solid var(--ok);background:transparent;color:var(--ok);cursor:pointer}
+.done-btn:hover{background:var(--ok-bg)}
+.done-btn[aria-pressed="true"]{background:var(--ok);color:#fff}
+ul.plain{padding-left:1.2em;margin:.5em 0}
+ul.plain li{margin:.3em 0;max-width:70ch}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="hero-in">
+    <div>
+      <h1>Switches Cisco desde cero, con Packet Tracer</h1>
+      <p class="lead">Doce laboratorios cortos, de la configuración inicial a ACLs y respaldo. Cada uno parte de lo anterior: copia los comandos, comprueba el resultado, rompe algo a propósito y arréglalo.</p>
+      <div class="legend">
+        <span><b style="color:var(--p-user)">&gt;</b> modo usuario</span>
+        <span><b style="color:var(--p-priv)">#</b> modo privilegiado</span>
+        <span><b style="color:var(--p-cfg)">(config)#</b> modo configuración</span>
+      </div>
+    </div>
+    <div class="demo" aria-label="Ejemplo de cambio de modos en el CLI">
+      <div><span style="color:var(--p-user)">Switch&gt;</span> enable</div>
+      <div><span style="color:var(--p-priv)">Switch#</span> configure terminal</div>
+      <div><span style="color:var(--p-cfg)">Switch(config)#</span> hostname SW1</div>
+      <div><span style="color:var(--p-cfg)">SW1(config)#</span> interface fa0/1</div>
+      <div><span style="color:var(--p-cfg)">SW1(config-if)#</span> <span style="color:#84a0b4">_</span></div>
+      <small>El prompt siempre te dice en qué modo estás. En esta guía usa los mismos colores.</small>
+    </div>
+  </div>
+</header>
+
+<div class="shell">
+<aside class="toc" id="toc">
+  <details open id="tocd">
+    <summary>Contenido del curso</summary>
+    <p class="prog" id="progtxt">0 de 12 laboratorios completados</p>
+    <div class="bar"><i id="progbar"></i></div>
+    <h5>Base</h5>
+    <ul>
+      <li><a href="#inicio"><span class="nk"></span>Antes de empezar</a></li>
+      <li><a href="#cli"><span class="nk"></span>Fundamentos del CLI</a></li>
+      <li><a href="#lab1" data-lab="1"><span class="ck"></span>1. Configuración inicial</a></li>
+      <li><a href="#lab2" data-lab="2"><span class="ck"></span>2. Acceso remoto con SSH</a></li>
+    </ul>
+    <h5>VLANs y enrutamiento</h5>
+    <ul>
+      <li><a href="#lab3" data-lab="3"><span class="ck"></span>3. VLANs y puertos de acceso</a></li>
+      <li><a href="#lab4" data-lab="4"><span class="ck"></span>4. Enlaces troncales</a></li>
+      <li><a href="#lab5" data-lab="5"><span class="ck"></span>5. Router-on-a-stick</a></li>
+      <li><a href="#lab6" data-lab="6"><span class="ck"></span>6. Switch capa 3 (SVI)</a></li>
+    </ul>
+    <h5>Seguridad y redundancia</h5>
+    <ul>
+      <li><a href="#lab7" data-lab="7"><span class="ck"></span>7. Seguridad de puertos</a></li>
+      <li><a href="#lab8" data-lab="8"><span class="ck"></span>8. Spanning Tree (STP)</a></li>
+      <li><a href="#lab9" data-lab="9"><span class="ck"></span>9. EtherChannel</a></li>
+    </ul>
+    <h5>Servicios y control</h5>
+    <ul>
+      <li><a href="#lab10" data-lab="10"><span class="ck"></span>10. DHCP y DHCP Snooping</a></li>
+      <li><a href="#lab11" data-lab="11"><span class="ck"></span>11. ACLs y administración</a></li>
+      <li><a href="#lab12" data-lab="12"><span class="ck"></span>12. Respaldo y diagnóstico</a></li>
+    </ul>
+    <h5>Referencia</h5>
+    <ul>
+      <li><a href="#chuleta"><span class="nk"></span>Chuleta rápida</a></li>
+      <li><a href="#proyecto"><span class="nk"></span>Proyecto final</a></li>
+    </ul>
+  </details>
+</aside>
+
+<main>
+
+<!-- =============== ANTES DE EMPEZAR =============== -->
+<section id="inicio">
+  <h2>Antes de empezar</h2>
+  <p class="goal">Lo mínimo que necesitas tener claro para que los laboratorios funcionen a la primera.</p>
+
+  <h3>Qué usar en Packet Tracer</h3>
+  <ul class="plain">
+    <li><strong>Switch 2960-24TT</strong> (capa 2): laboratorios 1 al 5 y 7 al 12. Tiene 24 puertos <code>FastEthernet0/1-24</code> y 2 puertos <code>GigabitEthernet0/1-2</code>.</li>
+    <li><strong>Switch multicapa 3650-24PS</strong>: solo el laboratorio 6.</li>
+    <li><strong>Router 2911</strong>: laboratorios 5, 10 y 11.</li>
+    <li><strong>PC</strong> y <strong>Server</strong> de la categoría End Devices.</li>
+  </ul>
+
+  <h3>Cables</h3>
+  <div class="scroll"><table>
+    <tr><th>Cable</th><th>Úsalo para</th></tr>
+    <tr><td>Consola (celeste)</td><td>PC (puerto RS-232) al puerto <code>Console</code> del switch o router</td></tr>
+    <tr><td>Cobre directo</td><td>PC a switch, switch a router</td></tr>
+    <tr><td>Cobre cruzado</td><td>Switch a switch, PC a PC, router a router (mismo tipo de equipo)</td></tr>
+    <tr><td>Automático (rayo)</td><td>Deja que Packet Tracer elija el cable correcto; útil mientras aprendes</td></tr>
+  </table></div>
+
+  <div class="callout">
+    <p><strong>Luces de los enlaces.</strong> Verde = activo. Ámbar = el puerto está convergiendo o bloqueado por STP (tarda unos 30 segundos, o usa el botón <em>Fast Forward Time</em> de la barra inferior). Rojo = caído o deshabilitado por error.</p>
+  </div>
+
+  <h3>Plan de direccionamiento (se reutiliza en todo el curso)</h3>
+  <div class="scroll"><table>
+    <tr><th>VLAN</th><th>Nombre</th><th>Red</th><th>Gateway</th></tr>
+    <tr><td>10</td><td>Ventas</td><td>192.168.10.0/24</td><td>192.168.10.1</td></tr>
+    <tr><td>20</td><td>Contabilidad</td><td>192.168.20.0/24</td><td>192.168.20.1</td></tr>
+    <tr><td>30</td><td>TI</td><td>192.168.30.0/24</td><td>192.168.30.1</td></tr>
+    <tr><td>99</td><td>Gestión (administración de equipos)</td><td>192.168.99.0/24</td><td>192.168.99.1</td></tr>
+    <tr><td>999</td><td>Sin_Uso (puertos apagados)</td><td>sin red</td><td>-</td></tr>
+  </table></div>
+
+  <h3>Cómo está armado cada laboratorio</h3>
+  <p>Objetivo, topología, pasos numerados (con los comandos listos para copiar con el botón <em>Copiar</em>), una sección para verificar y un reto. Al copiar, solo se copian los comandos: los prompts y las salidas se omiten.</p>
+  <div class="callout warn">
+    <p><strong>Hábito clave.</strong> Después de cada laboratorio guarda la configuración en el equipo (<code>copy running-config startup-config</code>) y guarda el archivo <code>.pkt</code> (Ctrl+S). Son dos cosas distintas.</p>
+  </div>
+</section>
+
+<!-- =============== FUNDAMENTOS CLI =============== -->
+<section id="cli">
+  <h2>Fundamentos del CLI</h2>
+  <p class="goal">Aprende primero a moverte. La mitad de los errores de principiante son "estoy en el modo equivocado".</p>
+
+  <h3>Los modos y cómo cambiar entre ellos</h3>
+  <div class="scroll"><table>
+    <tr><th>Modo</th><th>Prompt</th><th>Cómo entrar</th><th>Para qué sirve</th></tr>
+    <tr><td>Usuario</td><td><code>Switch&gt;</code></td><td>Al conectarte</td><td>Ver muy poco. Solo consultas básicas</td></tr>
+    <tr><td>Privilegiado</td><td><code>Switch#</code></td><td><code>enable</code></td><td><code>show</code>, <code>copy</code>, <code>reload</code>, <code>ping</code></td></tr>
+    <tr><td>Configuración global</td><td><code>Switch(config)#</code></td><td><code>configure terminal</code></td><td>Cambios que afectan a todo el equipo</td></tr>
+    <tr><td>Interfaz</td><td><code>Switch(config-if)#</code></td><td><code>interface fa0/1</code></td><td>Configurar un puerto (o rango)</td></tr>
+    <tr><td>Línea</td><td><code>Switch(config-line)#</code></td><td><code>line console 0</code> / <code>line vty 0 15</code></td><td>Acceso por consola y remoto</td></tr>
+    <tr><td>VLAN</td><td><code>Switch(config-vlan)#</code></td><td><code>vlan 10</code></td><td>Nombrar y definir una VLAN</td></tr>
+  </table></div>
+
+  <div class="cli-wrap"><pre class="cli">
+Switch> enable
+Switch# configure terminal
+Switch(config)# interface fa0/1
+Switch(config-if)# exit
+! exit sube un nivel. end (o Ctrl+Z) vuelve directo al modo privilegiado
+Switch(config)# end
+Switch# disable
+Switch>
+  </pre></div>
+
+  <h3>Atajos que te ahorran horas</h3>
+  <div class="scroll"><table>
+    <tr><th>Tecla o comando</th><th>Qué hace</th></tr>
+    <tr><td><kbd>Tab</kbd></td><td>Autocompleta el comando (<code>conf</code> + Tab = <code>configure</code>)</td></tr>
+    <tr><td><code>?</code></td><td>Ayuda contextual: <code>show ?</code> lista lo que sigue; <code>sh?</code> lista comandos que empiezan por "sh"</td></tr>
+    <tr><td>Abreviaturas</td><td><code>conf t</code>, <code>int fa0/1</code>, <code>sh run</code>, <code>sh ip int br</code> funcionan mientras no sean ambiguas</td></tr>
+    <tr><td><kbd>↑</kbd> / <kbd>↓</kbd></td><td>Recorre el historial de comandos</td></tr>
+    <tr><td><code>no</code> + comando</td><td>Deshace ese comando (<code>no shutdown</code>, <code>no ip address</code>)</td></tr>
+    <tr><td><code>do</code> + comando</td><td>Ejecuta un comando de modo privilegiado sin salir de config: <code>do show run</code></td></tr>
+    <tr><td><code>show running-config | include vlan</code></td><td>Filtra la salida. También <code>| section</code> y <code>| begin</code></td></tr>
+  </table></div>
+
+  <h3>Configuración en ejecución vs. guardada</h3>
+  <p><code>running-config</code> vive en RAM: lo que escribes se aplica al instante, pero se pierde al reiniciar. <code>startup-config</code> vive en NVRAM: es lo que se carga al arrancar. Para guardar:</p>
+  <div class="cli-wrap"><pre class="cli">
+Switch# copy running-config startup-config
+! atajo equivalente
+Switch# write memory
+  </pre></div>
+
+  <div class="callout warn">
+    <p><strong>Errores del CLI que verás mucho.</strong></p>
+    <p><code>% Invalid input detected at '^' marker</code>: el comando está mal escrito o estás en el modo equivocado. El <code>^</code> apunta al punto exacto del error.</p>
+    <p><code>% Incomplete command</code>: falta un parámetro. Escribe <code>?</code> al final para ver qué falta.</p>
+    <p><code>% Ambiguous command</code>: la abreviatura coincide con varios comandos. Escribe más letras.</p>
+  </div>
+</section>
+
+<!-- =============== LAB 1 =============== -->
+<section class="lab" id="lab1" data-lab="1">
+  <span class="tag">Lab 1</span>
+  <h2>Configuración inicial</h2>
+  <p class="goal">Tomar un switch sin configurar y dejarlo con nombre, contraseñas, banner, IP de gestión y configuración guardada.</p>
+  <div class="facts"><span><b>Equipos</b>1 switch 2960, 2 PC</span><span><b>Tiempo</b>20 min</span><span><b>Aprenderás</b>hostname, enable secret, líneas, SVI, guardar</span></div>
+
+  <h3>Topología</h3>
+<pre class="topo">
+ PC0 ---- cable de consola ----> [ SW1 ] <---- Fa0/1 (directo) ---- PC1
+ (RS-232 -> Console)             IP gestión: 192.168.1.2/24         192.168.1.10/24
+</pre>
+  <p>En PC1: <em>Desktop &gt; IP Configuration</em> y escribe IP <code>192.168.1.10</code>, máscara <code>255.255.255.0</code>. En PC0 abre <em>Desktop &gt; Terminal</em> (9600 baudios, valores por defecto) para practicar la consola real.</p>
+
+  <h3>Paso a paso</h3>
+  <ol class="steps">
+    <li>
+      <h4>Mira el estado de fábrica</h4>
+      <p>Un switch nuevo ya funciona (todos los puertos están en la VLAN 1), pero sin nombre ni seguridad.</p>
+      <div class="cli-wrap"><pre class="cli">
+Switch> enable
+Switch# show running-config
+Switch# show version
+Switch# show ip interface brief
+Switch# show vlan brief
+      </pre></div>
+    </li>
+    <li>
+      <h4>Ponle nombre y desactiva la búsqueda DNS</h4>
+      <p><code>no ip domain-lookup</code> evita que el switch se quede 30 segundos "pensando" cuando escribes un comando mal.</p>
+      <div class="cli-wrap"><pre class="cli">
+Switch# configure terminal
+Switch(config)# hostname SW1
+SW1(config)# no ip domain-lookup
+      </pre></div>
+    </li>
+    <li>
+      <h4>Protege el acceso con contraseñas</h4>
+      <p><code>enable secret</code> protege el modo privilegiado (guardada con hash). Las líneas protegen la consola y el acceso remoto. <code>service password-encryption</code> cifra las contraseñas que quedan en texto plano.</p>
+      <div class="cli-wrap"><pre class="cli">
+SW1(config)# enable secret Cisco123
+SW1(config)# line console 0
+SW1(config-line)# password cisco
+SW1(config-line)# login
+SW1(config-line)# logging synchronous
+SW1(config-line)# exec-timeout 10 0
+SW1(config-line)# exit
+SW1(config)# line vty 0 15
+SW1(config-line)# password cisco
+SW1(config-line)# login
+SW1(config-line)# exit
+SW1(config)# service password-encryption
+      </pre></div>
+      <div class="callout"><p><code>logging synchronous</code> evita que los mensajes del sistema te corten lo que estás escribiendo. <code>exec-timeout 10 0</code> cierra la sesión tras 10 minutos sin actividad.</p></div>
+      <div class="callout warn"><p><strong>Cuidado.</strong> <code>service password-encryption</code> usa cifrado tipo 7, que es reversible. Sirve para que nadie lea la contraseña por encima del hombro, no como seguridad real. Por eso en el Lab 2 pasaremos a usuarios con <code>secret</code>.</p></div>
+    </li>
+    <li>
+      <h4>Agrega un mensaje de advertencia (banner)</h4>
+      <p>El carácter <code>#</code> es el delimitador: el mensaje va entre dos <code>#</code>.</p>
+      <div class="cli-wrap"><pre class="cli">
+SW1(config)# banner motd #Acceso solo para personal autorizado#
+      </pre></div>
+    </li>
+    <li>
+      <h4>Dale una IP de gestión (SVI)</h4>
+      <p>Un switch de capa 2 no necesita IP para conmutar, pero sí para administrarlo de forma remota. La IP se asigna a una interfaz virtual (SVI), no a un puerto físico.</p>
+      <div class="cli-wrap"><pre class="cli">
+SW1(config)# interface vlan 1
+SW1(config-if)# ip address 192.168.1.2 255.255.255.0
+SW1(config-if)# no shutdown
+SW1(config-if)# exit
+SW1(config)# ip default-gateway 192.168.1.1
+      </pre></div>
+    </li>
+    <li>
+      <h4>Describe los puertos y guarda</h4>
+      <div class="cli-wrap"><pre class="cli">
+SW1(config)# interface fa0/1
+SW1(config-if)# description PC1
+SW1(config-if)# exit
+SW1(config)# end
+SW1# copy running-config startup-config
+Destination filename [startup-config]?
+      </pre></div>
+      <p>Pulsa Enter para aceptar el nombre por defecto.</p>
+    </li>
+  </ol>
+
+  <h3>Verifica</h3>
+  <div class="cli-wrap"><pre class="cli">
+SW1# show running-config
+SW1# show ip interface brief
+SW1# show interfaces status
+C:\> ping 192.168.1.2
+  </pre></div>
+  <div class="callout ok"><p><strong>Resultado esperado.</strong> <code>Vlan1</code> aparece <em>up/up</em> con IP 192.168.1.2. Desde PC1, el ping responde (el primero puede fallar mientras se resuelve ARP: es normal). En <code>show run</code> las contraseñas de línea aparecen cifradas.</p></div>
+
+  <div class="callout challenge"><p><strong>Reto.</strong> Cambia el banner y la IP de gestión, y haz <code>reload</code> sin guardar. Después de reiniciar, ¿qué cambios sobrevivieron? Repite guardando antes de reiniciar.</p></div>
+  <button class="done-btn" type="button" aria-pressed="false">Marcar laboratorio como completado</button>
+</section>
+
+<!-- =============== LAB 2 =============== -->
+<section class="lab" id="lab2" data-lab="2">
+  <span class="tag">Lab 2</span>
+  <h2>Acceso remoto seguro con SSH</h2>
+  <p class="goal">Sustituir Telnet (texto plano) por SSH versión 2 con usuarios locales, y limitar los intentos fallidos.</p>
+  <div class="facts"><span><b>Equipos</b>el mismo switch del Lab 1 y PC1</span><span><b>Tiempo</b>15 min</span><span><b>Aprenderás</b>claves RSA, usuarios locales, transport input ssh</span></div>
+
+  <h3>Topología</h3>
+<pre class="topo">
+ PC1 (192.168.1.10) ---- Fa0/1 ---- [ SW1 ] 192.168.1.2/24
+        |__ ssh -l admin 192.168.1.2 __|
+</pre>
+
+  <h3>Paso a paso</h3>
+  <ol class="steps">
+    <li>
+      <h4>Comprueba los requisitos</h4>
+      <p>SSH necesita un hostname distinto de "Switch" y un nombre de dominio. Las claves RSA se generan a partir de ambos.</p>
+      <div class="cli-wrap"><pre class="cli">
+SW1# configure terminal
+SW1(config)# ip domain-name lab.local
+      </pre></div>
+    </li>
+    <li>
+      <h4>Genera las claves RSA</h4>
+      <p>Cuando pregunte el tamaño, escribe 1024 (rápido en Packet Tracer). En equipos reales usa 2048 o más.</p>
+      <div class="cli-wrap"><pre class="cli">
+SW1(config)# crypto key generate rsa
+How many bits in the modulus [512]: 1024
+      </pre></div>
+    </li>
+    <li>
+      <h4>Crea el usuario y activa SSH v2</h4>
+      <div class="cli-wrap"><pre class="cli">
+SW1(config)# username admin privilege 15 secret Admin123
+SW1(config)# ip ssh version 2
+SW1(config)# line vty 0 15
+SW1(config-line)# login local
+SW1(config-line)# transport input ssh
+SW1(config-line)# exec-timeout 5 0
+SW1(config-line)# exit
+      </pre></div>
+      <div class="callout"><p><code>login local</code> usa la base de usuarios del switch en vez de una contraseña de línea. <code>transport input ssh</code> rechaza Telnet. <code>privilege 15</code> hace que el usuario entre directo en modo privilegiado.</p></div>
+    </li>
+    <li>
+      <h4>Bloquea los ataques de fuerza bruta</h4>
+      <p>Si hay 3 intentos fallidos en 60 segundos, el acceso remoto se bloquea 2 minutos.</p>
+      <div class="cli-wrap"><pre class="cli">
+SW1(config)# login block-for 120 attempts 3 within 60
+SW1(config)# end
+SW1# copy running-config startup-config
+      </pre></div>
+      <div class="callout"><p><strong>En Packet Tracer.</strong> Si tu versión no reconoce <code>login block-for</code>, sáltalo: el resto del laboratorio funciona igual.</p></div>
+    </li>
+  </ol>
+
+  <h3>Verifica</h3>
+  <p>Desde PC1, abre <em>Desktop &gt; Command Prompt</em>:</p>
+  <div class="cli-wrap"><pre class="cli">
+C:\> ssh -l admin 192.168.1.2
+Password:
+C:\> telnet 192.168.1.2
+% Connection refused by remote host
+SW1# show ip ssh
+SW1# show ssh
+  </pre></div>
+  <div class="callout ok"><p><strong>Resultado esperado.</strong> SSH entra pidiendo la contraseña de <code>admin</code>; Telnet es rechazado. <code>show ip ssh</code> indica "SSH Enabled - version 2.0".</p></div>
+
+  <div class="callout challenge"><p><strong>Reto.</strong> Crea un segundo usuario <code>consulta</code> sin privilegio 15. Al entrar por SSH verás <code>SW1&gt;</code>, no <code>SW1#</code>. ¿Qué tienes que escribir para llegar a modo privilegiado y qué contraseña te pide?</p></div>
+  <button class="done-btn" type="button" aria-pressed="false">Marcar laboratorio como completado</button>
+</section>
+
+<!-- =============== LAB 3 =============== -->
+<section class="lab" id="lab3" data-lab="3">
+  <span class="tag">Lab 3</span>
+  <h2>VLANs y puertos de acceso</h2>
+  <p class="goal">Separar la red en tres departamentos con VLANs, asignar puertos y mover la gestión a una VLAN dedicada.</p>
+  <div class="facts"><span><b>Equipos</b>1 switch 2960, 7 PC</span><span><b>Tiempo</b>30 min</span><span><b>Aprenderás</b>vlan, switchport access, SVI de gestión</span></div>
+
+  <h3>Topología</h3>
+<pre class="topo">
+                         [ SW1 ]
+   Fa0/1  Fa0/2     Fa0/3  Fa0/4     Fa0/5  Fa0/6      Fa0/24
+    |      |         |      |         |      |           |
+  PC-V1  PC-V2     PC-C1  PC-C2     PC-T1  PC-T2     PC-Admin
+     VLAN 10         VLAN 20          VLAN 30          VLAN 99
+</pre>
+  <div class="scroll"><table>
+    <tr><th>PC</th><th>IP</th><th>Máscara</th><th>Puerto</th></tr>
+    <tr><td>PC-V1 / PC-V2</td><td>192.168.10.11 / .12</td><td>255.255.255.0</td><td>Fa0/1 / Fa0/2</td></tr>
+    <tr><td>PC-C1 / PC-C2</td><td>192.168.20.11 / .12</td><td>255.255.255.0</td><td>Fa0/3 / Fa0/4</td></tr>
+    <tr><td>PC-T1 / PC-T2</td><td>192.168.30.11 / .12</td><td>255.255.255.0</td><td>Fa0/5 / Fa0/6</td></tr>
+    <tr><td>PC-Admin</td><td>192.168.99.10</td><td>255.255.255.0</td><td>Fa0/24</td></tr>
+  </table></div>
+  <p>Por ahora deja el gateway de los PC vacío: lo agregaremos en el Lab 5.</p>
+
+  <h3>Paso a paso</h3>
+  <ol class="steps">
+    <li>
+      <h4>Observa las VLANs que ya existen</h4>
+      <p>La VLAN 1 (default) y las 1002-1005 vienen de fábrica y no se pueden borrar. Todos los puertos empiezan en la VLAN 1.</p>
+      <div class="cli-wrap"><pre class="cli">
+SW1# show vlan brief
+      </pre></div>
+    </li>
+    <li>
+      <h4>Crea y nombra las VLANs</h4>
+      <div class="cli-wrap"><pre class="cli">
+SW1# configure terminal
+SW1(config)# vlan 10
+SW1(config-vlan)# name Ventas
+SW1(config-vlan)# exit
+SW1(config)# vlan 20
+SW1(config-vlan)# name Contabilidad
+SW1(config-vlan)# exit
+SW1(config)# vlan 30
+SW1(config-vlan)# name TI
+SW1(config-vlan)# exit
+SW1(config)# vlan 99
+SW1(config-vlan)# name Gestion
+SW1(config-vlan)# exit
+SW1(config)# vlan 999
+SW1(config-vlan)# name Sin_Uso
+SW1(config-vlan)# exit
+      </pre></div>
+    </li>
+    <li>
+      <h4>Asigna los puertos de acceso</h4>
+      <p><code>interface range</code> configura varios puertos a la vez. Un puerto de acceso pertenece a una sola VLAN y envía las tramas sin etiqueta.</p>
+      <div class="cli-wrap"><pre class="cli">
+SW1(config)# interface range fa0/1-2
+SW1(config-if-range)# switchport mode access
+SW1(config-if-range)# switchport access vlan 10
+SW1(config-if-range)# exit
+SW1(config)# interface range fa0/3-4
+SW1(config-if-range)# switchport mode access
+SW1(config-if-range)# switchport access vlan 20
+SW1(config-if-range)# exit
+SW1(config)# interface range fa0/5-6
+SW1(config-if-range)# switchport mode access
+SW1(config-if-range)# switchport access vlan 30
+SW1(config-if-range)# exit
+SW1(config)# interface fa0/24
+SW1(config-if)# switchport mode access
+SW1(config-if)# switchport access vlan 99
+SW1(config-if)# exit
+      </pre></div>
+    </li>
+    <li>
+      <h4>Mueve la gestión de la VLAN 1 a la VLAN 99</h4>
+      <p>Buena práctica: la VLAN 1 no se usa para administrar. La SVI de la VLAN 99 solo se pone <em>up</em> si hay al menos un puerto activo en esa VLAN (por eso conectamos PC-Admin en Fa0/24).</p>
+      <div class="cli-wrap"><pre class="cli">
+SW1(config)# interface vlan 1
+SW1(config-if)# no ip address
+SW1(config-if)# shutdown
+SW1(config-if)# exit
+SW1(config)# interface vlan 99
+SW1(config-if)# ip address 192.168.99.2 255.255.255.0
+SW1(config-if)# no shutdown
+SW1(config-if)# exit
+SW1(config)# ip default-gateway 192.168.99.1
+SW1(config)# end
+SW1# copy running-config startup-config
+      </pre></div>
+    </li>
+  </ol>
+
+  <h3>Verifica</h3>
+  <div class="cli-wrap"><pre class="cli">
+SW1# show vlan brief
+SW1# show interfaces fa0/1 switchport
+SW1# show ip interface brief
+C:\> ping 192.168.10.12
+C:\> ping 192.168.20.11
+C:\> ping 192.168.99.2
+  </pre></div>
+  <div class="callout ok"><p><strong>Resultado esperado.</strong> <code>show vlan brief</code> lista cada VLAN con sus puertos. PC-V1 hace ping a PC-V2 (misma VLAN) pero <strong>no</strong> a PC-C1: son redes distintas y aún no hay quien las enrute. PC-Admin hace ping a 192.168.99.2.</p></div>
+  <div class="callout warn"><p><strong>Trampa clásica.</strong> Si borras una VLAN con <code>no vlan 10</code>, los puertos asignados a ella no vuelven a la VLAN 1: quedan <em>inactivos</em> y desaparecen de <code>show vlan brief</code>. Reasígnalos a otra VLAN.</p></div>
+
+  <div class="callout challenge"><p><strong>Reto.</strong> Cambia PC-V2 a la VLAN 20 con <code>switchport access vlan 20</code> sin tocar su IP. ¿Con quién hace ping ahora y por qué falla con PC-V1?</p></div>
+  <button class="done-btn" type="button" aria-pressed="false">Marcar laboratorio como completado</button>
+</section>
+
+<!-- =============== LAB 4 =============== -->
+<section class="lab" id="lab4" data-lab="4">
+  <span class="tag">Lab 4</span>
+  <h2>Enlaces troncales (trunk)</h2>
+  <p class="goal">Conectar dos switches para que las mismas VLANs existan en ambos, transportando varias VLANs por un solo cable.</p>
+  <div class="facts"><span><b>Equipos</b>2 switches 2960, 4 PC</span><span><b>Tiempo</b>30 min</span><span><b>Aprenderás</b>trunk 802.1Q, VLAN nativa, lista de VLANs permitidas, VTP</span></div>
+
+  <h3>Topología</h3>
+<pre class="topo">
+ PC-V1 (Fa0/1, VLAN10)                                   PC-V3 (Fa0/1, VLAN10)
+ PC-C1 (Fa0/3, VLAN20)  [ SW1 ] Gi0/1 ===trunk=== Gi0/1 [ SW2 ]  PC-C3 (Fa0/3, VLAN20)
+ PC-Admin (Fa0/24, V99)                                   SW2 gestión: 192.168.99.3
+</pre>
+  <p>Agrega en SW2: PC-V3 con <code>192.168.10.13</code> (Fa0/1) y PC-C3 con <code>192.168.20.13</code> (Fa0/3). Conecta los switches con cable cruzado (o automático) en <code>Gi0/1</code> de ambos.</p>
+
+  <h3>Paso a paso</h3>
+  <ol class="steps">
+    <li>
+      <h4>Prepara SW2 con las mismas VLANs</h4>
+      <p>Una VLAN debe existir en <strong>ambos</strong> switches para que el tráfico atraviese el trunk.</p>
+      <div class="cli-wrap"><pre class="cli">
+Switch> enable
+Switch# configure terminal
+Switch(config)# hostname SW2
+SW2(config)# no ip domain-lookup
+SW2(config)# enable secret Cisco123
+SW2(config)# vlan 10
+SW2(config-vlan)# name Ventas
+SW2(config-vlan)# vlan 20
+SW2(config-vlan)# name Contabilidad
+SW2(config-vlan)# vlan 30
+SW2(config-vlan)# name TI
+SW2(config-vlan)# vlan 99
+SW2(config-vlan)# name Gestion
+SW2(config-vlan)# vlan 999
+SW2(config-vlan)# name Sin_Uso
+SW2(config-vlan)# exit
+SW2(config)# interface fa0/1
+SW2(config-if)# switchport mode access
+SW2(config-if)# switchport access vlan 10
+SW2(config-if)# interface fa0/3
+SW2(config-if)# switchport mode access
+SW2(config-if)# switchport access vlan 20
+SW2(config-if)# exit
+SW2(config)# interface vlan 99
+SW2(config-if)# ip address 192.168.99.3 255.255.255.0
+SW2(config-if)# no shutdown
+SW2(config-if)# exit
+SW2(config)# ip default-gateway 192.168.99.1
+      </pre></div>
+    </li>
+    <li>
+      <h4>Configura el trunk en ambos switches</h4>
+      <p>Repite este bloque en SW1 <em>y</em> en SW2. La VLAN nativa (la que viaja sin etiqueta) debe coincidir en los dos extremos; usamos la 99 en lugar de la 1 por seguridad.</p>
+      <div class="cli-wrap"><pre class="cli">
+SW1(config)# interface g0/1
+SW1(config-if)# switchport mode trunk
+SW1(config-if)# switchport trunk native vlan 99
+SW1(config-if)# switchport trunk allowed vlan 10,20,30,99
+SW1(config-if)# description TRUNK a SW2
+SW1(config-if)# end
+SW1# copy running-config startup-config
+      </pre></div>
+      <div class="callout"><p><strong>En Packet Tracer.</strong> El 2960 solo soporta 802.1Q, por eso no existe el comando <code>switchport trunk encapsulation</code>. Si lo ves en tutoriales, es para switches más antiguos o multicapa.</p></div>
+    </li>
+    <li>
+      <h4>Neutraliza VTP (recomendado mientras aprendes)</h4>
+      <p>VTP propaga VLANs entre switches automáticamente, pero un switch con un número de revisión más alto puede sobrescribir toda la base de VLANs de la red. En modo transparente ignora esos anuncios.</p>
+      <div class="cli-wrap"><pre class="cli">
+SW1(config)# vtp mode transparent
+SW2(config)# vtp mode transparent
+      </pre></div>
+    </li>
+  </ol>
+
+  <h3>Verifica</h3>
+  <div class="cli-wrap"><pre class="cli">
+SW1# show interfaces trunk
+SW1# show vlan brief
+C:\> ping 192.168.10.13
+C:\> ping 192.168.20.13
+C:\> ping 192.168.99.3
+  </pre></div>
+  <div class="callout ok"><p><strong>Resultado esperado.</strong> <code>show interfaces trunk</code> muestra Gi0/1 en modo <em>on</em>, encapsulación 802.1q, nativa 99 y las VLANs 10,20,30,99 permitidas. PC-V1 hace ping a PC-V3 y PC-C1 a PC-C3 (misma VLAN, distinto switch). Entre VLANs distintas sigue sin haber ping.</p></div>
+  <div class="callout warn"><p><strong>Si algo falla, revisa en este orden.</strong> ¿Existe la VLAN en ambos switches? ¿La lista <em>allowed</em> incluye la VLAN? ¿La VLAN nativa coincide? Un desajuste genera mensajes <code>NATIVE_VLAN_MISMATCH</code> en la consola.</p></div>
+
+  <div class="callout challenge"><p><strong>Reto.</strong> En SW1 ejecuta <code>switchport trunk allowed vlan remove 20</code> y prueba el ping de VLAN 20 entre switches. Luego restáuralo con <code>add 20</code>. Ojo: <code>allowed vlan 10,30</code> (sin <code>add</code>/<code>remove</code>) reemplaza toda la lista.</p></div>
+  <button class="done-btn" type="button" aria-pressed="false">Marcar laboratorio como completado</button>
+</section>
+
+<!-- =============== LAB 5 =============== -->
+<section class="lab" id="lab5" data-lab="5">
+  <span class="tag">Lab 5</span>
+  <h2>Enrutamiento entre VLANs (router-on-a-stick)</h2>
+  <p class="goal">Lograr que las VLANs se comuniquen entre sí usando un solo cable trunk hacia un router con subinterfaces.</p>
+  <div class="facts"><span><b>Equipos</b>lo del Lab 4 + 1 router 2911</span><span><b>Tiempo</b>30 min</span><span><b>Aprenderás</b>subinterfaces, encapsulation dot1Q, gateway, tracert</span></div>
+
+  <h3>Topología</h3>
+<pre class="topo">
+                                 R1
+                              Gi0/0 (sin IP; subinterfaces .10 .20 .30 .99)
+                                 |
+                              Gi0/2 (trunk)
+ PCs VLAN10/20/30 ----------- [ SW1 ] Gi0/1 ===trunk=== Gi0/1 [ SW2 ] ---- PCs VLAN10/20
+</pre>
+  <p>Conecta <code>R1 Gi0/0</code> a <code>SW1 Gi0/2</code> con cable directo.</p>
+
+  <h3>Paso a paso</h3>
+  <ol class="steps">
+    <li>
+      <h4>Convierte el puerto hacia el router en trunk (en SW1)</h4>
+      <div class="cli-wrap"><pre class="cli">
+SW1# configure terminal
+SW1(config)# interface g0/2
+SW1(config-if)# switchport mode trunk
+SW1(config-if)# switchport trunk native vlan 99
+SW1(config-if)# switchport trunk allowed vlan 10,20,30,99
+SW1(config-if)# description TRUNK a R1
+SW1(config-if)# exit
+      </pre></div>
+    </li>
+    <li>
+      <h4>Crea una subinterfaz por VLAN en el router</h4>
+      <p>La interfaz física solo se enciende; cada subinterfaz es el gateway de una VLAN. La convención es que el número de la subinterfaz coincida con el ID de la VLAN. En la 99, <code>native</code> le dice al router que esa VLAN viaja sin etiqueta.</p>
+      <div class="cli-wrap"><pre class="cli">
+Router> enable
+Router# configure terminal
+Router(config)# hostname R1
+R1(config)# interface g0/0
+R1(config-if)# no shutdown
+R1(config-if)# exit
+R1(config)# interface g0/0.10
+R1(config-subif)# description Gateway VLAN 10 Ventas
+R1(config-subif)# encapsulation dot1Q 10
+R1(config-subif)# ip address 192.168.10.1 255.255.255.0
+R1(config-subif)# exit
+R1(config)# interface g0/0.20
+R1(config-subif)# description Gateway VLAN 20 Contabilidad
+R1(config-subif)# encapsulation dot1Q 20
+R1(config-subif)# ip address 192.168.20.1 255.255.255.0
+R1(config-subif)# exit
+R1(config)# interface g0/0.30
+R1(config-subif)# description Gateway VLAN 30 TI
+R1(config-subif)# encapsulation dot1Q 30
+R1(config-subif)# ip address 192.168.30.1 255.255.255.0
+R1(config-subif)# exit
+R1(config)# interface g0/0.99
+R1(config-subif)# description Gateway VLAN 99 Gestion
+R1(config-subif)# encapsulation dot1Q 99 native
+R1(config-subif)# ip address 192.168.99.1 255.255.255.0
+R1(config-subif)# end
+R1# copy running-config startup-config
+      </pre></div>
+    </li>
+    <li>
+      <h4>Configura el gateway en los PC</h4>
+      <p>En cada PC: <em>IP Configuration &gt; Default Gateway</em> = la <code>.1</code> de su red (por ejemplo 192.168.10.1 para VLAN 10). PC-Admin usa 192.168.99.1. Los switches ya tienen <code>ip default-gateway 192.168.99.1</code> del Lab 3.</p>
+    </li>
+  </ol>
+
+  <h3>Verifica</h3>
+  <div class="cli-wrap"><pre class="cli">
+R1# show ip interface brief
+R1# show ip route
+R1# show interfaces g0/0.10
+C:\> ping 192.168.20.11
+C:\> tracert 192.168.20.11
+  </pre></div>
+  <div class="callout ok"><p><strong>Resultado esperado.</strong> <code>show ip route</code> lista cuatro redes conectadas (<code>C</code>) y sus direcciones locales (<code>L</code>). El ping de VLAN 10 a VLAN 20 funciona, y <code>tracert</code> muestra un salto por <code>192.168.10.1</code> (el router). Los primeros paquetes pueden perderse mientras se llena la tabla ARP.</p></div>
+  <div class="callout warn">
+    <p><strong>Lista de fallos típicos.</strong></p>
+    <p>Olvidar <code>no shutdown</code> en la interfaz física. El trunk no permite alguna VLAN. El número de <code>encapsulation dot1Q</code> no coincide con la VLAN real. El PC tiene mal el gateway o la máscara. VLAN nativa distinta a cada lado.</p>
+  </div>
+
+  <div class="callout challenge"><p><strong>Reto.</strong> Cambia <code>encapsulation dot1Q 20</code> a <code>21</code> en la subinterfaz .20 y observa qué deja de funcionar. Usa <code>show interfaces g0/0.20</code> para detectar el error y corrígelo.</p></div>
+  <button class="done-btn" type="button" aria-pressed="false">Marcar laboratorio como completado</button>
+</section>
+
+<!-- =============== LAB 6 =============== -->
+<section class="lab" id="lab6" data-lab="6">
+  <span class="tag">Lab 6</span>
+  <h2>Switch capa 3 (SVI)</h2>
+  <p class="goal">Enrutar entre VLANs dentro del propio switch multicapa, sin router externo, y crear un puerto enrutado.</p>
+  <div class="facts"><span><b>Equipos</b>1 switch 3650-24PS (MLS1), 1 switch 2960, 4 PC</span><span><b>Tiempo</b>25 min</span><span><b>Aprenderás</b>ip routing, SVI como gateway, no switchport</span></div>
+
+  <h3>Topología</h3>
+<pre class="topo">
+ PCs VLAN10/20/30 ---- [ SW1 ] Gi0/1 ===trunk=== Gi1/0/1 [ MLS1 ]  (VLANs 10,20,30,99 + SVIs)
+                                                              |
+                                                     Gi1/0/24 (puerto enrutado 10.0.0.1/30)
+</pre>
+  <p>Hazlo en un archivo nuevo, o desconecta R1 para que no haya dos gateways compitiendo. Los nombres de puerto del 3650 son del tipo <code>Gi1/0/1</code>.</p>
+
+  <h3>Paso a paso</h3>
+  <ol class="steps">
+    <li>
+      <h4>Crea las VLANs en el switch multicapa</h4>
+      <p>Las SVI solo se activan si la VLAN existe en el switch.</p>
+      <div class="cli-wrap"><pre class="cli">
+Switch> enable
+Switch# configure terminal
+Switch(config)# hostname MLS1
+MLS1(config)# vlan 10
+MLS1(config-vlan)# name Ventas
+MLS1(config-vlan)# vlan 20
+MLS1(config-vlan)# name Contabilidad
+MLS1(config-vlan)# vlan 30
+MLS1(config-vlan)# name TI
+MLS1(config-vlan)# vlan 99
+MLS1(config-vlan)# name Gestion
+MLS1(config-vlan)# exit
+      </pre></div>
+    </li>
+    <li>
+      <h4>Enlace trunk hacia SW1</h4>
+      <div class="cli-wrap"><pre class="cli">
+MLS1(config)# interface g1/0/1
+MLS1(config-if)# switchport mode trunk
+MLS1(config-if)# switchport trunk native vlan 99
+MLS1(config-if)# switchport trunk allowed vlan 10,20,30,99
+MLS1(config-if)# exit
+      </pre></div>
+      <div class="callout"><p><strong>En Packet Tracer.</strong> Si usas un 3560-24PS en vez del 3650, antes de <code>switchport mode trunk</code> debes escribir <code>switchport trunk encapsulation dot1q</code>.</p></div>
+    </li>
+    <li>
+      <h4>Activa el enrutamiento y crea una SVI por VLAN</h4>
+      <p>Cada SVI es el gateway de su VLAN. Es la alternativa moderna y más rápida al router-on-a-stick.</p>
+      <div class="cli-wrap"><pre class="cli">
+MLS1(config)# ip routing
+MLS1(config)# interface vlan 10
+MLS1(config-if)# ip address 192.168.10.1 255.255.255.0
+MLS1(config-if)# no shutdown
+MLS1(config-if)# interface vlan 20
+MLS1(config-if)# ip address 192.168.20.1 255.255.255.0
+MLS1(config-if)# no shutdown
+MLS1(config-if)# interface vlan 30
+MLS1(config-if)# ip address 192.168.30.1 255.255.255.0
+MLS1(config-if)# no shutdown
+MLS1(config-if)# interface vlan 99
+MLS1(config-if)# ip address 192.168.99.1 255.255.255.0
+MLS1(config-if)# no shutdown
+MLS1(config-if)# exit
+      </pre></div>
+    </li>
+    <li>
+      <h4>Crea un puerto enrutado hacia el exterior (opcional)</h4>
+      <p><code>no switchport</code> convierte un puerto del switch en un puerto de router: sin VLAN, con IP directa. Útil para enlazar con un router o firewall.</p>
+      <div class="cli-wrap"><pre class="cli">
+MLS1(config)# interface g1/0/24
+MLS1(config-if)# no switchport
+MLS1(config-if)# ip address 10.0.0.1 255.255.255.252
+MLS1(config-if)# no shutdown
+MLS1(config-if)# exit
+MLS1(config)# ip route 0.0.0.0 0.0.0.0 10.0.0.2
+MLS1(config)# end
+MLS1# copy running-config startup-config
+      </pre></div>
+    </li>
+  </ol>
+
+  <h3>Verifica</h3>
+  <div class="cli-wrap"><pre class="cli">
+MLS1# show ip interface brief
+MLS1# show ip route
+MLS1# show interfaces trunk
+C:\> ping 192.168.30.11
+  </pre></div>
+  <div class="callout ok"><p><strong>Resultado esperado.</strong> Las cuatro SVI aparecen <em>up/up</em>, <code>show ip route</code> las lista como conectadas y los PC de VLAN distintas se hacen ping usando como gateway la SVI de su VLAN.</p></div>
+  <div class="callout warn"><p><strong>Si una SVI queda <em>down</em>.</strong> Comprueba que la VLAN existe en MLS1 y que hay al menos un puerto activo en esa VLAN (un trunk que la permita cuenta).</p></div>
+
+  <div class="callout challenge"><p><strong>Reto.</strong> Compara la tabla de rutas de este laboratorio con la del Lab 5. ¿En qué se parecen? ¿Qué ventaja tiene que el enrutamiento no pase por el cable trunk hacia un router?</p></div>
+  <button class="done-btn" type="button" aria-pressed="false">Marcar laboratorio como completado</button>
+</section>
+
+<!-- =============== LAB 7 =============== -->
+<section class="lab" id="lab7" data-lab="7">
+  <span class="tag">Lab 7</span>
+  <h2>Seguridad de puertos</h2>
+  <p class="goal">Impedir que un dispositivo desconocido use un puerto, apagar lo que no se usa y cerrar puertas típicas de ataque en el switch.</p>
+  <div class="facts"><span><b>Equipos</b>SW1 del Lab 3 (o Lab 5), varios PC y un PC extra "intruso"</span><span><b>Tiempo</b>30 min</span><span><b>Aprenderás</b>port-security, sticky MAC, err-disabled, puertos sin uso, DTP</span></div>
+
+  <h3>Topología</h3>
+<pre class="topo">
+ PC-V1 (Fa0/1)  PC-V2 (Fa0/2) ... PC-T2 (Fa0/6)        Fa0/7-23: sin uso -> VLAN 999 + shutdown
+                       \  |  /                          Fa0/24: PC-Admin (VLAN 99)
+                        [ SW1 ] Gi0/1 = trunk, Gi0/2 = trunk / router
+</pre>
+
+  <h3>Paso a paso</h3>
+  <ol class="steps">
+    <li>
+      <h4>Activa port-security en los puertos de acceso</h4>
+      <p>El puerto debe estar en modo <code>access</code> fijo antes de activar la seguridad. Con <code>sticky</code>, el switch aprende la MAC del primer dispositivo que envía tráfico y la guarda en la configuración.</p>
+      <div class="cli-wrap"><pre class="cli">
+SW1# configure terminal
+SW1(config)# interface range fa0/1-6
+SW1(config-if-range)# switchport mode access
+SW1(config-if-range)# switchport port-security
+SW1(config-if-range)# switchport port-security maximum 1
+SW1(config-if-range)# switchport port-security mac-address sticky
+SW1(config-if-range)# switchport port-security violation shutdown
+SW1(config-if-range)# exit
+      </pre></div>
+      <p>Haz un ping desde cada PC para que el switch aprenda sus MAC.</p>
+      <div class="scroll"><table>
+        <tr><th>Modo de violación</th><th>Qué hace al detectar una MAC no permitida</th></tr>
+        <tr><td><code>protect</code></td><td>Descarta las tramas extra. Sin aviso ni registro</td></tr>
+        <tr><td><code>restrict</code></td><td>Descarta las tramas y genera mensajes de log y contador de violaciones</td></tr>
+        <tr><td><code>shutdown</code> (por defecto)</td><td>Deshabilita el puerto (<em>err-disabled</em>). Es el más seguro</td></tr>
+      </table></div>
+    </li>
+    <li>
+      <h4>Comprueba lo que aprendió</h4>
+      <div class="cli-wrap"><pre class="cli">
+SW1# show port-security
+SW1# show port-security interface fa0/1
+SW1# show port-security address
+SW1# show running-config interface fa0/1
+      </pre></div>
+      <p>En la configuración del puerto verás una línea <code>switchport port-security mac-address sticky &lt;MAC&gt;</code> agregada sola.</p>
+    </li>
+    <li>
+      <h4>Provoca una violación a propósito</h4>
+      <p>Desconecta PC-V1 de Fa0/1 y conecta en su lugar el PC intruso (otra MAC). Haz un ping desde él. El puerto se pondrá en rojo.</p>
+      <div class="cli-wrap"><pre class="cli">
+SW1# show interfaces status
+Port      Name     Status        Vlan  Duplex Speed Type
+Fa0/1              err-disabled  10    auto   auto  10/100BaseTX
+SW1# show port-security interface fa0/1
+      </pre></div>
+    </li>
+    <li>
+      <h4>Recupera el puerto</h4>
+      <p>Primero retira al intruso y reconecta el PC legítimo. Después reinicia el puerto y, si quieres permitir un equipo nuevo, borra la MAC sticky.</p>
+      <div class="cli-wrap"><pre class="cli">
+SW1(config)# interface fa0/1
+SW1(config-if)# shutdown
+SW1(config-if)# no shutdown
+SW1(config-if)# end
+SW1# clear port-security sticky interface fa0/1
+      </pre></div>
+      <div class="callout"><p><strong>En Packet Tracer.</strong> Si <code>clear port-security sticky</code> no existe en tu versión, quita <code>sticky</code> del puerto y vuelve a ponerlo para olvidar la MAC guardada.</p></div>
+    </li>
+    <li>
+      <h4>Apaga los puertos que no usas</h4>
+      <p>Un puerto libre y activo es una puerta abierta. Muévelos a una VLAN sin uso (VLAN 999) y apágalos.</p>
+      <div class="cli-wrap"><pre class="cli">
+SW1(config)# interface range fa0/7-23
+SW1(config-if-range)# switchport mode access
+SW1(config-if-range)# switchport access vlan 999
+SW1(config-if-range)# shutdown
+SW1(config-if-range)# exit
+      </pre></div>
+    </li>
+    <li>
+      <h4>Cierra la negociación automática de trunks (DTP)</h4>
+      <p>Por defecto un puerto puede "negociar" convertirse en trunk si el otro extremo se lo pide. Apágalo en todos los puertos.</p>
+      <div class="cli-wrap"><pre class="cli">
+SW1(config)# interface range fa0/1-6, fa0/24
+SW1(config-if-range)# switchport nonegotiate
+SW1(config-if-range)# exit
+SW1(config)# interface range g0/1-2
+SW1(config-if-range)# switchport nonegotiate
+SW1(config-if-range)# exit
+      </pre></div>
+    </li>
+    <li>
+      <h4>Recuperación automática (opcional)</h4>
+      <p>Si no quieres levantar los puertos a mano, puedes hacer que salgan solos de <em>err-disabled</em> tras un tiempo.</p>
+      <div class="cli-wrap"><pre class="cli">
+SW1(config)# errdisable recovery cause psecure-violation
+SW1(config)# errdisable recovery interval 120
+SW1(config)# end
+SW1# copy running-config startup-config
+      </pre></div>
+    </li>
+  </ol>
+
+  <h3>Verifica</h3>
+  <div class="cli-wrap"><pre class="cli">
+SW1# show port-security
+SW1# show interfaces status
+SW1# show vlan brief
+SW1# show interfaces g0/1 switchport
+  </pre></div>
+  <div class="callout ok"><p><strong>Resultado esperado.</strong> <code>show port-security</code> lista los puertos con máximo 1 MAC y acción "Shutdown". Fa0/7-23 aparecen deshabilitados y en la VLAN 999. Un dispositivo no autorizado deja el puerto en <em>err-disabled</em>.</p></div>
+
+  <div class="callout challenge"><p><strong>Reto.</strong> Cambia Fa0/2 a <code>violation restrict</code> y repite el experimento del intruso. ¿El puerto se cae? ¿Qué muestran los contadores en <code>show port-security interface fa0/2</code>?</p></div>
+  <button class="done-btn" type="button" aria-pressed="false">Marcar laboratorio como completado</button>
+</section>
+
+<!-- =============== LAB 8 =============== -->
+<section class="lab" id="lab8" data-lab="8">
+  <span class="tag">Lab 8</span>
+  <h2>Spanning Tree (STP)</h2>
+  <p class="goal">Entender cómo el switch evita bucles, elegir tú mismo el root bridge y proteger los puertos de usuario.</p>
+  <div class="facts"><span><b>Equipos</b>3 switches 2960 en triángulo, 2 PC</span><span><b>Tiempo</b>35 min</span><span><b>Aprenderás</b>root bridge, roles de puerto, Rapid-PVST, PortFast, BPDU Guard</span></div>
+
+  <h3>Topología</h3>
+<pre class="topo">
+                    [ SW1 ]  (será el root)
+              Gi0/1 /         \ Gi0/2
+                   /           \
+            Gi0/1 /             \ Gi0/2
+             [ SW2 ]-----------[ SW3 ]
+                    Fa0/1   Fa0/1
+
+ PC-V1 en SW2 Fa0/2 (VLAN 10)        PC-V3 en SW3 Fa0/2 (VLAN 10)
+ 192.168.10.11                       192.168.10.13
+</pre>
+  <p>Conecta en triángulo: SW1 Gi0/1 con SW2 Gi0/1, SW1 Gi0/2 con SW3 Gi0/2, y SW2 con SW3 por <code>Fa0/1</code> en ambos. Configura trunk en los tres enlaces como en el Lab 4, crea las VLANs 10 y 99 en los tres switches y pon <code>Fa0/2</code> de SW2 y SW3 como acceso en VLAN 10.</p>
+
+  <h3>Paso a paso</h3>
+  <ol class="steps">
+    <li>
+      <h4>Observa quién es el root bridge</h4>
+      <p>STP elige como root al switch con menor prioridad (por defecto 32768 + ID de VLAN); si hay empate, gana la MAC más baja. Los demás calculan el camino de menor costo hacia él y <em>bloquean</em> el puerto que cierra el bucle.</p>
+      <div class="cli-wrap"><pre class="cli">
+SW1# show spanning-tree vlan 10
+SW2# show spanning-tree vlan 10
+SW3# show spanning-tree vlan 10
+      </pre></div>
+      <p>Busca "This bridge is the root" y fíjate en los roles: <code>Root</code> (mejor camino al root), <code>Desg</code> (designado) y <code>Altn / BLK</code> (bloqueado). Anota qué puerto quedó bloqueado.</p>
+    </li>
+    <li>
+      <h4>Elige tú el root bridge</h4>
+      <p>Que sea el switch central (aquí SW1), no el que casualmente tenga la MAC más baja. Deja a SW2 como respaldo.</p>
+      <div class="cli-wrap"><pre class="cli">
+SW1(config)# spanning-tree vlan 1,10,20,30,99 root primary
+SW2(config)# spanning-tree vlan 1,10,20,30,99 root secondary
+      </pre></div>
+      <div class="callout"><p><code>root primary</code> baja la prioridad automáticamente por debajo de la actual. Alternativa manual: <code>spanning-tree vlan 10 priority 4096</code> (siempre múltiplos de 4096).</p></div>
+    </li>
+    <li>
+      <h4>Cambia a Rapid-PVST</h4>
+      <p>El STP clásico tarda hasta 50 segundos en reconverger. Rapid-PVST lo hace en pocos segundos. Aplícalo en <strong>los tres</strong> switches.</p>
+      <div class="cli-wrap"><pre class="cli">
+SW1(config)# spanning-tree mode rapid-pvst
+SW2(config)# spanning-tree mode rapid-pvst
+SW3(config)# spanning-tree mode rapid-pvst
+      </pre></div>
+    </li>
+    <li>
+      <h4>Protege los puertos de usuario</h4>
+      <p><code>portfast</code> pone el puerto en reenvío de inmediato (sin esperar la convergencia). <code>bpduguard</code> lo apaga si alguien conecta un switch ahí, evitando que altere la topología.</p>
+      <div class="cli-wrap"><pre class="cli">
+SW2(config)# interface range fa0/2-6
+SW2(config-if-range)# spanning-tree portfast
+SW2(config-if-range)# spanning-tree bpduguard enable
+SW2(config-if-range)# end
+SW2# copy running-config startup-config
+      </pre></div>
+      <div class="callout warn"><p><strong>Nunca</strong> actives PortFast en enlaces entre switches; solo en puertos hacia PC, servidores o impresoras.</p></div>
+    </li>
+    <li>
+      <h4>Rompe un enlace y mira cómo se recupera</h4>
+      <p>En PC-V1 abre el Command Prompt y deja un ping continuo. Luego apaga el enlace activo hacia el root.</p>
+      <div class="cli-wrap"><pre class="cli">
+C:\> ping -t 192.168.10.13
+SW2(config)# interface g0/1
+SW2(config-if)# shutdown
+! espera unos segundos y mira el ping; luego restaura el enlace
+SW2(config-if)# no shutdown
+      </pre></div>
+      <p>Observa cuántos paquetes se pierden hasta que el puerto que estaba bloqueado pasa a reenviar.</p>
+    </li>
+  </ol>
+
+  <h3>Verifica</h3>
+  <div class="cli-wrap"><pre class="cli">
+SW1# show spanning-tree summary
+SW1# show spanning-tree vlan 10
+SW2# show spanning-tree interface fa0/2 detail
+  </pre></div>
+  <div class="callout ok"><p><strong>Resultado esperado.</strong> SW1 dice "This bridge is the root" en todas las VLANs; el modo es <em>rapid-pvst</em>; hay exactamente un puerto bloqueado en el triángulo. Los puertos de PC aparecen con la marca <em>P2p Edge</em>.</p></div>
+  <table><tr><th>Velocidad</th><th>Costo STP</th></tr><tr><td>10 Mb/s</td><td>100</td></tr><tr><td>100 Mb/s</td><td>19</td></tr><tr><td>1 Gb/s</td><td>4</td></tr></table>
+
+  <div class="callout challenge"><p><strong>Reto.</strong> Antes de cambiar el root, predice qué puerto quedará bloqueado si SW3 pasa a ser el root. Aplica <code>root primary</code> en SW3 y comprueba si acertaste con <code>show spanning-tree</code>.</p></div>
+  <button class="done-btn" type="button" aria-pressed="false">Marcar laboratorio como completado</button>
+</section>
+
+<!-- =============== LAB 9 =============== -->
+<section class="lab" id="lab9" data-lab="9">
+  <span class="tag">Lab 9</span>
+  <h2>EtherChannel</h2>
+  <p class="goal">Juntar dos cables entre switches como un solo enlace lógico con más ancho de banda y redundancia, sin que STP bloquee uno.</p>
+  <div class="facts"><span><b>Equipos</b>2 switches 2960, 2 PC</span><span><b>Tiempo</b>25 min</span><span><b>Aprenderás</b>LACP, port-channel, verificación con show etherchannel</span></div>
+
+  <h3>Topología</h3>
+<pre class="topo">
+ PC-V1 -- [ SW1 ] Gi0/1 =========== Gi0/1 [ SW2 ] -- PC-V3
+                  Gi0/2 =========== Gi0/2
+                        Port-channel 1 (LACP)
+</pre>
+  <p>Hazlo en un archivo nuevo con SW1 y SW2 (o quita otras conexiones que usen Gi0/1-2). Ya deben tener las VLANs 10, 20, 30 y 99.</p>
+
+  <h3>Paso a paso</h3>
+  <ol class="steps">
+    <li>
+      <h4>Agrupa los puertos físicos en un canal LACP</h4>
+      <p>Repite en SW2. <code>active</code> significa que el puerto inicia la negociación LACP. Apagar los puertos antes evita que STP los bloquee mientras configuras.</p>
+      <div class="cli-wrap"><pre class="cli">
+SW1# configure terminal
+SW1(config)# interface range g0/1-2
+SW1(config-if-range)# shutdown
+SW1(config-if-range)# channel-group 1 mode active
+SW1(config-if-range)# no shutdown
+SW1(config-if-range)# exit
+      </pre></div>
+    </li>
+    <li>
+      <h4>Configura el trunk en el port-channel, no en los puertos</h4>
+      <p>Lo que configures en la interfaz lógica se aplica a todos los miembros. Repite en SW2 con la misma configuración.</p>
+      <div class="cli-wrap"><pre class="cli">
+SW1(config)# interface port-channel 1
+SW1(config-if)# switchport mode trunk
+SW1(config-if)# switchport trunk native vlan 99
+SW1(config-if)# switchport trunk allowed vlan 10,20,30,99
+SW1(config-if)# end
+SW1# copy running-config startup-config
+      </pre></div>
+    </li>
+  </ol>
+
+  <h3>Cómo se combinan los modos</h3>
+  <div class="scroll"><table>
+    <tr><th>Protocolo</th><th>Modos</th><th>Se forma el canal si...</th></tr>
+    <tr><td>LACP (estándar IEEE)</td><td><code>active</code> / <code>passive</code></td><td>active-active o active-passive. Nunca passive-passive</td></tr>
+    <tr><td>PAgP (propietario Cisco)</td><td><code>desirable</code> / <code>auto</code></td><td>desirable-desirable o desirable-auto. Nunca auto-auto</td></tr>
+    <tr><td>Estático</td><td><code>on</code></td><td>on en ambos lados. No se mezcla con LACP ni PAgP</td></tr>
+  </table></div>
+
+  <h3>Verifica</h3>
+  <div class="cli-wrap"><pre class="cli">
+SW1# show etherchannel summary
+SW1# show interfaces trunk
+SW1# show spanning-tree vlan 10
+C:\> ping -t 192.168.10.13
+  </pre></div>
+  <div class="callout ok"><p><strong>Resultado esperado.</strong> En <code>show etherchannel summary</code> ves <code>Po1(SU)</code> (S = capa 2, U = en uso) y ambos puertos con <code>(P)</code> (en el canal). STP trata el Po1 como un solo enlace: ningún puerto bloqueado.</p></div>
+  <div class="callout warn"><p><strong>Si un puerto sale con <code>(s)</code> o <code>(I)</code>.</strong> La configuración de los miembros no coincide: velocidad, dúplex, modo trunk, VLAN nativa o lista de VLANs distintos entre los dos puertos o entre los dos switches.</p></div>
+
+  <div class="callout challenge"><p><strong>Reto.</strong> Con el ping continuo activo, apaga <code>Gi0/1</code> en SW1. ¿Cuántos paquetes se pierden? Vuelve a encenderlo y confirma en <code>show etherchannel summary</code> que regresa al canal.</p></div>
+  <button class="done-btn" type="button" aria-pressed="false">Marcar laboratorio como completado</button>
+</section>
+
+<!-- =============== LAB 10 =============== -->
+<section class="lab" id="lab10" data-lab="10">
+  <span class="tag">Lab 10</span>
+  <h2>DHCP y DHCP Snooping</h2>
+  <p class="goal">Repartir direcciones IP automáticamente a cada VLAN y evitar que un servidor DHCP falso (rogue) engañe a los PC.</p>
+  <div class="facts"><span><b>Equipos</b>topología del Lab 5 (R1 + SW1 + SW2), 1 server "intruso"</span><span><b>Tiempo</b>35 min</span><span><b>Aprenderás</b>pool DHCP, excluded-address, helper-address, snooping, puertos trust</span></div>
+
+  <h3>Topología</h3>
+<pre class="topo">
+                    R1 (servidor DHCP: pools VLAN10/20/30)
+                     | Gi0/0
+                     | Gi0/2 (trust)
+ PCs (DHCP) ------ [ SW1 ] Gi0/1 (trust) === [ SW2 ] ------ PCs (DHCP)
+                     |
+              Server-Rogue en Fa0/7 (puerto no confiable)
+</pre>
+
+  <h3>Paso a paso</h3>
+  <ol class="steps">
+    <li>
+      <h4>Crea los pools DHCP en el router</h4>
+      <p>Primero excluye las direcciones que no debe repartir (gateway y equipos fijos); luego define un pool por VLAN. Como R1 ya es el gateway de cada VLAN (subinterfaces), no hace falta <code>helper-address</code>.</p>
+      <div class="cli-wrap"><pre class="cli">
+R1# configure terminal
+R1(config)# ip dhcp excluded-address 192.168.10.1 192.168.10.10
+R1(config)# ip dhcp excluded-address 192.168.20.1 192.168.20.10
+R1(config)# ip dhcp excluded-address 192.168.30.1 192.168.30.10
+R1(config)# ip dhcp pool VLAN10
+R1(dhcp-config)# network 192.168.10.0 255.255.255.0
+R1(dhcp-config)# default-router 192.168.10.1
+R1(dhcp-config)# dns-server 8.8.8.8
+R1(dhcp-config)# exit
+R1(config)# ip dhcp pool VLAN20
+R1(dhcp-config)# network 192.168.20.0 255.255.255.0
+R1(dhcp-config)# default-router 192.168.20.1
+R1(dhcp-config)# dns-server 8.8.8.8
+R1(dhcp-config)# exit
+R1(config)# ip dhcp pool VLAN30
+R1(dhcp-config)# network 192.168.30.0 255.255.255.0
+R1(dhcp-config)# default-router 192.168.30.1
+R1(dhcp-config)# dns-server 8.8.8.8
+R1(dhcp-config)# end
+R1# copy running-config startup-config
+      </pre></div>
+      <div class="callout"><p><strong>Si el servidor DHCP está en otra red</strong> (por ejemplo, un server en la VLAN 99), el router debe reenviar las peticiones. En cada subinterfaz de cliente:</p></div>
+      <div class="cli-wrap"><pre class="cli">
+R1(config)# interface g0/0.10
+R1(config-subif)# ip helper-address 192.168.99.50
+      </pre></div>
+    </li>
+    <li>
+      <h4>Pon los PC en modo DHCP</h4>
+      <p>En cada PC: <em>Desktop &gt; IP Configuration &gt; DHCP</em>. Si ya tenían IP fija, cámbiala a DHCP. Debe aparecer una IP dentro de su VLAN.</p>
+      <div class="cli-wrap"><pre class="cli">
+C:\> ipconfig /renew
+C:\> ipconfig
+R1# show ip dhcp binding
+R1# show ip dhcp pool
+      </pre></div>
+    </li>
+    <li>
+      <h4>Activa DHCP Snooping en los switches</h4>
+      <p>Snooping actúa como firewall de DHCP: solo los puertos marcados <code>trust</code> pueden responder con ofertas (Offer/Ack). Marca como confiables los puertos hacia el router y hacia el otro switch. Repite en SW2 con sus puertos troncales.</p>
+      <div class="cli-wrap"><pre class="cli">
+SW1# configure terminal
+SW1(config)# ip dhcp snooping
+SW1(config)# ip dhcp snooping vlan 10,20,30
+SW1(config)# interface g0/2
+SW1(config-if)# ip dhcp snooping trust
+SW1(config-if)# exit
+SW1(config)# interface g0/1
+SW1(config-if)# ip dhcp snooping trust
+SW1(config-if)# exit
+      </pre></div>
+    </li>
+    <li>
+      <h4>Limita la tasa de peticiones en puertos de usuario</h4>
+      <p>Evita ataques de agotamiento de direcciones (DHCP starvation): más de 10 paquetes DHCP por segundo apaga el puerto.</p>
+      <div class="cli-wrap"><pre class="cli">
+SW1(config)# interface range fa0/1-6
+SW1(config-if-range)# ip dhcp snooping limit rate 10
+SW1(config-if-range)# end
+SW1# copy running-config startup-config
+      </pre></div>
+    </li>
+    <li>
+      <h4>Prueba con un servidor falso</h4>
+      <p>Conecta un Server a un puerto de acceso de VLAN 10 y activa en él el servicio DHCP (<em>Services &gt; DHCP</em>) con un rango distinto, por ejemplo gateway 192.168.10.254. Pide IP desde un PC.</p>
+    </li>
+  </ol>
+
+  <h3>Verifica</h3>
+  <div class="cli-wrap"><pre class="cli">
+SW1# show ip dhcp snooping
+SW1# show ip dhcp snooping binding
+R1# show ip dhcp binding
+  </pre></div>
+  <div class="callout ok"><p><strong>Resultado esperado.</strong> Los PC reciben IP del router (192.168.X.11 en adelante, porque .1-.10 están excluidas). <code>show ip dhcp snooping</code> lista las VLANs vigiladas y los puertos trust. La tabla <em>binding</em> relaciona MAC, IP, VLAN y puerto de cada cliente. El servidor falso no logra entregar ofertas.</p></div>
+  <div class="callout warn"><p><strong>En Packet Tracer.</strong> El soporte de snooping depende de la versión y algunos comandos no simulan todo el comportamiento; si un comando no existe, revisa <code>?</code> o actualiza Packet Tracer. En equipos reales, la opción 82 que inserta el switch puede hacer que un router no responda: en ese caso se usa <code>no ip dhcp snooping information option</code> en el switch. Con el mismo enfoque existen también <em>Dynamic ARP Inspection</em> e <em>IP Source Guard</em>.</p></div>
+
+  <div class="callout challenge"><p><strong>Reto.</strong> Quita <code>ip dhcp snooping trust</code> del puerto Gi0/2 de SW1 (el que va al router). ¿Qué pasa cuando un PC pide IP? ¿Por qué?</p></div>
+  <button class="done-btn" type="button" aria-pressed="false">Marcar laboratorio como completado</button>
+</section>
+
+<!-- =============== LAB 11 =============== -->
+<section class="lab" id="lab11" data-lab="11">
+  <span class="tag">Lab 11</span>
+  <h2>ACLs y control de administración</h2>
+  <p class="goal">Decidir qué VLAN puede hablar con cuál, y permitir que solo la VLAN de gestión administre el switch por SSH.</p>
+  <div class="facts"><span><b>Equipos</b>topología del Lab 5 con SSH del Lab 2 activo</span><span><b>Tiempo</b>30 min</span><span><b>Aprenderás</b>ACL extendida nombrada, access-group, access-class, contadores</span></div>
+
+  <h3>Topología</h3>
+<pre class="topo">
+ VLAN 10 Ventas ---\
+ VLAN 20 Contab.  ---[ SW1 ]---trunk---[ R1 ]   ACL VENTAS-IN en R1 Gi0/0.10 (entrada)
+ VLAN 30 TI      ---/                            ACL ADMIN-SSH en las líneas vty de SW1
+ VLAN 99 PC-Admin -/
+</pre>
+  <div class="callout"><p><strong>Regla práctica.</strong> Las ACL extendidas se colocan lo más cerca posible del origen del tráfico; las estándar (solo filtran por IP origen), lo más cerca del destino. Al final de toda ACL hay un <code>deny any</code> implícito.</p></div>
+
+  <h3>Paso a paso</h3>
+  <ol class="steps">
+    <li>
+      <h4>Bloquea Ventas → TI, pero permite todo lo demás</h4>
+      <p>El orden importa: la primera regla que coincide se aplica. Sin el <code>permit ip any any</code> final, el <code>deny</code> implícito bloquearía todo.</p>
+      <div class="cli-wrap"><pre class="cli">
+R1# configure terminal
+R1(config)# ip access-list extended VENTAS-IN
+R1(config-ext-nacl)# remark Ventas no puede llegar a TI
+R1(config-ext-nacl)# deny ip 192.168.10.0 0.0.0.255 192.168.30.0 0.0.0.255
+R1(config-ext-nacl)# permit ip any any
+R1(config-ext-nacl)# exit
+R1(config)# interface g0/0.10
+R1(config-subif)# ip access-group VENTAS-IN in
+R1(config-subif)# end
+      </pre></div>
+      <p>Se usa la <em>máscara wildcard</em> (0.0.0.255), que es la inversa de la máscara de subred (255.255.255.0).</p>
+    </li>
+    <li>
+      <h4>Permite SSH solo desde la VLAN de gestión</h4>
+      <p>Una ACL en las líneas <code>vty</code> (con <code>access-class</code>) filtra quién puede conectarse al switch, sin afectar el tráfico normal.</p>
+      <div class="cli-wrap"><pre class="cli">
+SW1# configure terminal
+SW1(config)# ip access-list standard ADMIN-SSH
+SW1(config-std-nacl)# permit 192.168.99.0 0.0.0.255
+SW1(config-std-nacl)# exit
+SW1(config)# line vty 0 15
+SW1(config-line)# access-class ADMIN-SSH in
+SW1(config-line)# end
+SW1# copy running-config startup-config
+      </pre></div>
+    </li>
+  </ol>
+
+  <h3>Verifica</h3>
+  <div class="cli-wrap"><pre class="cli">
+C:\> ping 192.168.20.11
+C:\> ping 192.168.30.11
+R1# show access-lists
+R1# show ip interface g0/0.10
+C:\> ssh -l admin 192.168.99.2
+  </pre></div>
+  <div class="callout ok"><p><strong>Resultado esperado.</strong> Desde Ventas, el ping a Contabilidad responde, pero el ping a TI falla con "Destination host unreachable" (lo devuelve el router). <code>show access-lists</code> muestra contadores (<em>matches</em>) que suben en la regla <code>deny</code>. El SSH a 192.168.99.2 funciona desde PC-Admin y falla desde un PC de otra VLAN.</p></div>
+  <div class="callout warn"><p><strong>Cuidado al probar.</strong> Una ACL mal aplicada en la interfaz por la que te administras puede dejarte fuera. Practica con la consola de Packet Tracer a mano para poder deshacerlo (<code>no ip access-group VENTAS-IN in</code>).</p></div>
+
+  <div class="callout challenge"><p><strong>Reto.</strong> Modifica la ACL para que Ventas <em>sí</em> pueda hacer ping a TI pero no pueda hacer SSH (puerto 22) a nada de esa red. Pista: <code>permit icmp ...</code> antes del <code>deny tcp ... eq 22</code>.</p></div>
+  <button class="done-btn" type="button" aria-pressed="false">Marcar laboratorio como completado</button>
+</section>
+
+<!-- =============== LAB 12 =============== -->
+<section class="lab" id="lab12" data-lab="12">
+  <span class="tag">Lab 12</span>
+  <h2>Mantenimiento, respaldo y diagnóstico</h2>
+  <p class="goal">Respaldar la configuración en un servidor TFTP, descubrir tu red con CDP, registrar eventos y dejar un switch en estado de fábrica.</p>
+  <div class="facts"><span><b>Equipos</b>SW1 configurado + 1 Server (192.168.99.50 en VLAN 99)</span><span><b>Tiempo</b>25 min</span><span><b>Aprenderás</b>TFTP, CDP, syslog, borrar configuración</span></div>
+
+  <h3>Topología</h3>
+<pre class="topo">
+ PC-Admin ---- [ SW1 ] ---- Server-TFTP (192.168.99.50/24, VLAN 99)
+                 | Gi0/1
+               [ SW2 ]
+</pre>
+  <p>En el Server: <em>Services &gt; TFTP</em> con el servicio encendido. Pon IP fija 192.168.99.50, máscara 255.255.255.0 y gateway 192.168.99.1, conectado a un puerto de la VLAN 99.</p>
+
+  <h3>Paso a paso</h3>
+  <ol class="steps">
+    <li>
+      <h4>Respalda la configuración por TFTP</h4>
+      <p>El switch te pregunta la IP del servidor y el nombre del archivo. Pulsa Enter para aceptar el nombre propuesto o escribe el tuyo.</p>
+      <div class="cli-wrap"><pre class="cli">
+SW1# copy running-config tftp:
+Address or name of remote host []? 192.168.99.50
+Destination filename [SW1-confg]? SW1-backup.cfg
+      </pre></div>
+      <p>Comprueba en el servidor (<em>Services &gt; TFTP</em>) que aparece el archivo. Para restaurar, copia en sentido inverso:</p>
+      <div class="cli-wrap"><pre class="cli">
+SW1# copy tftp: startup-config
+Address or name of remote host []? 192.168.99.50
+Source filename []? SW1-backup.cfg
+      </pre></div>
+    </li>
+    <li>
+      <h4>Descubre vecinos con CDP</h4>
+      <p>CDP (Cisco Discovery Protocol) te dice qué equipos hay al otro lado de cada cable, con su modelo, puerto e IP. Es oro para entender una red que no conoces.</p>
+      <div class="cli-wrap"><pre class="cli">
+SW1# show cdp neighbors
+SW1# show cdp neighbors detail
+      </pre></div>
+      <div class="callout warn"><p><strong>Seguridad.</strong> CDP entrega información útil a un atacante. Desactívalo en puertos de usuario con <code>no cdp enable</code> (dentro de la interfaz) y déjalo solo entre equipos de red.</p></div>
+    </li>
+    <li>
+      <h4>Registra eventos con marca de tiempo y syslog</h4>
+      <div class="cli-wrap"><pre class="cli">
+SW1# clock set 10:30:00 28 September 2026
+SW1# configure terminal
+SW1(config)# service timestamps log datetime msec
+SW1(config)# logging host 192.168.99.50
+SW1(config)# end
+SW1# show logging
+      </pre></div>
+    </li>
+    <li>
+      <h4>Deja el switch como nuevo</h4>
+      <p>Para reutilizar un equipo, hay que borrar dos cosas: la configuración guardada y la base de datos de VLANs (que vive en un archivo aparte).</p>
+      <div class="cli-wrap"><pre class="cli">
+SW1# erase startup-config
+SW1# delete vlan.dat
+SW1# reload
+      </pre></div>
+      <p>Responde <code>confirm</code> o Enter a las preguntas. Si el reinicio te ofrece guardar los cambios de la configuración actual, responde <code>no</code>.</p>
+    </li>
+  </ol>
+
+  <h3>Verifica</h3>
+  <div class="cli-wrap"><pre class="cli">
+SW1# show flash:
+SW1# show version
+SW1# show startup-config
+  </pre></div>
+  <div class="callout ok"><p><strong>Resultado esperado.</strong> El servidor TFTP muestra el archivo <code>SW1-backup.cfg</code>. Después de <code>reload</code>, el equipo vuelve a llamarse <code>Switch</code>, no tiene VLANs personalizadas y <code>show startup-config</code> indica que no hay configuración.</p></div>
+
+  <div class="callout challenge"><p><strong>Reto.</strong> Restaura el respaldo en el switch limpio con <code>copy tftp: running-config</code> y comprueba con <code>show vlan brief</code> que las VLANs volvieron. ¿Por qué crees que restaurar a <code>running-config</code> <em>combina</em> con lo existente en vez de reemplazarlo?</p></div>
+  <button class="done-btn" type="button" aria-pressed="false">Marcar laboratorio como completado</button>
+</section>
+
+<!-- =============== CHULETA =============== -->
+<section id="chuleta">
+  <h2>Chuleta rápida</h2>
+  <p class="goal">Para consultar cuando ya hiciste los laboratorios y solo necesitas recordar el comando.</p>
+
+  <h3>Plantilla base para un switch nuevo</h3>
+  <p>Ajusta nombre, IP y VLANs. Es el resumen de los laboratorios 1, 2, 3, 4 y 7.</p>
+  <div class="cli-wrap"><pre class="cli">
+Switch> enable
+Switch# configure terminal
+Switch(config)# hostname SW1
+SW1(config)# no ip domain-lookup
+SW1(config)# enable secret Cisco123
+SW1(config)# service password-encryption
+SW1(config)# banner motd #Acceso solo para personal autorizado#
+SW1(config)# ip domain-name lab.local
+SW1(config)# crypto key generate rsa
+How many bits in the modulus [512]: 1024
+SW1(config)# ip ssh version 2
+SW1(config)# username admin privilege 15 secret Admin123
+SW1(config)# line console 0
+SW1(config-line)# password cisco
+SW1(config-line)# login
+SW1(config-line)# logging synchronous
+SW1(config-line)# exec-timeout 10 0
+SW1(config-line)# exit
+SW1(config)# line vty 0 15
+SW1(config-line)# login local
+SW1(config-line)# transport input ssh
+SW1(config-line)# exec-timeout 5 0
+SW1(config-line)# exit
+SW1(config)# vtp mode transparent
+SW1(config)# vlan 99
+SW1(config-vlan)# name Gestion
+SW1(config-vlan)# exit
+SW1(config)# interface vlan 99
+SW1(config-if)# ip address 192.168.99.2 255.255.255.0
+SW1(config-if)# no shutdown
+SW1(config-if)# exit
+SW1(config)# ip default-gateway 192.168.99.1
+SW1(config)# spanning-tree mode rapid-pvst
+SW1(config)# end
+SW1# copy running-config startup-config
+  </pre></div>
+
+  <h3>Comandos show que más vas a usar</h3>
+  <div class="scroll"><table>
+    <tr><th>Comando</th><th>Te dice</th></tr>
+    <tr><td><code>show running-config</code></td><td>La configuración activa completa</td></tr>
+    <tr><td><code>show ip interface brief</code></td><td>IP y estado (up/down) de cada interfaz. Primer vistazo para diagnosticar</td></tr>
+    <tr><td><code>show interfaces status</code></td><td>Estado, VLAN, dúplex y velocidad de cada puerto (aquí ves <em>err-disabled</em>)</td></tr>
+    <tr><td><code>show vlan brief</code></td><td>VLANs existentes y sus puertos de acceso</td></tr>
+    <tr><td><code>show interfaces trunk</code></td><td>Puertos en trunk, VLAN nativa y VLANs permitidas</td></tr>
+    <tr><td><code>show interfaces fa0/1 switchport</code></td><td>Modo (access/trunk) y VLAN de un puerto concreto</td></tr>
+    <tr><td><code>show mac address-table</code></td><td>Qué MAC aprendió en qué puerto y VLAN</td></tr>
+    <tr><td><code>show spanning-tree</code></td><td>Root bridge y rol/estado de cada puerto</td></tr>
+    <tr><td><code>show etherchannel summary</code></td><td>Canales agrupados y estado de sus miembros</td></tr>
+    <tr><td><code>show port-security</code></td><td>Puertos con seguridad y violaciones</td></tr>
+    <tr><td><code>show ip route</code></td><td>Tabla de rutas (router o switch capa 3)</td></tr>
+    <tr><td><code>show ip dhcp binding</code></td><td>Direcciones repartidas por el servidor DHCP</td></tr>
+    <tr><td><code>show cdp neighbors</code></td><td>Equipos Cisco conectados directamente</td></tr>
+    <tr><td><code>show access-lists</code></td><td>ACL configuradas y cuántas veces coincidió cada regla</td></tr>
+  </table></div>
+
+  <h3>Diagnóstico por capas: qué revisar y en qué orden</h3>
+  <div class="scroll"><table>
+    <tr><th>Paso</th><th>Pregunta</th><th>Comando</th></tr>
+    <tr><td>1. Físico</td><td>¿El cable es el correcto y la luz está verde? ¿El puerto está apagado o <em>err-disabled</em>?</td><td><code>show interfaces status</code></td></tr>
+    <tr><td>2. VLAN</td><td>¿El puerto está en la VLAN correcta? ¿La VLAN existe en ese switch?</td><td><code>show vlan brief</code></td></tr>
+    <tr><td>3. Trunk</td><td>¿Hay trunk? ¿La VLAN está permitida y la nativa coincide en ambos lados?</td><td><code>show interfaces trunk</code></td></tr>
+    <tr><td>4. Direccionamiento</td><td>¿IP, máscara y gateway del PC son de la red correcta?</td><td><code>ipconfig</code> en el PC</td></tr>
+    <tr><td>5. Enrutamiento</td><td>¿El router o la SVI tiene la red en su tabla? ¿Está <em>up/up</em>?</td><td><code>show ip route</code>, <code>show ip int brief</code></td></tr>
+    <tr><td>6. Filtros y seguridad</td><td>¿Una ACL, port-security o DHCP snooping lo está bloqueando?</td><td><code>show access-lists</code>, <code>show port-security</code></td></tr>
+    <tr><td>7. Bucles y convergencia</td><td>¿STP bloquea un enlace que creías activo?</td><td><code>show spanning-tree</code></td></tr>
+  </table></div>
+  <p>Prueba también con <code>ping</code> por etapas: primero tu gateway, luego un equipo de otra VLAN, luego un destino lejano. El primer punto donde falla te dice en qué capa está el problema.</p>
+</section>
+
+<!-- =============== PROYECTO FINAL =============== -->
+<section id="proyecto">
+  <h2>Proyecto final: integra todo</h2>
+  <p class="goal">Construye una red pequeña desde cero usando lo aprendido, sin mirar los laboratorios (o mirándolos solo para consultar).</p>
+
+<pre class="topo">
+                       R1  (DHCP + ACL + gateway por subinterfaces)
+                        |
+                     [ SW1 ] root bridge
+             Po1 (2 cables) /   \ Gi0/2
+                        [ SW2 ]--------[ SW3 ]
+   VLAN 10 y 20 en SW2 y SW3, VLAN 30 solo en SW3, VLAN 99 en los tres
+</pre>
+
+  <h3>Requisitos</h3>
+  <ul class="plain">
+    <li>Nombres, <code>enable secret</code>, banner, SSH v2 con usuario local y IP de gestión en VLAN 99 en los tres switches.</li>
+    <li>VLANs 10, 20, 30, 99 y 999. Trunks con VLAN nativa 99 y lista de VLANs permitidas.</li>
+    <li>SW1 y SW2 unidos por un EtherChannel LACP de dos enlaces.</li>
+    <li>SW1 es root primary y SW2 root secondary. Rapid-PVST en todos. PortFast y BPDU Guard en puertos de PC.</li>
+    <li>Port-security con sticky (máximo 1 MAC) en los puertos de usuario. Puertos libres en VLAN 999 y apagados.</li>
+    <li>R1 con subinterfaces como gateway y pools DHCP para las VLANs 10, 20 y 30. DHCP snooping en los switches.</li>
+    <li>ACL: Ventas (VLAN 10) no llega a TI (VLAN 30). Solo la VLAN 99 puede hacer SSH a los switches.</li>
+    <li>Respaldo de todas las configuraciones en un servidor TFTP.</li>
+  </ul>
+
+  <h3>Cómo saber que quedó bien</h3>
+  <ul class="plain">
+    <li>Cada PC obtiene IP por DHCP en su VLAN y hace ping a su gateway.</li>
+    <li>Ventas y Contabilidad se comunican; Ventas no llega a TI.</li>
+    <li>Apagas un enlace del EtherChannel y el ping continuo casi no se corta.</li>
+    <li>Un PC intruso en un puerto de usuario lo deja en <em>err-disabled</em>.</li>
+    <li>Desde una VLAN de usuario no puedes entrar por SSH a los switches; desde PC-Admin sí.</li>
+  </ul>
+  <div class="callout ok"><p><strong>Cuando lo logres</strong>, ya tienes las bases de un CCNA en switching. Los siguientes temas naturales son OSPF, NAT, VLAN de voz y redes inalámbricas.</p></div>
+</section>
+
+</main>
+</div>
+
+<script>
+(function(){
+  var promptRe=/^([A-Za-z][\w\-\.]*(?:\([\w\-\.]+\))?[>#])(?:\s(.*))?$/;
+  var pcRe=/^(C:\\>)(?:\s(.*))?$/;
+
+  function copyText(text,btn){
+    function ok(){ btn.textContent='Copiado'; btn.classList.add('ok'); setTimeout(function(){btn.textContent='Copiar';btn.classList.remove('ok');},1600); }
+    function fallback(){
+      try{
+        var ta=document.createElement('textarea'); ta.value=text; ta.style.position='fixed'; ta.style.opacity='0';
+        document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); ok();
+      }catch(e){ btn.textContent='Selecciona y copia'; }
+    }
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(ok,fallback);
+    } else { fallback(); }
+  }
+
+  document.querySelectorAll('pre.cli').forEach(function(pre){
+    var raw=pre.textContent.replace(/^\n/,'').replace(/\s+$/,'');
+    var lines=raw.split('\n'), cmds=[], frag=document.createDocumentFragment();
+    lines.forEach(function(line){
+      var row=document.createElement('span'); row.className='ln';
+      var pc=line.match(pcRe), m=line.match(promptRe);
+      if(pc){
+        var a=document.createElement('span'); a.className='pr pc'; a.textContent=pc[1];
+        row.appendChild(a); row.appendChild(document.createTextNode(pc[2]?' '+pc[2]:''));
+        if(pc[2]) cmds.push(pc[2]);
+      } else if(m){
+        var p=document.createElement('span');
+        var cls= m[1].indexOf('(')>-1 ? 'c' : (m[1].slice(-1)==='#' ? 'p' : 'u');
+        p.className='pr '+cls; p.textContent=m[1];
+        row.appendChild(p); row.appendChild(document.createTextNode(m[2]?' '+m[2]:''));
+        if(m[2]) cmds.push(m[2]);
+      } else if(line.trim().charAt(0)==='!'){
+        row.classList.add('cm'); row.textContent=line;
+      } else {
+        row.classList.add('out'); row.textContent=line;
+      }
+      frag.appendChild(row);
+    });
+    pre.textContent=''; pre.appendChild(frag);
+    var btn=document.createElement('button');
+    btn.type='button'; btn.className='copy'; btn.textContent='Copiar';
+    btn.setAttribute('aria-label','Copiar los comandos de este bloque');
+    btn.addEventListener('click',function(){ copyText(cmds.join('\n'),btn); });
+    pre.parentNode.appendChild(btn);
+  });
+
+  /* progreso de laboratorios */
+  var KEY='curso-cisco-pt-progreso', done={};
+  try{ done=JSON.parse(localStorage.getItem(KEY)||'{}')||{}; }catch(e){ done={}; }
+  function save(){ try{ localStorage.setItem(KEY,JSON.stringify(done)); }catch(e){} }
+  function render(){
+    var n=0;
+    document.querySelectorAll('section.lab').forEach(function(sec){
+      var id=sec.getAttribute('data-lab'), on=!!done[id];
+      if(on) n++;
+      var b=sec.querySelector('.done-btn');
+      if(b){ b.setAttribute('aria-pressed',on?'true':'false'); b.textContent=on?'Laboratorio completado (clic para desmarcar)':'Marcar laboratorio como completado'; }
+      var link=document.querySelector('.toc a[data-lab="'+id+'"]');
+      if(link) link.classList.toggle('done',on);
+    });
+    var t=document.getElementById('progtxt'), bar=document.getElementById('progbar');
+    if(t) t.textContent=n+' de 12 laboratorios completados';
+    if(bar) bar.style.width=(n/12*100)+'%';
+  }
+  document.querySelectorAll('section.lab .done-btn').forEach(function(b){
+    b.addEventListener('click',function(){
+      var id=b.closest('section.lab').getAttribute('data-lab');
+      if(done[id]) delete done[id]; else done[id]=1;
+      save(); render();
+    });
+  });
+  render();
+
+  /* índice: colapsado en móvil, abierto en escritorio; sección actual */
+  var det=document.getElementById('tocd');
+  if(det && window.matchMedia && window.matchMedia('(max-width:900px)').matches){ det.open=false; }
+  if('IntersectionObserver' in window){
+    var links={};
+    document.querySelectorAll('.toc a[href^="#"]').forEach(function(a){ links[a.getAttribute('href').slice(1)]=a; });
+    var io=new IntersectionObserver(function(entries){
+      entries.forEach(function(e){
+        if(e.isIntersecting){
+          Object.keys(links).forEach(function(k){ links[k].removeAttribute('aria-current'); });
+          if(links[e.target.id]) links[e.target.id].setAttribute('aria-current','true');
+        }
+      });
+    },{rootMargin:'-20% 0px -70% 0px'});
+    document.querySelectorAll('main section[id]').forEach(function(s){ io.observe(s); });
+  }
+})();
+</script>
+</body>
+</html>

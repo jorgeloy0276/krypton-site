@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="es">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="color-scheme" content="dark">
+    <title>Documentation | Krypton Logic</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <script src="js/layout.js"></script>
+</head>
+
+<body>
+    <header id="hdr"></header>
+    <main>
+        <div class="wrap">
+            <section class="page-head">
+                <h1>Documentacion</h1>
+                <p class="lead">Base de conocimiento de Krypton Logic. Guías y manuales técnicos.</p>
+                <div class="search"><i class="fa-solid fa-magnifying-glass"></i><input id="q" type="search"
+                        placeholder="Buscar guía…" aria-label="Buscar guía"></div>
+            </section>
+            <section class="sec" style="padding-top:0">
+                <div class="grid" id="docs"></div>
+                <p id="none" class="lead" hidden>No hay guías que coincidan con tu búsqueda.</p>
+            </section>
+        </div>
+        <script>
+            // Para agregar o editar una guía: [icono Font Awesome, título, descripción, ruta]
+            const DOCS = [
+                ["fa-brands fa-git-alt", "Guía de Git", "Desde la instalación hasta flujos avanzados: ramas, rebase y recuperación.", "/docs/guia-git-instalacion-a-avanzado.html"],
+
+                ["fa-solid fa-shield-halved", "Guía de uso de Greenbone (GVM)", "Escaneo de vulnerabilidades: instalación, tareas e informes.", "/docs/guia-greenbone-gvm.html"],
+
+                ["fa-brands fa-angular", "Angular 21 — De Básico a Avanzado", "Referencia rápida y guía completa del framework.", "/docs/guia-book-angular21.html"],
+
+                ["fa-brands fa-linux", "Guia de comandos Linux", "Los comandos que más se usan, válidos en Ubuntu, Debian, Fedora, Arch y casi cualquier distribución. Toca un comando para copiarlo.", "/docs/guia-comandos-linux.html"],
+
+                ["fa-brands fa-linux", "Hashcat Cheat Sheet", "Ethical Hacking · Password Auditing · Command Reference", "/docs/hashcat-cheat-sheet.html"],
+
+                ["fa-brands fa-linux", "Guia de Aircrack-ng Suite", "Flujo cronológico completo — de modo monitor a crackeo de handshake, con herramientas complementarias.", "/docs/guia-aircrack-ng-suite.html"],
+
+                ["fa-brands fa-linux", "bettercap command reference", "A single-page reference to every interactive-session command bettercap ships, organized by module.", "/docs/bettercap-command-reference.html"],
+
+                ["fa-solid fa-globe", "Guia de Animaciones Web", "CSS Transitions · @keyframes · requestAnimationFrame · GSAP", "/docs/guia-animaciones.html"],
+
+                ["fa-brands fa-python", "GUIA COMPLETA: Flask + MySQL + MVC + POO", "CRUD · Paginación · Búsqueda · JSON API · Export PDF · Tailwind CSS", "/docs/guia-flask-mysql.html"],
+
+                ["fa-solid fa-network-wired", "Switches Cisco desde cero, con Packet Tracer", "Doce laboratorios cortos, de la configuración inicial a ACLs y respaldo.", "/docs/guia-animaciones.html"]
+
+            ];
+            const g = document.getElementById('docs');
+            g.innerHTML = DOCS.map(([i, t, d, h]) => `<a class="card" href="${h}" data-s="${(t + ' ' + d).toLowerCase()}"><div class="ico"><i class="${i}"></i></div><h3>${t}</h3><p>${d}</p></a>`).join('');
+            q.oninput = () => { const v = q.value.toLowerCase(); let n = 0; g.querySelectorAll('.card').forEach(c => { const ok = c.dataset.s.includes(v); c.hidden = !ok; n += ok }); none.hidden = n > 0 };
+        </script>
+    </main>
+    <footer id="ftr"></footer>
+
+</body>
+
+</html>

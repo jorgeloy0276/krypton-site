@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Guia de Animaciones Web — CSS, JS y GSAP</title>
+<style>
+  :root {
+    --bg: #0f1419;
+    --panel: #161d26;
+    --border: #263140;
+    --text: #e6edf3;
+    --muted: #8b98a5;
+    --accent: #60a5fa;
+    --accent2: #4ade80;
+    --code-bg: #0a0e13;
+    --comment: #6a9955;
+  }
+  * { box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
+    margin: 0;
+    padding: 0 0 80px 0;
+    line-height: 1.5;
+  }
+  header {
+    padding: 48px 24px 32px;
+    border-bottom: 1px solid var(--border);
+    text-align: center;
+  }
+  header h1 {
+    font-size: 28px;
+    margin: 0 0 8px;
+    letter-spacing: -0.5px;
+  }
+  header p { color: var(--muted); margin: 0; font-size: 15px; }
+
+  nav {
+    max-width: 900px;
+    margin: 24px auto 0;
+    padding: 0 24px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+  }
+  nav a {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 13px;
+    padding: 6px 12px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+  }
+  nav a:hover { color: var(--accent); border-color: var(--accent); }
+
+  main {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+  section {
+    margin-top: 56px;
+    scroll-margin-top: 24px;
+  }
+  section h2 {
+    font-size: 20px;
+    border-left: 3px solid var(--accent);
+    padding-left: 12px;
+    margin-bottom: 6px;
+  }
+  section > p.desc {
+    color: var(--muted);
+    font-size: 14px;
+    margin: 0 0 20px;
+    max-width: 65ch;
+  }
+
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+  .card h3 {
+    font-size: 14px;
+    margin: 0 0 12px;
+    color: var(--accent2);
+    font-family: "SF Mono", Consolas, monospace;
+    font-weight: 600;
+  }
+
+  .demo-row {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+  .stage {
+    width: 260px;
+    height: 90px;
+    background: var(--code-bg);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+  .box {
+    width: 46px;
+    height: 46px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--accent), #3b82f6);
+    box-shadow: 0 4px 14px rgba(96,165,250,0.4);
+  }
+  .box.circle { border-radius: 50%; }
+
+  pre {
+    background: var(--code-bg);
+    border-radius: 8px;
+    padding: 14px 16px;
+    overflow-x: auto;
+    font-size: 12.5px;
+    flex: 1;
+    min-width: 260px;
+    margin: 0;
+  }
+  code { font-family: "SF Mono", Consolas, "Courier New", monospace; }
+  .c-comment { color: var(--comment); }
+  .c-prop { color: #9cdcfe; }
+  .c-val { color: #ce9178; }
+  .c-kw { color: #c586c0; }
+
+  button.trigger {
+    background: var(--accent);
+    color: #0f1419;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 10px;
+  }
+  button.trigger:hover { opacity: 0.85; }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  table th, table td {
+    text-align: left;
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--border);
+  }
+  table th { color: var(--muted); font-weight: 600; }
+  table code { color: var(--accent2); }
+
+  /* ===================================================================
+     KEYFRAMES — cada animación con su propio @keyframes, nombre único
+  =================================================================== */
+  @keyframes demo-fade { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes demo-fade-out { from { opacity: 1; } to { opacity: 0; } }
+
+  @keyframes demo-slide-right {
+    from { transform: translateX(-90px); opacity: 0; }
+    to   { transform: translateX(0); opacity: 1; }
+  }
+  @keyframes demo-slide-left {
+    from { transform: translateX(90px); opacity: 0; }
+    to   { transform: translateX(0); opacity: 1; }
+  }
+  @keyframes demo-scale-in {
+    from { transform: scale(0); opacity: 0; }
+    to   { transform: scale(1); opacity: 1; }
+  }
+  @keyframes demo-bounce {
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(-22px); }
+  }
+  @keyframes demo-pulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50%      { transform: scale(1.15); opacity: 0.7; }
+  }
+  @keyframes demo-shake {
+    0%, 100% { transform: translateX(0); }
+    20%      { transform: translateX(-8px); }
+    40%      { transform: translateX(8px); }
+    60%      { transform: translateX(-6px); }
+    80%      { transform: translateX(6px); }
+  }
+  @keyframes demo-spin {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+  }
+  @keyframes demo-flip {
+    from { transform: rotateY(0deg); }
+    to   { transform: rotateY(360deg); }
+  }
+  @keyframes demo-ball-cycle {
+    0%   { opacity: 0; transform: scale(0) rotate(180deg); }
+    15%  { opacity: 1; transform: scale(1) rotate(0deg); }
+    85%  { opacity: 1; transform: scale(1) rotate(0deg); }
+    100% { opacity: 0; transform: scale(0.7) rotate(0deg); }
+  }
+
+  .anim-fade      { animation: demo-fade 1.2s ease both; }
+  .anim-slide-r   { animation: demo-slide-right 0.8s ease both; }
+  .anim-slide-l   { animation: demo-slide-left 0.8s ease both; }
+  .anim-scale     { animation: demo-scale-in 0.6s cubic-bezier(.34,1.56,.64,1) both; }
+  .anim-bounce    { animation: demo-bounce 1s ease-in-out infinite; }
+  .anim-pulse     { animation: demo-pulse 1.4s ease-in-out infinite; }
+  .anim-shake     { animation: demo-shake 0.6s ease-in-out; }
+  .anim-spin      { animation: demo-spin 1.6s linear infinite; }
+  .anim-flip      { animation: demo-flip 1.4s ease-in-out infinite; }
+  .anim-ball      { animation: demo-ball-cycle 3.5s ease-in-out; }
+
+  .gsap-box {
+    width: 46px; height: 46px; border-radius: 10px;
+    background: linear-gradient(135deg, var(--accent2), #16a34a);
+  }
+
+  /* Respeta la preferencia del usuario de reducir movimiento */
+  @media (prefers-reduced-motion: reduce) {
+    * { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🎬 Guia de Animaciones Web</h1>
+  <p>CSS Transitions · @keyframes · requestAnimationFrame · GSAP</p>
+</header>
+
+<nav>
+  <a href="#transitions">Transitions</a>
+  <a href="#keyframes-basico">Keyframes básico</a>
+  <a href="#propiedades">Propiedades animation-*</a>
+  <a href="#timing">Timing functions</a>
+  <a href="#catalogo">Catálogo de animaciones</a>
+  <a href="#raf">requestAnimationFrame</a>
+  <a href="#gsap">GSAP</a>
+  <a href="#recursos">Recursos</a>
+</nav>
+
+<main>
+
+  <!-- ===================== TRANSITIONS ===================== -->
+  <section id="transitions">
+    <h2>1. CSS Transitions</h2>
+    <p class="desc">Para animar UN cambio de estado (hover, click, clase agregada). No sirve para loops ni secuencias con varios pasos — para eso están los <code>@keyframes</code> (sección 2).</p>
+    <div class="card">
+      <h3>hover con transition</h3>
+      <div class="demo-row">
+        <div class="stage">
+          <div class="box" style="transition: transform 0.3s ease, background 0.3s ease; cursor:pointer;"
+               onmouseover="this.style.transform='scale(1.3)'; this.style.background='linear-gradient(135deg,#4ade80,#16a34a)'"
+               onmouseout="this.style.transform='scale(1)'; this.style.background='linear-gradient(135deg,#60a5fa,#3b82f6)'"></div>
+        </div>
+        <pre><code><span class="c-comment">/* Pasa el mouse por encima del cuadro */</span>
+.caja {
+  <span class="c-prop">transition</span>: <span class="c-val">transform 0.3s ease</span>, <span class="c-val">background 0.3s ease</span>;
+  <span class="c-comment">/* formato: propiedad | duración | timing-function | delay(opcional) */</span>
+}
+.caja:hover {
+  <span class="c-prop">transform</span>: <span class="c-val">scale(1.3)</span>;
+}</code></pre>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Propiedades clave de transition</h3>
+      <table>
+        <tr><th>Propiedad</th><th>Qué hace</th></tr>
+        <tr><td><code>transition-property</code></td><td>Qué propiedad(es) animar (o <code>all</code>)</td></tr>
+        <tr><td><code>transition-duration</code></td><td>Cuánto dura, ej. <code>0.3s</code></td></tr>
+        <tr><td><code>transition-timing-function</code></td><td>Curva de aceleración (ver sección 4)</td></tr>
+        <tr><td><code>transition-delay</code></td><td>Espera antes de iniciar</td></tr>
+      </table>
+    </div>
+  </section>
+
+  <!-- ===================== KEYFRAMES BASICO ===================== -->
+  <section id="keyframes-basico">
+    <h2>2. @keyframes — lo básico</h2>
+    <p class="desc">Para secuencias con varios pasos, loops infinitos, o animaciones que corren solas sin esperar un evento del usuario.</p>
+    <div class="card">
+      <h3>Anatomía de un @keyframes</h3>
+      <pre><code><span class="c-comment">/* 1. Defines los "fotogramas clave" con porcentajes o from/to */</span>
+<span class="c-kw">@keyframes</span> mi-animacion {
+  <span class="c-val">0%</span>   { <span class="c-prop">opacity</span>: 0; <span class="c-prop">transform</span>: <span class="c-val">translateY(20px)</span>; }
+  <span class="c-val">50%</span>  { <span class="c-prop">opacity</span>: 0.5; }
+  <span class="c-val">100%</span> { <span class="c-prop">opacity</span>: 1; <span class="c-prop">transform</span>: <span class="c-val">translateY(0)</span>; }
+}
+
+<span class="c-comment">/* 2. La aplicas a un elemento con la propiedad "animation" */</span>
+.elemento {
+  <span class="c-prop">animation</span>: <span class="c-val">mi-animacion 1s ease-in-out</span>;
+  <span class="c-comment">/* nombre | duración | timing-function */</span>
+}</code></pre>
+    </div>
+  </section>
+
+  <!-- ===================== PROPIEDADES ===================== -->
+  <section id="propiedades">
+    <h2>3. Todas las propiedades animation-*</h2>
+    <p class="desc">El shorthand <code>animation</code> es la combinación de estas 8 propiedades, en este orden (todas opcionales excepto nombre y duración).</p>
+    <div class="card">
+      <table>
+        <tr><th>Propiedad</th><th>Valores comunes</th><th>Qué controla</th></tr>
+        <tr><td><code>animation-name</code></td><td>nombre del @keyframes</td><td>Cuál animación usar</td></tr>
+        <tr><td><code>animation-duration</code></td><td><code>2s</code>, <code>500ms</code></td><td>Cuánto dura UN ciclo</td></tr>
+        <tr><td><code>animation-timing-function</code></td><td><code>ease</code>, <code>linear</code>, <code>cubic-bezier()</code></td><td>Curva de velocidad</td></tr>
+        <tr><td><code>animation-delay</code></td><td><code>0.5s</code></td><td>Espera antes de empezar</td></tr>
+        <tr><td><code>animation-iteration-count</code></td><td><code>1</code>, <code>3</code>, <code>infinite</code></td><td>Cuántas veces se repite</td></tr>
+        <tr><td><code>animation-direction</code></td><td><code>normal</code>, <code>reverse</code>, <code>alternate</code></td><td>Si rebota de vuelta o siempre igual</td></tr>
+        <tr><td><code>animation-fill-mode</code></td><td><code>none</code>, <code>forwards</code>, <code>backwards</code>, <code>both</code></td><td>Qué estilo queda ANTES/DESPUÉS de correr</td></tr>
+        <tr><td><code>animation-play-state</code></td><td><code>running</code>, <code>paused</code></td><td>Pausar/reanudar (útil con JS)</td></tr>
+      </table>
+      <p class="desc" style="margin-top:14px;"><strong>Nota sobre <code>fill-mode</code>:</strong> si tu animación empieza en <code>opacity:0</code> y no pones <code>fill-mode: forwards</code> (o <code>both</code>), el elemento vuelve a su estado ORIGINAL del CSS (probablemente <code>opacity:1</code>) apenas termina la animación — un bug muy común.</p>
+    </div>
+  </section>
+
+  <!-- ===================== TIMING FUNCTIONS ===================== -->
+  <section id="timing">
+    <h2>4. Timing functions (curvas de aceleración)</h2>
+    <p class="desc">Definen si el movimiento es constante, o si acelera/frena en algún punto. Prueba cada botón.</p>
+    <div class="card">
+      <div class="demo-row">
+        <div class="stage" style="justify-content:flex-start; padding:0 10px;">
+          <div class="box circle" id="tf-box" style="transition: transform 1.2s;"></div>
+        </div>
+        <pre id="tf-code"><code><span class="c-comment">// selecciona una curva ↓</span></code></pre>
+      </div>
+      <div style="margin-top:10px; display:flex; gap:8px; flex-wrap:wrap;">
+        <button class="trigger" onclick="runTiming('linear')">linear</button>
+        <button class="trigger" onclick="runTiming('ease')">ease</button>
+        <button class="trigger" onclick="runTiming('ease-in')">ease-in</button>
+        <button class="trigger" onclick="runTiming('ease-out')">ease-out</button>
+        <button class="trigger" onclick="runTiming('ease-in-out')">ease-in-out</button>
+        <button class="trigger" onclick="runTiming('cubic-bezier(.68,-0.55,.27,1.55)')">cubic-bezier (rebote)</button>
+      </div>
+      <table style="margin-top:16px;">
+        <tr><td><code>linear</code></td><td>velocidad constante, sin aceleración</td></tr>
+        <tr><td><code>ease</code></td><td>(default) acelera al inicio, frena al final — la más natural</td></tr>
+        <tr><td><code>ease-in</code></td><td>empieza lento, termina rápido</td></tr>
+        <tr><td><code>ease-out</code></td><td>empieza rápido, termina lento</td></tr>
+        <tr><td><code>ease-in-out</code></td><td>lento-rápido-lento</td></tr>
+        <tr><td><code>cubic-bezier(x1,y1,x2,y2)</code></td><td>curva 100% personalizada — usa <a href="https://cubic-bezier.com" style="color:var(--accent)" target="_blank">cubic-bezier.com</a> para diseñarla visualmente</td></tr>
+      </table>
+    </div>
+  </section>
+
+  <!-- ===================== CATALOGO ===================== -->
+  <section id="catalogo">
+    <h2>5. Catálogo de animaciones comunes</h2>
+    <p class="desc">Las que más se repiten en proyectos reales. Copia el <code>@keyframes</code> y el nombre que quieras.</p>
+
+    <div class="card">
+      <h3>fade-in / fade-out</h3>
+      <div class="demo-row">
+        <div class="stage"><div class="box anim-fade" id="d-fade"></div></div>
+        <pre><code><span class="c-kw">@keyframes</span> fade-in {
+  <span class="c-val">from</span> { <span class="c-prop">opacity</span>: 0; }
+  <span class="c-val">to</span>   { <span class="c-prop">opacity</span>: 1; }
+}
+.el { <span class="c-prop">animation</span>: <span class="c-val">fade-in 1.2s ease both</span>; }</code></pre>
+      </div>
+      <button class="trigger" onclick="replay('d-fade','anim-fade')">Reiniciar</button>
+    </div>
+
+    <div class="card">
+      <h3>slide-in (izquierda / derecha)</h3>
+      <div class="demo-row">
+        <div class="stage"><div class="box anim-slide-r" id="d-slide"></div></div>
+        <pre><code><span class="c-kw">@keyframes</span> slide-in-right {
+  <span class="c-val">from</span> { <span class="c-prop">transform</span>: <span class="c-val">translateX(-90px)</span>; <span class="c-prop">opacity</span>: 0; }
+  <span class="c-val">to</span>   { <span class="c-prop">transform</span>: <span class="c-val">translateX(0)</span>; <span class="c-prop">opacity</span>: 1; }
+}
+<span class="c-comment">/* para que venga de la derecha, usa translateX(90px) */</span></code></pre>
+      </div>
+      <button class="trigger" onclick="replay('d-slide','anim-slide-r')">Desde izquierda</button>
+      <button class="trigger" onclick="replay('d-slide','anim-slide-l')">Desde derecha</button>
+    </div>
+
+    <div class="card">
+      <h3>scale-in (con rebote)</h3>
+      <div class="demo-row">
+        <div class="stage"><div class="box circle anim-scale" id="d-scale"></div></div>
+        <pre><code><span class="c-kw">@keyframes</span> scale-in {
+  <span class="c-val">from</span> { <span class="c-prop">transform</span>: <span class="c-val">scale(0)</span>; <span class="c-prop">opacity</span>: 0; }
+  <span class="c-val">to</span>   { <span class="c-prop">transform</span>: <span class="c-val">scale(1)</span>; <span class="c-prop">opacity</span>: 1; }
+}
+.el {
+  <span class="c-prop">animation</span>: <span class="c-val">scale-in 0.6s</span> <span class="c-val">cubic-bezier(.34,1.56,.64,1)</span> <span class="c-val">both</span>;
+  <span class="c-comment">/* esta curva es la que da el "rebote" al final */</span>
+}</code></pre>
+      </div>
+      <button class="trigger" onclick="replay('d-scale','anim-scale')">Reiniciar</button>
+    </div>
+
+    <div class="card">
+      <h3>bounce (loop infinito)</h3>
+      <div class="demo-row">
+        <div class="stage"><div class="box circle anim-bounce"></div></div>
+        <pre><code><span class="c-kw">@keyframes</span> bounce {
+  <span class="c-val">0%, 100%</span> { <span class="c-prop">transform</span>: <span class="c-val">translateY(0)</span>; }
+  <span class="c-val">50%</span>      { <span class="c-prop">transform</span>: <span class="c-val">translateY(-22px)</span>; }
+}
+.el { <span class="c-prop">animation</span>: <span class="c-val">bounce 1s ease-in-out infinite</span>; }</code></pre>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>pulse (loop infinito)</h3>
+      <div class="demo-row">
+        <div class="stage"><div class="box circle anim-pulse"></div></div>
+        <pre><code><span class="c-kw">@keyframes</span> pulse {
+  <span class="c-val">0%, 100%</span> { <span class="c-prop">transform</span>: <span class="c-val">scale(1)</span>; <span class="c-prop">opacity</span>: 1; }
+  <span class="c-val">50%</span>      { <span class="c-prop">transform</span>: <span class="c-val">scale(1.15)</span>; <span class="c-prop">opacity</span>: 0.7; }
+}
+.el { <span class="c-prop">animation</span>: <span class="c-val">pulse 1.4s ease-in-out infinite</span>; }</code></pre>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>shake (error / validación)</h3>
+      <div class="demo-row">
+        <div class="stage"><div class="box" id="d-shake"></div></div>
+        <pre><code><span class="c-kw">@keyframes</span> shake {
+  <span class="c-val">0%, 100%</span> { <span class="c-prop">transform</span>: <span class="c-val">translateX(0)</span>; }
+  <span class="c-val">20%</span>      { <span class="c-prop">transform</span>: <span class="c-val">translateX(-8px)</span>; }
+  <span class="c-val">40%</span>      { <span class="c-prop">transform</span>: <span class="c-val">translateX(8px)</span>; }
+  <span class="c-val">60%</span>      { <span class="c-prop">transform</span>: <span class="c-val">translateX(-6px)</span>; }
+  <span class="c-val">80%</span>      { <span class="c-prop">transform</span>: <span class="c-val">translateX(6px)</span>; }
+}
+<span class="c-comment">/* típico: input.classList.add('shake') al fallar validación */</span></code></pre>
+      </div>
+      <button class="trigger" onclick="replay('d-shake','anim-shake')">Simular error</button>
+    </div>
+
+    <div class="card">
+      <h3>spin (loading spinner)</h3>
+      <div class="demo-row">
+        <div class="stage"><div class="box anim-spin" style="border-radius:50%; border:4px solid rgba(255,255,255,0.15); border-top-color:var(--accent); background:none;"></div></div>
+        <pre><code><span class="c-kw">@keyframes</span> spin {
+  <span class="c-val">from</span> { <span class="c-prop">transform</span>: <span class="c-val">rotate(0deg)</span>; }
+  <span class="c-val">to</span>   { <span class="c-prop">transform</span>: <span class="c-val">rotate(360deg)</span>; }
+}
+.el { <span class="c-prop">animation</span>: <span class="c-val">spin 1.6s linear infinite</span>; }
+<span class="c-comment">/* linear es clave aquí: un spinner no debe acelerar/frenar */</span></code></pre>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>flip 3D</h3>
+      <div class="demo-row">
+        <div class="stage" style="perspective:400px;"><div class="box anim-flip"></div></div>
+        <pre><code><span class="c-kw">@keyframes</span> flip {
+  <span class="c-val">from</span> { <span class="c-prop">transform</span>: <span class="c-val">rotateY(0deg)</span>; }
+  <span class="c-val">to</span>   { <span class="c-prop">transform</span>: <span class="c-val">rotateY(360deg)</span>; }
+}
+.contenedor { <span class="c-prop">perspective</span>: <span class="c-val">400px</span>; } <span class="c-comment">/* da profundidad 3D */</span>
+.el { <span class="c-prop">animation</span>: <span class="c-val">flip 1.4s ease-in-out infinite</span>; }</code></pre>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>tu caso: balota que entra girando y desaparece</h3>
+      <div class="demo-row">
+        <div class="stage"><div class="box circle anim-ball" id="d-ball" style="background:radial-gradient(circle at 30% 25%, #fff 0%, #dbeafe 40%, #60a5fa 100%); box-shadow:0 6px 14px rgba(0,0,0,0.4);"></div></div>
+        <pre><code><span class="c-kw">@keyframes</span> ball-cycle {
+  <span class="c-val">0%</span>   { <span class="c-prop">opacity</span>:0; <span class="c-prop">transform</span>:<span class="c-val">scale(0) rotate(180deg)</span>; }
+  <span class="c-val">15%</span>  { <span class="c-prop">opacity</span>:1; <span class="c-prop">transform</span>:<span class="c-val">scale(1) rotate(0deg)</span>; }
+  <span class="c-val">85%</span>  { <span class="c-prop">opacity</span>:1; <span class="c-prop">transform</span>:<span class="c-val">scale(1) rotate(0deg)</span>; }
+  <span class="c-val">100%</span> { <span class="c-prop">opacity</span>:0; <span class="c-prop">transform</span>:<span class="c-val">scale(0.7) rotate(0deg)</span>; }
+}
+.el { <span class="c-prop">animation</span>: <span class="c-val">ball-cycle 3.5s ease-in-out</span>; }
+<span class="c-comment">// para reiniciar con JS: remove clase → forzar reflow → add clase</span></code></pre>
+      </div>
+      <button class="trigger" onclick="replay('d-ball','anim-ball')">Reiniciar ciclo</button>
+    </div>
+  </section>
+
+  <!-- ===================== RAF ===================== -->
+  <section id="raf">
+    <h2>6. requestAnimationFrame (JS)</h2>
+    <p class="desc">Solo cuando el movimiento depende de algo en tiempo real: posición de otro elemento, input del usuario, física, colisiones. Si es un guion fijo, usa <code>@keyframes</code>.</p>
+    <div class="card">
+      <h3>Patrón base</h3>
+      <pre><code><span class="c-kw">function</span> animar() {
+  <span class="c-comment">// 1. lees el estado real (posición, tiempo, lo que sea)</span>
+  <span class="c-kw">const</span> rect = elemento.getBoundingClientRect();
+
+  <span class="c-comment">// 2. calculas el siguiente estado</span>
+  x += velocidad;
+
+  <span class="c-comment">// 3. aplicas el cambio</span>
+  elemento.style.transform = <span class="c-val">`translateX(${x}px)`</span>;
+
+  <span class="c-comment">// 4. pides el siguiente frame (~60 veces por segundo)</span>
+  requestAnimationFrame(animar);
+}
+requestAnimationFrame(animar);</code></pre>
+      <p class="desc" style="margin-top:12px;">Para cancelarlo: guarda el id que retorna <code>requestAnimationFrame()</code> y usa <code>cancelAnimationFrame(id)</code>.</p>
+    </div>
+  </section>
+
+  <!-- ===================== GSAP ===================== -->
+  <section id="gsap">
+    <h2>7. GSAP (GreenSock Animation Platform)</h2>
+    <p class="desc">Librería JS para animaciones complejas: timelines encadenadas, easing avanzado, scroll-triggers, y control total (pausar/reversar/reescalar) que CSS puro no te da fácilmente.</p>
+
+    <div class="card">
+      <h3>Instalación — opción 1: CDN (rápido, sin build tools)</h3>
+      <pre><code>&lt;<span class="c-kw">script</span> <span class="c-prop">src</span>=<span class="c-val">"https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"</span>&gt;&lt;/<span class="c-kw">script</span>&gt;
+<span class="c-comment">&lt;!-- ya tienes la variable global "gsap" disponible --&gt;</span></code></pre>
+    </div>
+
+    <div class="card">
+      <h3>Instalación — opción 2: npm (proyectos con bundler)</h3>
+      <pre><code><span class="c-comment"># en tu terminal</span>
+npm install gsap</code></pre>
+      <pre><code><span class="c-comment">// en tu archivo JS</span>
+<span class="c-kw">import</span> { gsap } <span class="c-kw">from</span> <span class="c-val">"gsap"</span>;</code></pre>
+    </div>
+
+    <div class="card">
+      <h3>gsap.to() — anima HACIA estos valores</h3>
+      <div class="demo-row">
+        <div class="stage"><div class="gsap-box" id="g-to"></div></div>
+        <pre><code>gsap.to(<span class="c-val">"#g-to"</span>, {
+  x: <span class="c-val">150</span>,
+  rotation: <span class="c-val">360</span>,
+  duration: <span class="c-val">1.2</span>,
+  ease: <span class="c-val">"back.out(1.7)"</span> <span class="c-comment">// easing propio de GSAP</span>
+});</code></pre>
+      </div>
+      <button class="trigger" onclick="gsap.to('#g-to',{x:150,rotation:360,duration:1.2,ease:'back.out(1.7)'})">Ejecutar</button>
+      <button class="trigger" onclick="gsap.to('#g-to',{x:0,rotation:0,duration:0.6})">Reset</button>
+    </div>
+
+    <div class="card">
+      <h3>gsap.from() — anima DESDE estos valores hasta el estado actual</h3>
+      <pre><code>gsap.from(<span class="c-val">"#card"</span>, {
+  opacity: <span class="c-val">0</span>,
+  y: <span class="c-val">40</span>,
+  duration: <span class="c-val">0.8</span>
+});
+<span class="c-comment">// útil para animaciones de entrada: no defines el estado final,</span>
+<span class="c-comment">// GSAP asume que el final es como ya está en el CSS/HTML</span></code></pre>
+    </div>
+
+    <div class="card">
+      <h3>gsap.timeline() — encadenar pasos en orden</h3>
+      <div class="demo-row">
+        <div class="stage"><div class="gsap-box circle" id="g-tl"></div></div>
+        <pre><code><span class="c-kw">const</span> tl = gsap.timeline();
+
+tl.to(<span class="c-val">"#g-tl"</span>, { scale: <span class="c-val">1.4</span>, duration: <span class="c-val">0.4</span> })
+  .to(<span class="c-val">"#g-tl"</span>, { x: <span class="c-val">120</span>, duration: <span class="c-val">0.6</span> })
+  .to(<span class="c-val">"#g-tl"</span>, { rotation: <span class="c-val">360</span>, duration: <span class="c-val">0.5</span> })
+  .to(<span class="c-val">"#g-tl"</span>, { x: <span class="c-val">0</span>, scale: <span class="c-val">1</span>, duration: <span class="c-val">0.5</span> });
+<span class="c-comment">// cada .to() empieza cuando termina el anterior, en orden</span></code></pre>
+      </div>
+      <button class="trigger" onclick="runTimeline()">Ejecutar secuencia</button>
+    </div>
+
+    <div class="card">
+      <h3>stagger — animar varios elementos con retraso escalonado</h3>
+      <div class="demo-row">
+        <div class="stage" style="gap:8px;">
+          <div class="gsap-box" style="width:28px;height:28px;" id="s1"></div>
+          <div class="gsap-box" style="width:28px;height:28px;" id="s2"></div>
+          <div class="gsap-box" style="width:28px;height:28px;" id="s3"></div>
+          <div class="gsap-box" style="width:28px;height:28px;" id="s4"></div>
+        </div>
+        <pre><code>gsap.from(<span class="c-val">".bola"</span>, {
+  y: <span class="c-val">-30</span>,
+  opacity: <span class="c-val">0</span>,
+  duration: <span class="c-val">0.5</span>,
+  stagger: <span class="c-val">0.15</span> <span class="c-comment">// 0.15s de diferencia entre cada una</span>
+});
+<span class="c-comment">// ideal para tus 77 bolas apareciendo en cascada</span></code></pre>
+      </div>
+      <button class="trigger" onclick="runStagger()">Ejecutar stagger</button>
+    </div>
+
+    <div class="card">
+      <h3>ScrollTrigger (plugin aparte)</h3>
+      <pre><code><span class="c-comment">&lt;!-- necesitas cargar el plugin además del core --&gt;</span>
+&lt;<span class="c-kw">script</span> <span class="c-prop">src</span>=<span class="c-val">"https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"</span>&gt;&lt;/<span class="c-kw">script</span>&gt;
+&lt;<span class="c-kw">script</span> <span class="c-prop">src</span>=<span class="c-val">"https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"</span>&gt;&lt;/<span class="c-kw">script</span>&gt;
+
+<span class="c-kw">gsap</span>.registerPlugin(ScrollTrigger);
+
+gsap.to(<span class="c-val">".seccion"</span>, {
+  opacity: <span class="c-val">1</span>,
+  y: <span class="c-val">0</span>,
+  scrollTrigger: {
+    trigger: <span class="c-val">".seccion"</span>,
+    start: <span class="c-val">"top 80%"</span> <span class="c-comment">// se activa cuando el top de .seccion llega al 80% del viewport</span>
+  }
+});</code></pre>
+    </div>
+
+    <div class="card">
+      <h3>¿CSS o GSAP? Regla rápida</h3>
+      <table>
+        <tr><th>Situación</th><th>Usa</th></tr>
+        <tr><td>Hover, fade, spinner, loop simple</td><td>CSS (<code>transition</code> / <code>@keyframes</code>)</td></tr>
+        <tr><td>Secuencia de varios elementos en orden específico</td><td>GSAP <code>timeline()</code></td></tr>
+        <tr><td>Animar según scroll</td><td>GSAP + <code>ScrollTrigger</code></td></tr>
+        <tr><td>Necesitas pausar/revertir/reescalar en tiempo real desde JS</td><td>GSAP</td></tr>
+        <tr><td>Miles de elementos, rendimiento crítico</td><td>CSS (el navegador lo optimiza más)</td></tr>
+      </table>
+    </div>
+  </section>
+
+  <!-- ===================== RECURSOS ===================== -->
+  <section id="recursos">
+    <h2>8. Recursos para seguir estudiando</h2>
+    <div class="card">
+      <table>
+        <tr><td>MDN — Using CSS animations</td><td><a href="https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_animations/Using_CSS_animations" style="color:var(--accent)" target="_blank">developer.mozilla.org</a></td></tr>
+        <tr><td>MDN — Using CSS transitions</td><td><a href="https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_transitions/Using_CSS_transitions" style="color:var(--accent)" target="_blank">developer.mozilla.org</a></td></tr>
+        <tr><td>MDN — requestAnimationFrame</td><td><a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/requestAnimationFrame" style="color:var(--accent)" target="_blank">developer.mozilla.org</a></td></tr>
+        <tr><td>GSAP — documentación oficial</td><td><a href="https://gsap.com/docs/v3/" style="color:var(--accent)" target="_blank">gsap.com/docs</a></td></tr>
+        <tr><td>cubic-bezier.com — diseñar curvas visualmente</td><td><a href="https://cubic-bezier.com" style="color:var(--accent)" target="_blank">cubic-bezier.com</a></td></tr>
+        <tr><td>easings.net — catálogo visual de easings</td><td><a href="https://easings.net" style="color:var(--accent)" target="_blank">easings.net</a></td></tr>
+      </table>
+    </div>
+  </section>
+
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script>
+  // ---------- helper: reinicia una animación CSS con el truco del reflow ----------
+  function replay(elId, className) {
+    const el = document.getElementById(elId);
+    el.classList.remove(className);
+    void el.offsetWidth; // fuerza reflow para poder reiniciar
+    el.classList.add(className);
+  }
+
+  // ---------- timing functions demo ----------
+  function runTiming(curve) {
+    const box = document.getElementById('tf-box');
+    const code = document.getElementById('tf-code');
+    box.style.transition = 'transform 1.2s ' + curve;
+    box.style.transform = 'translateX(0px)';
+    void box.offsetWidth;
+    box.style.transform = 'translateX(210px)';
+    code.innerHTML = '<code>transition-timing-function: <span class="c-val">' + curve + '</span>;</code>';
+    setTimeout(() => { box.style.transform = 'translateX(0px)'; }, 1400);
+  }
+
+  // ---------- GSAP timeline demo ----------
+  function runTimeline() {
+    gsap.set('#g-tl', { x: 0, scale: 1, rotation: 0 });
+    const tl = gsap.timeline();
+    tl.to('#g-tl', { scale: 1.4, duration: 0.4 })
+      .to('#g-tl', { x: 120, duration: 0.6 })
+      .to('#g-tl', { rotation: 360, duration: 0.5 })
+      .to('#g-tl', { x: 0, scale: 1, duration: 0.5 });
+  }
+
+  // ---------- GSAP stagger demo ----------
+  function runStagger() {
+    gsap.from('#s1, #s2, #s3, #s4', {
+      y: -30,
+      opacity: 0,
+      duration: 0.5,
+      stagger: 0.15
+    });
+  }
+</script>
+
+</body>
+</html>

