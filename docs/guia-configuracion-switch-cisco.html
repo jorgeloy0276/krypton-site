@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Guía configuración Switch CISCO</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);--bg:#f6f8fb;--sf:#fff;--tx:#1b2430;--mu:#5b6877;--ac:#0a6cc2;--bd:#dbe2ea;--cb:#0f1720;--ct:#d7f5df;--wr:#fff4d6;--wt:#6b4a00}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#10161d;--sf:#18212b;--tx:#e6edf4;--mu:#9aa9b9;--ac:#5db2ff;--bd:#2a3644;--cb:#090d12;--ct:#d7f5df;--wr:#3a2e0f;--wt:#ffd98a}}
+:root[data-theme="dark"]{--bg:#10161d;--sf:#18212b;--tx:#e6edf4;--mu:#9aa9b9;--ac:#5db2ff;--bd:#2a3644;--cb:#090d12;--ct:#d7f5df;--wr:#3a2e0f;--wt:#ffd98a}
+html{scroll-padding-top:70px;scroll-behavior:smooth}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+header{background:linear-gradient(135deg,#0a4f8f,#0a8f7a);color:#fff;padding:28px 20px}
+header h1{margin:0 0 6px;font-size:1.7rem}
+header p{margin:0;opacity:.92;max-width:760px}
+nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--sf);border-bottom:1px solid var(--bd);display:flex;gap:6px;overflow-x:auto;padding:8px 12px}
+nav a{white-space:nowrap;text-decoration:none;color:var(--ac);font-size:.85rem;padding:5px 10px;border:1px solid var(--bd);border-radius:999px}
+main{max-width:900px;margin:0 auto;padding:20px 16px 60px}
+section{background:var(--sf);border:1px solid var(--bd);border-radius:12px;padding:18px 20px;margin:18px 0}
+h2{margin:0 0 4px;font-size:1.3rem;color:var(--ac)}
+h3{margin:18px 0 6px;font-size:1rem}
+.obj{color:var(--mu);margin:0 0 10px}
+pre{background:var(--cb);color:var(--ct);padding:12px 14px;border-radius:8px;overflow-x:auto;font:13px/1.5 ui-monospace,Consolas,monospace;margin:8px 0}
+code{font-family:ui-monospace,Consolas,monospace;background:var(--bg);padding:1px 5px;border-radius:4px;font-size:.9em}
+.tip{background:var(--wr);color:var(--wt);padding:10px 14px;border-radius:8px;margin:10px 0;font-size:.92rem}
+.topo{background:var(--bg);border:1px dashed var(--bd);padding:8px 12px;border-radius:8px;font-size:.92rem}
+.tw{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:.9rem}
+td,th{border:1px solid var(--bd);padding:6px 9px;text-align:left;vertical-align:top}
+th{background:var(--bg)}
+ul{padding-left:20px;margin:6px 0}
+footer{text-align:center;color:var(--mu);padding:20px;font-size:.85rem}
+</style>
+</head>
+<body>
+<header>
+<h1>Guía configuración Switch CISCO</h1>
+<p>Curso práctico por laboratorios en Packet Tracer: de cero hasta nivel avanzado. Cada lab tiene objetivo, topología, comandos y verificación. Hazlos en orden: cada uno se apoya en el anterior.</p>
+</header>
+<nav>
+<a href="#l0">0 Preparación</a><a href="#l1">1 Básica</a><a href="#l2">2 SSH</a><a href="#l3">3 Interfaces</a><a href="#l4">4 VLANs</a><a href="#l5">5 Troncales</a><a href="#l6">6 Inter-VLAN</a><a href="#l7">7 VTP</a><a href="#l8">8 STP</a><a href="#l9">9 EtherChannel</a><a href="#l10">10 Port Security</a><a href="#l11">11 Seguridad L2</a><a href="#l12">12 DHCP</a><a href="#l13">13 ACL</a><a href="#l14">14 Backup</a><a href="#l15">15 Troubleshooting</a>
+</nav>
+<main>
+
+<section id="l0">
+<h2>Lab 0 · Preparación y modos CLI</h2>
+<p class="obj">Objetivo: conocer el entorno y moverte por los modos del IOS.</p>
+<div class="topo"><b>Topología:</b> 1 PC + 1 Switch 2960. Cable <b>consola</b> (celeste) de la PC (RS232) al puerto Console del switch. En la PC: Desktop → Terminal (9600, 8, None, 1, None).</div>
+<table><tr><th>Modo</th><th>Prompt</th><th>Cómo entrar</th></tr>
+<tr><td>Usuario</td><td><code>Switch&gt;</code></td><td>Por defecto</td></tr>
+<tr><td>Privilegiado</td><td><code>Switch#</code></td><td><code>enable</code></td></tr>
+<tr><td>Configuración global</td><td><code>Switch(config)#</code></td><td><code>configure terminal</code></td></tr>
+<tr><td>Interfaz</td><td><code>Switch(config-if)#</code></td><td><code>interface fa0/1</code></td></tr>
+<tr><td>Línea</td><td><code>Switch(config-line)#</code></td><td><code>line console 0</code></td></tr>
+</table>
+<pre>Switch&gt; enable
+Switch# configure terminal
+Switch(config)# exit        ! sube un nivel
+Switch(config)# end         ! vuelve directo a #  (o Ctrl+Z)
+Switch# show version
+Switch# show running-config
+Switch# show ip interface brief</pre>
+<div class="tip"><b>Trucos:</b> <code>Tab</code> autocompleta, <code>?</code> muestra ayuda, <code>no</code> deshace un comando, y <code>do show ...</code> ejecuta show dentro de config. Abreviaturas válidas: <code>conf t</code>, <code>int fa0/1</code>, <code>sh run</code>.</div>
+</section>
+
+<section id="l1">
+<h2>Lab 1 · Configuración básica inicial</h2>
+<p class="obj">Objetivo: dejar el switch con nombre, contraseñas, banner y administración IP.</p>
+<div class="topo"><b>Topología:</b> PC0 ── Switch0 (SW1). PC0: IP 192.168.1.10/24. SW1 usará 192.168.1.2/24 en la VLAN 1 (gestión).</div>
+<pre>enable
+configure terminal
+hostname SW1
+no ip domain-lookup                 ! evita esperas por errores de tipeo
+banner motd # Acceso solo autorizado #
+
+! Contraseñas
+enable secret Cisco123              ! cifrada (MD5), usa esta y no "enable password"
+service password-encryption         ! cifra las demás contraseñas
+
+line console 0
+ password cisco
+ login
+ logging synchronous                ! evita que los logs interrumpan lo que escribes
+ exec-timeout 10 0
+exit
+line vty 0 15
+ password cisco
+ login
+exit
+
+! IP de administración
+interface vlan 1
+ ip address 192.168.1.2 255.255.255.0
+ no shutdown
+exit
+ip default-gateway 192.168.1.1
+end
+copy running-config startup-config  ! GUARDAR (o: write memory)</pre>
+<h3>Verificación</h3>
+<pre>show running-config
+show ip interface brief
+ping 192.168.1.10                   ! desde el switch hacia la PC
+! Desde la PC: Command Prompt → ping 192.168.1.2</pre>
+<div class="tip">Si no guardas con <code>copy run start</code>, al reiniciar pierdes todo. En Packet Tracer también puedes usar el botón «Save».</div>
+</section>
+
+<section id="l2">
+<h2>Lab 2 · Acceso remoto seguro con SSH</h2>
+<p class="obj">Objetivo: sustituir Telnet (texto plano) por SSH con usuarios locales.</p>
+<div class="topo"><b>Topología:</b> igual al Lab 1. Cable cruzado o directo (Packet Tracer lo acepta) PC0 ↔ SW1.</div>
+<pre>configure terminal
+ip domain-name curso.local
+username admin secret Admin123
+crypto key generate rsa             ! elige 1024 o 2048 bits
+ip ssh version 2
+
+line vty 0 15
+ login local                        ! usa la base local de usuarios
+ transport input ssh                ! bloquea Telnet
+ exec-timeout 5 0
+end</pre>
+<h3>Verificación</h3>
+<pre>show ip ssh
+show ssh
+! Desde PC0 → Command Prompt:
+ssh -l admin 192.168.1.2</pre>
+<div class="tip">Requisito: el switch debe tener hostname y domain-name configurados antes de generar las claves RSA.</div>
+</section>
+
+<section id="l3">
+<h2>Lab 3 · Interfaces: descripción, velocidad y rangos</h2>
+<p class="obj">Objetivo: configurar puertos y leer su estado.</p>
+<div class="topo"><b>Topología:</b> SW1 con PC0 en Fa0/1, PC1 en Fa0/2 y un servidor en Fa0/3.</div>
+<pre>configure terminal
+interface fa0/1
+ description PC0-Ventas
+ speed 100
+ duplex full
+ no shutdown
+exit
+
+interface range fa0/1 - 3           ! configura varios puertos a la vez
+ description Puertos de usuarios
+exit
+
+interface range fa0/10 - 24
+ shutdown                           ! apagar puertos sin uso
+end</pre>
+<h3>Verificación</h3>
+<pre>show interfaces status
+show interfaces fa0/1
+show ip interface brief
+show mac address-table</pre>
+<div class="tip">Estados: <b>up/up</b> = funciona; <b>up/down</b> = problema de capa 2; <b>administratively down</b> = tiene <code>shutdown</code>; <b>down/down</b> = cable desconectado.</div>
+</section>
+
+<section id="l4">
+<h2>Lab 4 · VLANs y puertos de acceso</h2>
+<p class="obj">Objetivo: segmentar la red en VLAN 10 (Ventas), 20 (IT) y 99 (Gestión).</p>
+<div class="topo"><b>Topología:</b> SW1 con PC0 (Fa0/1) y PC1 (Fa0/2) en VLAN 10; PC2 (Fa0/3) y PC3 (Fa0/4) en VLAN 20. IPs: 192.168.10.x/24 y 192.168.20.x/24.</div>
+<pre>configure terminal
+vlan 10
+ name Ventas
+vlan 20
+ name IT
+vlan 99
+ name Gestion
+exit
+
+interface range fa0/1 - 2
+ switchport mode access
+ switchport access vlan 10
+exit
+interface range fa0/3 - 4
+ switchport mode access
+ switchport access vlan 20
+exit
+
+! Mover la gestión a la VLAN 99
+interface vlan 99
+ ip address 192.168.99.2 255.255.255.0
+ no shutdown
+end</pre>
+<h3>Verificación</h3>
+<pre>show vlan brief
+show interfaces fa0/1 switchport
+! PC0 ↔ PC1 hacen ping (misma VLAN). PC0 ↔ PC2 NO (otra VLAN) hasta el Lab 6.</pre>
+<div class="tip">Si eliminas una VLAN con <code>no vlan 10</code>, los puertos asignados quedan inactivos: reasígnalos antes.</div>
+</section>
+
+<section id="l5">
+<h2>Lab 5 · Troncales 802.1Q y VLAN nativa</h2>
+<p class="obj">Objetivo: transportar varias VLAN entre dos switches por un solo enlace.</p>
+<div class="topo"><b>Topología:</b> SW1 Gi0/1 ── Gi0/1 SW2. En ambos, crea VLAN 10, 20 y 99. PC0 y PC2 en SW1 (VLAN 10 y 20); PC1 y PC3 en SW2 (VLAN 10 y 20).</div>
+<pre>! En SW1 y SW2 (mismo bloque)
+configure terminal
+interface gi0/1
+ switchport mode trunk
+ switchport trunk native vlan 99
+ switchport trunk allowed vlan 10,20,99
+ switchport nonegotiate             ! desactiva DTP
+end</pre>
+<h3>Verificación</h3>
+<pre>show interfaces trunk
+show interfaces gi0/1 switchport
+! PC0 (SW1, VLAN 10) hace ping a PC1 (SW2, VLAN 10) → debe funcionar</pre>
+<div class="tip">La VLAN nativa debe coincidir en ambos extremos o verás avisos de CDP. Evita usar la VLAN 1 como nativa por seguridad.</div>
+</section>
+
+<section id="l6">
+<h2>Lab 6 · Enrutamiento entre VLAN</h2>
+<p class="obj">Objetivo: que VLAN 10 y VLAN 20 se comuniquen. Dos métodos.</p>
+<h3>Método A · Router-on-a-stick</h3>
+<div class="topo"><b>Topología:</b> Router 2911 Gi0/0 ── Fa0/24 SW1 (troncal). PCs: gateway 192.168.10.1 (VLAN 10) y 192.168.20.1 (VLAN 20).</div>
+<pre>! En SW1
+interface fa0/24
+ switchport mode trunk
+
+! En el Router
+interface gi0/0
+ no shutdown
+interface gi0/0.10
+ encapsulation dot1Q 10
+ ip address 192.168.10.1 255.255.255.0
+interface gi0/0.20
+ encapsulation dot1Q 20
+ ip address 192.168.20.1 255.255.255.0
+interface gi0/0.99
+ encapsulation dot1Q 99 native
+ ip address 192.168.99.1 255.255.255.0</pre>
+<h3>Método B · Switch capa 3 (3560 / 3650)</h3>
+<pre>ip routing
+interface vlan 10
+ ip address 192.168.10.1 255.255.255.0
+interface vlan 20
+ ip address 192.168.20.1 255.255.255.0
+! Puerto hacia otro router sin switchport:
+interface gi0/24
+ no switchport
+ ip address 10.0.0.2 255.255.255.252
+! Ruta por defecto
+ip route 0.0.0.0 0.0.0.0 10.0.0.1</pre>
+<h3>Verificación</h3>
+<pre>show ip route
+show ip interface brief
+! PC de VLAN 10 → ping a PC de VLAN 20 (con gateway configurado en cada PC)</pre>
+</section>
+
+<section id="l7">
+<h2>Lab 7 · VTP (propagación de VLAN)</h2>
+<p class="obj">Objetivo: crear las VLAN en un solo switch y replicarlas a los demás.</p>
+<div class="topo"><b>Topología:</b> SW1 (servidor) ── troncal ── SW2 (cliente) ── troncal ── SW3 (cliente).</div>
+<pre>! SW1 (servidor)
+vtp mode server
+vtp domain CURSO
+vtp password vtp123
+vtp version 2
+vlan 30
+ name Soporte
+
+! SW2 y SW3
+vtp mode client
+vtp domain CURSO
+vtp password vtp123</pre>
+<h3>Verificación</h3>
+<pre>show vtp status
+show vlan brief                     ! en los clientes debe aparecer la VLAN 30</pre>
+<div class="tip"><b>Cuidado:</b> un switch nuevo con <i>revision number</i> mayor puede borrar las VLAN de toda la red. Muchos administradores usan <code>vtp mode transparent</code> o <code>off</code>. Los clientes no pueden crear VLAN.</div>
+</section>
+
+<section id="l8">
+<h2>Lab 8 · Spanning Tree (STP / RSTP)</h2>
+<p class="obj">Objetivo: evitar bucles, elegir el root bridge y proteger los puertos.</p>
+<div class="topo"><b>Topología:</b> triángulo de 3 switches (SW1, SW2, SW3) conectados entre sí con troncales. Debe haber un enlace redundante.</div>
+<pre>! Modo rápido
+spanning-tree mode rapid-pvst
+
+! Elegir root bridge
+spanning-tree vlan 1,10,20 root primary        ! en SW1
+spanning-tree vlan 1,10,20 root secondary      ! en SW2
+! Alternativa manual: spanning-tree vlan 10 priority 4096
+
+! Puertos de acceso (PCs)
+interface range fa0/1 - 4
+ spanning-tree portfast             ! pasa a forwarding de inmediato
+ spanning-tree bpduguard enable     ! apaga el puerto si llega un BPDU
+exit
+! Global: spanning-tree portfast default / bpduguard default
+! Evitar que un puerto de acceso sea elegido root
+spanning-tree guard root            ! en interfaces que no deben ser root</pre>
+<h3>Verificación</h3>
+<pre>show spanning-tree
+show spanning-tree vlan 10
+show spanning-tree summary</pre>
+<div class="tip">En <code>show spanning-tree</code> busca «This bridge is the root» y los roles: <b>Root</b>, <b>Desg</b> (designado) y <b>Altn</b> (bloqueado). Nunca actives PortFast en enlaces entre switches.</div>
+</section>
+
+<section id="l9">
+<h2>Lab 9 · EtherChannel (agregación de enlaces)</h2>
+<p class="obj">Objetivo: unir 2 o más cables en un enlace lógico con más ancho de banda y redundancia.</p>
+<div class="topo"><b>Topología:</b> SW1 Gi0/1 y Gi0/2 ── SW2 Gi0/1 y Gi0/2 (dos cables entre ambos).</div>
+<pre>! En SW1 y SW2
+interface range gi0/1 - 2
+ channel-group 1 mode active        ! LACP (estándar). PAgP (Cisco): desirable
+exit
+interface port-channel 1
+ switchport mode trunk
+ switchport trunk native vlan 99</pre>
+<h3>Verificación</h3>
+<pre>show etherchannel summary           ! debe verse Po1(SU) con Gi0/1(P) Gi0/2(P)
+show interfaces port-channel 1</pre>
+<div class="tip">Modos compatibles: active↔active/passive (LACP), desirable↔desirable/auto (PAgP), on↔on. Velocidad, duplex y VLAN deben coincidir en todos los puertos del grupo.</div>
+</section>
+
+<section id="l10">
+<h2>Lab 10 · Port Security</h2>
+<p class="obj">Objetivo: limitar qué dispositivos pueden usar un puerto.</p>
+<div class="topo"><b>Topología:</b> SW1 con PC0 en Fa0/1. Para probar, conecta después un segundo equipo (laptop) a ese puerto.</div>
+<pre>interface fa0/1
+ switchport mode access
+ switchport port-security
+ switchport port-security maximum 1
+ switchport port-security mac-address sticky     ! aprende la MAC conectada
+ switchport port-security violation shutdown     ! o restrict / protect
+exit
+
+! Recuperar un puerto en err-disabled
+interface fa0/1
+ shutdown
+ no shutdown</pre>
+<h3>Verificación</h3>
+<pre>show port-security
+show port-security interface fa0/1
+show interfaces status err-disabled
+! Recuperación automática:
+errdisable recovery cause psecure-violation
+errdisable recovery interval 60</pre>
+<table><tr><th>Violación</th><th>Efecto</th></tr>
+<tr><td>protect</td><td>Descarta tráfico, sin aviso</td></tr>
+<tr><td>restrict</td><td>Descarta y genera log/contador</td></tr>
+<tr><td>shutdown</td><td>Puerto en err-disabled (por defecto)</td></tr></table>
+</section>
+
+<section id="l11">
+<h2>Lab 11 · Seguridad de capa 2 avanzada</h2>
+<p class="obj">Objetivo: mitigar ataques típicos (DHCP spoofing, ARP spoofing, VLAN hopping, tormentas).</p>
+<h3>11.1 Buenas prácticas básicas</h3>
+<pre>! Puertos sin uso: apagados y en una VLAN «agujero negro»
+vlan 999
+ name BLACKHOLE
+interface range fa0/10 - 24
+ switchport mode access
+ switchport access vlan 999
+ shutdown
+
+! Anti VLAN hopping
+interface range fa0/1 - 9
+ switchport mode access
+ switchport nonegotiate
+! VLAN nativa distinta de la 1 en troncales (ver Lab 5)
+
+! Deshabilitar CDP/LLDP donde no hace falta
+interface fa0/1
+ no cdp enable</pre>
+<h3>11.2 DHCP Snooping</h3>
+<pre>ip dhcp snooping
+ip dhcp snooping vlan 10,20
+interface gi0/1                      ! puerto hacia el servidor DHCP / troncal
+ ip dhcp snooping trust
+interface range fa0/1 - 9
+ ip dhcp snooping limit rate 10      ! paquetes por segundo
+show ip dhcp snooping
+show ip dhcp snooping binding</pre>
+<h3>11.3 Dynamic ARP Inspection</h3>
+<pre>ip arp inspection vlan 10,20
+interface gi0/1
+ ip arp inspection trust
+show ip arp inspection</pre>
+<h3>11.4 Storm Control</h3>
+<pre>interface fa0/1
+ storm-control broadcast level 20
+ storm-control action shutdown</pre>
+<div class="tip">Packet Tracer soporta DHCP snooping y port security en el 2960, pero algunas funciones (DAI, storm-control) pueden no estar disponibles en todos los modelos o versiones. Si un comando no se reconoce, prueba con un 3560.</div>
+</section>
+
+<section id="l12">
+<h2>Lab 12 · DHCP (servidor en router o switch L3) y relay</h2>
+<p class="obj">Objetivo: asignar IP automáticamente a cada VLAN.</p>
+<div class="topo"><b>Topología:</b> la del Lab 6 (router-on-a-stick). PCs en modo DHCP (IP Configuration → DHCP).</div>
+<pre>! En el Router (o switch L3)
+ip dhcp excluded-address 192.168.10.1 192.168.10.20
+ip dhcp excluded-address 192.168.20.1 192.168.20.20
+
+ip dhcp pool VLAN10
+ network 192.168.10.0 255.255.255.0
+ default-router 192.168.10.1
+ dns-server 8.8.8.8
+ip dhcp pool VLAN20
+ network 192.168.20.0 255.255.255.0
+ default-router 192.168.20.1
+ dns-server 8.8.8.8
+
+! Si el servidor DHCP está en otra red: relay en la interfaz del gateway
+interface gi0/0.10
+ ip helper-address 10.0.0.100</pre>
+<h3>Verificación</h3>
+<pre>show ip dhcp binding
+show ip dhcp pool
+! En la PC: ipconfig /renew</pre>
+</section>
+
+<section id="l13">
+<h2>Lab 13 · ACL para controlar el acceso</h2>
+<p class="obj">Objetivo: permitir solo a IT administrar el switch y bloquear Ventas → IT.</p>
+<pre>! ACL estándar para limitar VTY a la red IT
+access-list 10 permit 192.168.20.0 0.0.0.255
+line vty 0 15
+ access-class 10 in
+
+! ACL extendida: bloquear VLAN 10 hacia VLAN 20 (en el router o L3)
+ip access-list extended BLOQUEO-VENTAS
+ deny ip 192.168.10.0 0.0.0.255 192.168.20.0 0.0.0.255
+ permit ip any any
+interface gi0/0.10
+ ip access-group BLOQUEO-VENTAS in</pre>
+<h3>Verificación</h3>
+<pre>show access-lists
+show ip interface gi0/0.10 | include access list</pre>
+<div class="tip">Reglas de oro: se evalúan de arriba abajo, hay un <i>deny any</i> implícito al final, y las extendidas se colocan cerca del origen.</div>
+</section>
+
+<section id="l14">
+<h2>Lab 14 · Respaldo, restauración y recuperación</h2>
+<p class="obj">Objetivo: guardar configuraciones, usar TFTP y restaurar un switch.</p>
+<div class="topo"><b>Topología:</b> SW1 ── Server0 (servicio TFTP activo, IP 192.168.99.10) ── misma VLAN 99.</div>
+<pre>! Respaldo a TFTP
+copy running-config tftp:
+ Address or name of remote host []? 192.168.99.10
+ Destination filename [SW1-confg]?
+
+! Restaurar
+copy tftp: running-config
+
+! Respaldo local
+copy running-config flash:backup.cfg
+
+! Dejar el switch de fábrica
+erase startup-config
+delete flash:vlan.dat
+reload</pre>
+<h3>Recuperar contraseña (hardware real 2960)</h3>
+<ul>
+<li>Mantén pulsado <b>Mode</b> al encender hasta ver <code>switch:</code></li>
+<li><code>flash_init</code> → <code>rename flash:config.text flash:config.old</code> → <code>boot</code></li>
+<li>Ya dentro: <code>rename flash:config.old flash:config.text</code> → <code>copy flash:config.text system:running-config</code> → cambia las contraseñas y guarda.</li>
+</ul>
+<div class="tip">Esta recuperación no se puede hacer realmente en Packet Tracer, pero conviene conocerla para el examen CCNA.</div>
+</section>
+
+<section id="l15">
+<h2>Lab 15 · Troubleshooting: tabla de diagnóstico</h2>
+<p class="obj">Objetivo: método de resolución de problemas capa por capa.</p>
+<div class="tw"><table>
+<tr><th>Síntoma</th><th>Posible causa</th><th>Comando / Solución</th></tr>
+<tr><td>Puerto «down»</td><td>Cable o puerto apagado</td><td><code>show ip int brief</code>, <code>no shutdown</code></td></tr>
+<tr><td>PC sin ping a su vecino</td><td>VLAN distinta o IP/máscara mal</td><td><code>show vlan brief</code>, revisar IPs</td></tr>
+<tr><td>Una VLAN no cruza el troncal</td><td>No permitida o native distinta</td><td><code>show interfaces trunk</code></td></tr>
+<tr><td>Puerto err-disabled</td><td>Port security / BPDU guard</td><td><code>show int status err-disabled</code>, <code>shutdown</code> + <code>no shutdown</code></td></tr>
+<tr><td>Entre VLAN sin ping</td><td>Sin gateway o sin subinterfaz</td><td><code>show ip route</code>, revisar gateway de la PC</td></tr>
+<tr><td>Red lenta o bucles</td><td>STP mal configurado</td><td><code>show spanning-tree</code></td></tr>
+<tr><td>No hay SSH</td><td>Faltan claves RSA o <code>login local</code></td><td><code>show ip ssh</code></td></tr>
+<tr><td>No recibe DHCP</td><td>Snooping sin trust / falta helper</td><td><code>show ip dhcp snooping</code>, <code>ip helper-address</code></td></tr>
+<tr><td>EtherChannel no sube</td><td>Parámetros distintos o modos incompatibles</td><td><code>show etherchannel summary</code></td></tr>
+</table></div>
+<h3>Comandos esenciales de verificación</h3>
+<pre>show running-config | section vlan      ! filtra la salida
+show interfaces status
+show mac address-table
+show cdp neighbors detail
+show logging
+ping / traceroute</pre>
+<div class="tip"><b>Método:</b> 1) Capa 1: cables y luces. 2) Capa 2: VLAN, troncales, STP, MAC. 3) Capa 3: IP, máscara, gateway, rutas. Cambia una sola cosa a la vez y verifica.</div>
+</section>
+
+</main>
+<footer>Guía de laboratorios Cisco · Packet Tracer · Practica cada lab, rómpelo a propósito y arréglalo.</footer>
+</body>
+</html>
