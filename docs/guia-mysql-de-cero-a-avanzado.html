@@ -1,0 +1,117 @@
+<!DOCTYPE html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>Guia MySQL: de cero a avanzado</title>
+<style>
+:root{--bg:#f4f7fb;--fg:#17212e;--card:#fff;--mut:#586579;--ac:#0a6fb8;--cb:#0e1a2b;--cf:#d6e2f2;--bd:#d9e2ee;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0b111a;--fg:#e4ebf5;--card:#131c2a;--mut:#93a1b5;--ac:#4cb3ff;--cb:#070e18;--bd:#233149;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0b111a;--fg:#e4ebf5;--card:#131c2a;--mut:#93a1b5;--ac:#4cb3ff;--cb:#070e18;--bd:#233149;color-scheme:dark}
+html{scroll-behavior:smooth;scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif}
+#pg{position:fixed;top:env(safe-area-inset-top,0px);left:0;height:3px;width:0;background:linear-gradient(90deg,#4cb3ff,#f29111);z-index:20}
+header{text-align:center;padding:48px 16px 28px;color:#fff;background:linear-gradient(120deg,#0a3f70,#0a6fb8,#e9870d,#0a3f70);background-size:300% 300%;animation:g 14s ease infinite}
+@keyframes g{50%{background-position:100% 50%}}
+h1{margin:0;font-size:clamp(28px,6vw,46px)}h1 span{color:#ffd37a}
+h1 i{display:inline-block;font-style:normal;animation:b 2.4s ease-in-out infinite}@keyframes b{50%{transform:translateY(-8px) rotate(-10deg)}}
+#ty{min-height:1.6em;margin:6px 0 14px}#ty::after{content:"▌";animation:k 1s steps(2) infinite}@keyframes k{50%{opacity:0}}
+#q{width:min(480px,90%);padding:11px 18px;border:0;border-radius:99px;font:inherit;background:#fff;color:#17212e}
+.wrap{display:grid;grid-template-columns:230px 1fr;gap:24px;max-width:1200px;margin:auto;padding:20px 16px}
+nav{position:sticky;top:calc(env(safe-area-inset-top,0px) + 12px);align-self:start;max-height:calc(100vh - 40px);overflow:auto;display:flex;flex-direction:column;gap:2px}
+nav a{padding:6px 10px;border-radius:8px;border-left:3px solid transparent;color:var(--mut);text-decoration:none;font-size:13.5px;transition:.2s}
+nav a:hover{background:var(--card);transform:translateX(4px)}
+nav a.on{color:var(--ac);border-color:var(--ac);background:var(--card);font-weight:600}
+section{margin-bottom:26px;scroll-margin-top:60px}
+h2{display:flex;gap:10px;align-items:center;margin:0 0 12px;font-size:22px}
+h2 b{background:var(--ac);color:#fff;border-radius:8px;padding:0 9px;font-size:15px}
+.c{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:14px;margin-bottom:12px;opacity:0;transform:translateY(16px);transition:opacity .5s,transform .5s,border-color .2s}
+.c.v{opacity:1;transform:none}.c:hover{border-color:var(--ac)}
+.c h3{margin:0 0 4px;font-size:16px;color:var(--ac)}.c p{margin:0 0 8px;color:var(--mut);font-size:13.5px}
+pre{position:relative;margin:0;padding:12px 14px;overflow-x:auto;border-radius:10px;background:var(--cb);color:var(--cf);font:13px/1.55 ui-monospace,Menlo,Consolas,monospace}
+pre button{position:absolute;top:6px;right:6px;padding:3px 10px;border:0;border-radius:6px;background:#ffffff26;color:#fff;font:12px system-ui;cursor:pointer;opacity:0;transition:.2s}
+pre:hover button,pre button:focus{opacity:1}@media(hover:none){pre button{opacity:1}}
+pre i{font-style:normal}pre i.m{font-style:italic;color:#7f8ea5}pre i.k{color:#ff9f6b;font-weight:600}pre i.s{color:#8fd694}pre i.n{color:#c8a0ff}pre i.p{color:#ffd37a}
+#th{position:fixed;right:14px;bottom:calc(14px + env(safe-area-inset-bottom,0px));width:40px;height:40px;border:0;border-radius:50%;background:var(--ac);color:#fff;font-size:18px;cursor:pointer;z-index:20;transition:transform .3s}#th:hover{transform:rotate(180deg)}
+@media(max-width:800px){.wrap{grid-template-columns:1fr}nav{flex-direction:row;overflow-x:auto;top:env(safe-area-inset-top,0px);max-height:none;padding:6px 0;background:var(--bg);z-index:10}nav a{white-space:nowrap}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.c{opacity:1;transform:none}}
+</style></head><body>
+<div id="pg"></div>
+<header><h1><i>🐬</i> Guia <span>MySQL</span></h1><div id="ty"></div><input id="q" type="search" placeholder="Buscar comando: JOIN, GRANT, INDEX…" aria-label="Buscar"></header>
+<div class="wrap"><nav id="nv"></nav><main id="mn"></main></div>
+<button id="th" title="Cambiar tema">◐</button>
+<script>
+const S=[
+["inst","📦 Instalación",[
+["Ubuntu / Debian","","$ sudo apt update && sudo apt install mysql-server -y\n$ sudo systemctl enable --now mysql\n$ sudo mysql_secure_installation\n$ mysql --version"],
+["macOS (Homebrew)","","$ brew install mysql\n$ brew services start mysql\n$ mysql_secure_installation"],
+["Windows","Descarga MySQL Installer (dev.mysql.com/downloads), elige «Server only» o «Developer Default» y define la clave de root. El servicio se llama MySQL80.","$ net start MySQL80\n$ net stop MySQL80"],
+["Docker","","$ docker run --name mysql -e MYSQL_ROOT_PASSWORD=secreto -p 3306:3306 -d mysql:8\n$ docker exec -it mysql mysql -u root -p"]]],
+["term","💻 Terminal y cliente",[
+["Conectarse","","$ mysql -u root -p\n$ mysql -h 127.0.0.1 -P 3306 -u usuario -p mi_bd\n$ mysql -u root -p -e \"SHOW DATABASES;\"\n$ mysql -u root -p mi_bd < script.sql"],
+["Dentro del cliente","Cada sentencia termina en ; o en \\G (resultado vertical).","STATUS;\nSELECT VERSION(), NOW(), CURRENT_USER();\nSELECT * FROM clientes\\G\nsource /ruta/script.sql;\nexit;  -- o \\q"]]],
+["base","🧠 Conceptos básicos",[
+["Vocabulario","MySQL es un gestor relacional (RDBMS): el servidor mysqld escucha en el puerto 3306 y el cliente mysql le envía SQL. Base de datos = contenedor de tablas. Tabla = filas (registros) × columnas (campos). PK identifica cada fila; FK enlaza tablas.","-- DDL (estructura): CREATE ALTER DROP TRUNCATE\n-- DML (datos):      INSERT UPDATE DELETE\n-- DQL (consultas):  SELECT\n-- DCL (permisos):   GRANT REVOKE\n-- TCL (transac.):   COMMIT ROLLBACK SAVEPOINT"],
+["Relaciones y normalización","","-- 1:1  usuario ↔ perfil (FK UNIQUE)\n-- 1:N  cliente → pedidos (FK en pedidos)\n-- N:M  alumnos ↔ cursos (tabla intermedia)\n-- 1FN: valores atómicos · 2FN: sin dependencias parciales · 3FN: sin dependencias transitivas"]]],
+["dbs","🗄️ Bases de datos",[
+["Crear, ver y usar","","CREATE DATABASE IF NOT EXISTS tienda\n  CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;\nSHOW DATABASES;\nUSE tienda;\nSELECT DATABASE();  -- BD activa"],
+["Modificar y eliminar","⚠️ DROP es irreversible: haz backup antes.","ALTER DATABASE tienda CHARACTER SET utf8mb4;\nDROP DATABASE IF EXISTS tienda;"]]],
+["tipos","🔢 Tipos de datos",[
+["Los más usados","Dinero siempre con DECIMAL, nunca FLOAT.","-- Enteros:   TINYINT SMALLINT INT BIGINT (+ UNSIGNED)\n-- Decimales: DECIMAL(10,2) exacto · FLOAT/DOUBLE aproximado\n-- Texto:     CHAR(n) fijo · VARCHAR(n) · TEXT · LONGTEXT\n-- Fechas:    DATE TIME DATETIME TIMESTAMP YEAR\n-- Otros:     BOOLEAN · ENUM('a','b') · SET · JSON · BLOB"]]],
+["tablas","📋 Tablas",[
+["Crear con restricciones","","CREATE TABLE clientes (\n  id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,\n  nombre VARCHAR(80) NOT NULL,\n  email VARCHAR(120) UNIQUE,\n  edad TINYINT UNSIGNED CHECK (edad >= 18),\n  activo BOOLEAN DEFAULT TRUE,\n  creado TIMESTAMP DEFAULT CURRENT_TIMESTAMP\n) ENGINE=InnoDB;\n\nCREATE TABLE pedidos (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  cliente_id INT UNSIGNED NOT NULL,\n  total DECIMAL(10,2) DEFAULT 0,\n  fecha DATE,\n  FOREIGN KEY (cliente_id) REFERENCES clientes(id)\n    ON DELETE CASCADE ON UPDATE CASCADE\n);"],
+["Inspeccionar","","SHOW TABLES;\nDESCRIBE clientes;\nSHOW CREATE TABLE clientes;"],
+["ALTER, renombrar y borrar","","ALTER TABLE clientes ADD telefono VARCHAR(20) AFTER email;\nALTER TABLE clientes MODIFY nombre VARCHAR(100) NOT NULL;\nALTER TABLE clientes CHANGE telefono celular VARCHAR(20);\nALTER TABLE clientes DROP COLUMN celular;\nRENAME TABLE viejo TO nuevo;\nTRUNCATE TABLE pedidos;  -- vacía y reinicia AUTO_INCREMENT\nDROP TABLE IF EXISTS pedidos;"]]],
+["crud","✏️ Insertar, actualizar y borrar",[
+["INSERT","","INSERT INTO clientes (nombre, email, edad) VALUES ('Ana','ana@mail.com',30);\nINSERT INTO clientes (nombre, email) VALUES ('Luis','l@mail.com'), ('Eva','e@mail.com');\nINSERT INTO clientes (id, nombre) VALUES (1,'Ana M.')\n  ON DUPLICATE KEY UPDATE nombre = VALUES(nombre);  -- upsert\nSELECT LAST_INSERT_ID();"],
+["UPDATE y DELETE","⚠️ Sin WHERE afectas TODAS las filas. Prueba antes con un SELECT.","UPDATE clientes SET edad = edad + 1, activo = 0 WHERE id = 3;\nDELETE FROM clientes WHERE activo = 0 AND creado < '2024-01-01';"]]],
+["select","🔍 SELECT y filtros",[
+["Consultar y filtrar","","SELECT DISTINCT nombre, edad AS anios FROM clientes\nWHERE edad BETWEEN 18 AND 40\n  AND (nombre LIKE 'A%' OR email IS NULL)\n  AND id IN (1,2,3) AND NOT activo = 0\nORDER BY edad DESC, nombre ASC\nLIMIT 10 OFFSET 20;  -- paginación"],
+["Comodines","","LIKE 'A%'    -- empieza por A\nLIKE '%ez'    -- termina en ez\nLIKE '_a%'    -- segunda letra a\nREGEXP '^[A-M]'  -- expresión regular"]]],
+["func","🧮 Funciones",[
+["Texto y números","","SELECT CONCAT(nombre,' ',email), UPPER(nombre), LOWER(nombre), LENGTH(nombre),\n  SUBSTRING(nombre,1,3), TRIM('  x '), REPLACE(nombre,'a','4'),\n  ROUND(3.14159,2), CEIL(2.1), FLOOR(2.9), ABS(-5), MOD(10,3), RAND()\nFROM clientes;"],
+["Fechas","","SELECT NOW(), CURDATE(), CURTIME(),\n  DATE_FORMAT(NOW(),'%d/%m/%Y %H:%i'), YEAR(fecha), MONTH(fecha),\n  DATEDIFF('2026-12-31', CURDATE()),\n  DATE_ADD(CURDATE(), INTERVAL 7 DAY)\nFROM pedidos;"],
+["Condicionales y NULL","","SELECT IF(edad >= 18,'Mayor','Menor'), IFNULL(email,'sin email'),\n  COALESCE(email, nombre, 'n/d'),\n  CASE WHEN total > 1000 THEN 'Alto' WHEN total > 100 THEN 'Medio' ELSE 'Bajo' END\nFROM clientes, pedidos LIMIT 5;"]]],
+["agg","📊 Agregación",[
+["GROUP BY y HAVING","Orden lógico: FROM → WHERE → GROUP BY → HAVING → SELECT → ORDER BY → LIMIT.","SELECT cliente_id, COUNT(*) AS pedidos, SUM(total) AS gastado,\n  AVG(total), MIN(total), MAX(total)\nFROM pedidos\nWHERE fecha >= '2026-01-01'\nGROUP BY cliente_id\nHAVING SUM(total) > 500\nORDER BY gastado DESC;"]]],
+["joins","🔗 JOINs",[
+["Tipos de JOIN","","SELECT c.nombre, p.total FROM clientes c\n  INNER JOIN pedidos p ON p.cliente_id = c.id;  -- solo coincidencias\nSELECT c.nombre, p.total FROM clientes c\n  LEFT JOIN pedidos p ON p.cliente_id = c.id;   -- todos los clientes\nSELECT * FROM clientes c RIGHT JOIN pedidos p ON p.cliente_id = c.id;\nSELECT * FROM clientes CROSS JOIN pedidos;     -- producto cartesiano\nSELECT e.nombre, j.nombre AS jefe FROM empleados e\n  LEFT JOIN empleados j ON e.jefe_id = j.id;    -- self join"],
+["Anti-join y FULL OUTER","MySQL no tiene FULL JOIN: se simula con UNION.","SELECT c.* FROM clientes c LEFT JOIN pedidos p ON p.cliente_id = c.id\nWHERE p.id IS NULL;  -- clientes sin pedidos\nSELECT * FROM clientes c LEFT JOIN pedidos p ON p.cliente_id = c.id\nUNION\nSELECT * FROM clientes c RIGHT JOIN pedidos p ON p.cliente_id = c.id;"]]],
+["sub","🧩 Subconsultas, UNION y CTE",[
+["Subconsultas","","SELECT * FROM pedidos WHERE total > (SELECT AVG(total) FROM pedidos);\nSELECT * FROM clientes WHERE id IN (SELECT cliente_id FROM pedidos);\nSELECT * FROM clientes c WHERE EXISTS\n  (SELECT 1 FROM pedidos p WHERE p.cliente_id = c.id);\nSELECT t.cliente_id FROM\n  (SELECT cliente_id, SUM(total) s FROM pedidos GROUP BY cliente_id) t WHERE t.s > 500;"],
+["UNION y CTE (MySQL 8)","","SELECT nombre FROM clientes UNION ALL SELECT nombre FROM proveedores;  -- UNION quita duplicados\nWITH ventas AS (SELECT cliente_id, SUM(total) t FROM pedidos GROUP BY cliente_id)\nSELECT c.nombre, v.t FROM ventas v JOIN clientes c ON c.id = v.cliente_id;\nWITH RECURSIVE n AS (SELECT 1 x UNION ALL SELECT x+1 FROM n WHERE x < 5)\nSELECT * FROM n;"]]],
+["idx","⚡ Índices y EXPLAIN",[
+["Índices","Aceleran lecturas pero ralentizan escrituras. Indexa columnas de WHERE, JOIN y ORDER BY.","CREATE INDEX idx_email ON clientes(email);\nCREATE UNIQUE INDEX uq_email ON clientes(email);\nCREATE INDEX idx_cli_fecha ON pedidos(cliente_id, fecha);  -- compuesto\nCREATE FULLTEXT INDEX ft_nombre ON clientes(nombre);\nSHOW INDEX FROM clientes;\nDROP INDEX idx_email ON clientes;"],
+["EXPLAIN","Busca type = ref/const (bien) y evita ALL (recorre toda la tabla). No apliques funciones a columnas indexadas en el WHERE.","EXPLAIN SELECT * FROM pedidos WHERE cliente_id = 5;\nEXPLAIN ANALYZE SELECT * FROM pedidos WHERE total > 100;"]]],
+["vistas","👁️ Vistas",[
+["Crear y usar","Una consulta guardada que se usa como si fuera una tabla.","CREATE OR REPLACE VIEW v_ventas AS\nSELECT c.nombre, SUM(p.total) AS total FROM clientes c\n  JOIN pedidos p ON p.cliente_id = c.id GROUP BY c.id;\nSELECT * FROM v_ventas WHERE total > 500;\nDROP VIEW IF EXISTS v_ventas;"]]],
+["win","🪟 Funciones de ventana",[
+["OVER (MySQL 8)","Calculan sobre grupos sin colapsar las filas.","SELECT cliente_id, total,\n  ROW_NUMBER() OVER (PARTITION BY cliente_id ORDER BY total DESC) AS pos,\n  RANK() OVER (ORDER BY total DESC) AS rk,\n  SUM(total) OVER (PARTITION BY cliente_id) AS suma_cli,\n  LAG(total) OVER (ORDER BY fecha) AS anterior\nFROM pedidos;"]]],
+["rutinas","⚙️ Procedimientos, triggers y eventos",[
+["Procedimiento y función","","DELIMITER //\nCREATE PROCEDURE sp_pedidos_cliente(IN cid INT)\nBEGIN\n  SELECT * FROM pedidos WHERE cliente_id = cid;\nEND //\nCREATE FUNCTION iva(precio DECIMAL(10,2)) RETURNS DECIMAL(10,2) DETERMINISTIC\nBEGIN\n  RETURN precio * 1.19;\nEND //\nDELIMITER ;\nCALL sp_pedidos_cliente(1);\nSELECT iva(100);"],
+["Triggers y eventos","","CREATE TRIGGER trg_log AFTER INSERT ON pedidos\nFOR EACH ROW INSERT INTO log(msg) VALUES (CONCAT('Pedido ', NEW.id));\nSHOW TRIGGERS;\nDROP TRIGGER trg_log;\nSET GLOBAL event_scheduler = ON;\nCREATE EVENT ev_limpieza ON SCHEDULE EVERY 1 DAY\n  DO DELETE FROM log WHERE fecha < NOW() - INTERVAL 30 DAY;"]]],
+["tx","🔒 Transacciones",[
+["InnoDB y ACID","Atomicidad, Consistencia, Aislamiento y Durabilidad.","START TRANSACTION;\nUPDATE cuentas SET saldo = saldo - 100 WHERE id = 1;\nSAVEPOINT paso1;\nUPDATE cuentas SET saldo = saldo + 100 WHERE id = 2;\n-- ROLLBACK TO paso1;\nCOMMIT;  -- o ROLLBACK;\nSELECT * FROM cuentas WHERE id = 1 FOR UPDATE;  -- bloquea la fila\nSET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED;"]]],
+["users","🔑 Usuarios y permisos",[
+["Gestionar accesos","","CREATE USER 'ana'@'localhost' IDENTIFIED BY 'Clave#123';\nGRANT SELECT, INSERT ON tienda.* TO 'ana'@'localhost';\nGRANT ALL PRIVILEGES ON tienda.* TO 'ana'@'localhost';\nSHOW GRANTS FOR 'ana'@'localhost';\nREVOKE INSERT ON tienda.* FROM 'ana'@'localhost';\nALTER USER 'ana'@'localhost' IDENTIFIED BY 'NuevaClave#456';\nDROP USER 'ana'@'localhost';\nFLUSH PRIVILEGES;"]]],
+["bak","💾 Backup y restauración",[
+["mysqldump","","$ mysqldump -u root -p tienda > tienda.sql\n$ mysqldump -u root -p --single-transaction --routines --triggers tienda | gzip > tienda.sql.gz\n$ mysqldump -u root -p --all-databases > todo.sql\n$ mysql -u root -p tienda < tienda.sql\n$ gunzip < tienda.sql.gz | mysql -u root -p tienda"]]],
+["json","🧾 JSON y FULLTEXT",[
+["Columnas JSON y búsqueda de texto","","ALTER TABLE clientes ADD datos JSON;\nUPDATE clientes SET datos = JSON_OBJECT('ciudad','Panamá','tags',JSON_ARRAY('vip')) WHERE id = 1;\nSELECT datos->>'$.ciudad' FROM clientes WHERE JSON_CONTAINS(datos->'$.tags','\"vip\"');\nUPDATE clientes SET datos = JSON_SET(datos,'$.ciudad','Colón');\nSELECT * FROM clientes WHERE MATCH(nombre) AGAINST('ana' IN NATURAL LANGUAGE MODE);"]]],
+["admin","🛠️ Administración y buenas prácticas",[
+["Diagnóstico","","SHOW PROCESSLIST;\nKILL 42;\nSHOW STATUS LIKE 'Threads%';\nSHOW VARIABLES LIKE 'max_connections';\nSET GLOBAL slow_query_log = 'ON';\nSET GLOBAL long_query_time = 1;\nSELECT table_name, ROUND((data_length+index_length)/1024/1024,2) AS mb\n  FROM information_schema.tables WHERE table_schema = 'tienda';\n$ sudo nano /etc/mysql/mysql.conf.d/mysqld.cnf   # configuración\n$ sudo systemctl restart mysql"],
+["Buenas prácticas","","-- ✔ utf8mb4 + InnoDB siempre\n-- ✔ PK en cada tabla y FK para integridad\n-- ✔ DECIMAL para dinero, nunca FLOAT\n-- ✔ Evita SELECT * en producción; usa LIMIT\n-- ✔ Consultas parametrizadas (anti SQL injection)\n-- ✔ Mínimo privilegio; no uses root en las apps\n-- ✔ Backups automáticos y probados"]]]
+];
+const E=s=>s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+const KW="SELECT|FROM|WHERE|INSERT|INTO|VALUES|UPDATE|SET|DELETE|CREATE|DROP|ALTER|TABLE|DATABASE|INDEX|VIEW|JOIN|LEFT|RIGHT|INNER|CROSS|ON|GROUP|BY|ORDER|HAVING|LIMIT|OFFSET|AS|AND|OR|NOT|NULL|PRIMARY|KEY|FOREIGN|REFERENCES|UNIQUE|DEFAULT|AUTO_INCREMENT|USE|SHOW|DESCRIBE|UNION|ALL|DISTINCT|CASE|WHEN|THEN|ELSE|END|IN|LIKE|BETWEEN|EXISTS|BEGIN|COMMIT|ROLLBACK|START|TRANSACTION|SAVEPOINT|GRANT|REVOKE|TO|FLUSH|PRIVILEGES|IF|PROCEDURE|FUNCTION|TRIGGER|AFTER|FOR|EACH|ROW|CALL|WITH|RECURSIVE|OVER|PARTITION|ADD|COLUMN|MODIFY|CHANGE|RENAME|TRUNCATE|DELIMITER|RETURNS|RETURN|EVENT|EXPLAIN|ASC|DESC|IS|USER|IDENTIFIED|CHECK|ENGINE|CHARACTER|COLLATE|DUPLICATE|CASCADE|EVERY|SCHEDULE|DO|AFTER|MATCH|AGAINST|REPLACE|INTERVAL|FULLTEXT|KILL|SESSION|GLOBAL";
+const R=new RegExp("(--\\s.*$|#.*$)|('[^']*')|\\b("+KW+")\\b|\\b(\\d+)\\b|(^\\$ )","gim");
+const hl=c=>E(c).replace(R,(m,a,b,k,n)=>`<i class="${a?"m":b?"s":k?"k":n?"n":"p"}">${m}</i>`);
+nv.innerHTML=S.map(([id,t],i)=>`<a href="#${id}">${i+1}. ${t}</a>`).join("");
+mn.innerHTML=S.map(([id,t,bl],i)=>`<section id="${id}"><h2><b>${i+1}</b>${t}</h2>${bl.map(([a,n,c])=>`<div class="c"><h3>${a}</h3>${n?`<p>${n}</p>`:""}<pre><button>Copiar</button><code>${hl(c)}</code></pre></div>`).join("")}</section>`).join("");
+mn.addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;const t=b.nextSibling.innerText;
+(navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).catch(()=>{const x=document.createElement("textarea");x.value=t;document.body.append(x);x.select();document.execCommand("copy");x.remove()}).finally(()=>{b.textContent="¡Copiado!";setTimeout(()=>b.textContent="Copiar",1200)})});
+q.oninput=()=>{const v=q.value.toLowerCase();document.querySelectorAll(".c").forEach(c=>c.hidden=!c.textContent.toLowerCase().includes(v));document.querySelectorAll("section").forEach(s=>s.hidden=!s.querySelector(".c:not([hidden])"))};
+const io=new IntersectionObserver(es=>es.forEach(e=>e.isIntersecting&&e.target.classList.add("v")),{threshold:.05});
+document.querySelectorAll(".c").forEach(c=>io.observe(c));
+const so=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)document.querySelectorAll("nav a").forEach(a=>a.classList.toggle("on",a.hash=="#"+e.target.id))}),{rootMargin:"-30% 0px -60% 0px"});
+document.querySelectorAll("section").forEach(s=>so.observe(s));
+addEventListener("scroll",()=>{const h=document.documentElement;pg.style.width=100*h.scrollTop/(h.scrollHeight-h.clientHeight)+"%"});
+th.onclick=()=>{const r=document.documentElement;const d=r.dataset.theme?r.dataset.theme=="dark":matchMedia("(prefers-color-scheme:dark)").matches;r.dataset.theme=d?"light":"dark"};
+const P=["Instalación, terminal y CRUD…","JOINs, índices y transacciones…","Procedimientos, triggers y backups…"];let pi=0,ci=0,dl=0;
+(function t(){const w=P[pi];ci+=dl?-1:1;ty.textContent=w.slice(0,ci);let d=55;if(!dl&&ci==w.length){dl=1;d=1400}else if(dl&&!ci){dl=0;pi=(pi+1)%P.length;d=300}setTimeout(t,d)})();
+</script></body></html>
