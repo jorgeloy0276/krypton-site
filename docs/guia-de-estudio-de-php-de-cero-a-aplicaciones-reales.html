@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Guía de estudio de PHP: de cero a aplicaciones reales</title>
+<style>
+:root{--bg:#f6f7fb;--sf:#fff;--tx:#1c2233;--mu:#5b6478;--ac:#4f5bd5;--bd:#dfe3ee;--cb:#161a2b;--ct:#e6e9f5;--wn:#b4232c;--wb:#fdecee;--ok:#12663a;--ob:#e6f6ec;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1220;--sf:#171b2e;--tx:#e8ebf7;--mu:#9aa3bd;--ac:#8d98ff;--bd:#2a3050;--cb:#0a0c16;--wb:#3a1a20;--wn:#ff9aa2;--ob:#12301f;--ok:#7be0a3}}
+:root[data-theme="dark"]{--bg:#0f1220;--sf:#171b2e;--tx:#e8ebf7;--mu:#9aa3bd;--ac:#8d98ff;--bd:#2a3050;--cb:#0a0c16;--wb:#3a1a20;--wn:#ff9aa2;--ob:#12301f;--ok:#7be0a3}
+html{scroll-behavior:smooth;scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:17px/1.65 Georgia,"Times New Roman",serif}
+.wrap{display:flex;max-width:1200px;margin:auto}
+nav{position:sticky;top:0;align-self:flex-start;width:260px;height:100vh;overflow:auto;padding:24px 16px;border-right:1px solid var(--bd);font:14px/1.5 system-ui,sans-serif}
+nav b{display:block;margin-bottom:10px;font-size:15px}
+nav a{display:block;padding:4px 8px;color:var(--mu);text-decoration:none;border-radius:6px}
+nav a:hover,nav a:focus-visible{background:var(--sf);color:var(--ac);outline:none}
+main{flex:1;min-width:0;padding:32px 28px 80px;max-width:820px}
+h1{font:800 2.3rem/1.15 system-ui,sans-serif;margin:0 0 8px}
+h2{font:700 1.6rem/1.25 system-ui,sans-serif;margin:56px 0 12px;padding-top:20px;border-top:3px solid var(--ac)}
+h3{font:650 1.1rem system-ui,sans-serif;margin:26px 0 6px}
+p.lead{color:var(--mu);font-size:1.1rem}
+pre{background:var(--cb);color:var(--ct);padding:14px 16px;border-radius:8px;overflow-x:auto;font:13.5px/1.55 ui-monospace,Menlo,Consolas,monospace;margin:10px 0}
+code{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.88em;background:var(--sf);border:1px solid var(--bd);padding:1px 5px;border-radius:4px}
+pre code{background:none;border:0;padding:0;font-size:inherit}
+.box{padding:12px 16px;border-radius:8px;margin:14px 0;font-size:.95rem;border-left:4px solid var(--ok);background:var(--ob)}
+.box.w{border-color:var(--wn);background:var(--wb)}
+table{border-collapse:collapse;width:100%;font:14px system-ui,sans-serif;margin:10px 0}
+td,th{border:1px solid var(--bd);padding:6px 10px;text-align:left;vertical-align:top}
+th{background:var(--sf)}
+.tw{overflow-x:auto}
+li{margin:3px 0}
+@media(max-width:860px){nav{display:none}main{padding:20px 16px 60px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav aria-label="Índice"><b>Guía de PHP</b>
+<a href="#s1">1. Entorno y primer script</a><a href="#s2">2. Variables y tipos</a><a href="#s3">3. Operadores y control</a><a href="#s4">4. Funciones</a><a href="#s5">5. Arrays y strings</a><a href="#s6">6. Formularios y HTTP</a><a href="#s7">7. Sesiones y cookies</a><a href="#s8">8. Archivos y subidas</a><a href="#s9">9. MySQL con PDO</a><a href="#s10">10. CRUD completo</a><a href="#s11">11. POO</a><a href="#s12">12. Composer y namespaces</a><a href="#s13">13. MVC</a><a href="#s14">14. Seguridad</a><a href="#s15">15. Avanzado</a><a href="#s16">16. Proyecto real y ruta</a></nav>
+<main>
+<h1>Guía de estudio de PHP</h1>
+<p class="lead">Del primer <code>echo</code> a una aplicación MVC segura. Cada sección depende de la anterior: síguelas en orden y practica cada ejemplo.</p>
+
+<h2 id="s1">1. Entorno y primer script</h2>
+<p>Instala PHP 8.3+ (o XAMPP/Laragon), MySQL/MariaDB y un editor (VS Code). Ejecuta scripts con <code>php archivo.php</code> o el servidor integrado.</p>
+<pre><code>php -v
+php -S localhost:8000 -t public   # servidor de desarrollo</code></pre>
+<pre><code>&lt;?php
+echo "Hola, mundo";      // salida
+print("Otra forma");
+// comentario de línea   # otro   /* bloque */
+?&gt;</code></pre>
+<p>Cada instrucción termina en <code>;</code>. En archivos solo PHP omite la etiqueta de cierre <code>?&gt;</code>.</p>
+
+<h2 id="s2">2. Variables, constantes y tipos</h2>
+<pre><code>$nombre = "Ana";  $edad = 30;  $precio = 9.99;  $activo = true;  $nada = null;
+const IVA = 0.19;  define('APP', 'Mi sitio');
+echo "Hola $nombre, tienes {$edad} años";
+var_dump($precio);                  // tipo y valor
+echo gettype($edad);                // integer
+(int)"42abc;  (float)"3.5";  (string)10;  (bool)0;</code></pre>
+<p>Tipos: <code>int</code>, <code>float</code>, <code>string</code>, <code>bool</code>, <code>array</code>, <code>object</code>, <code>null</code>. Usa siempre <code>declare(strict_types=1);</code> al inicio de tus archivos para evitar conversiones silenciosas.</p>
+
+<h2 id="s3">3. Operadores y control de flujo</h2>
+<pre><code>+ - * / % **   .   ==  ===  !=  !==  &lt;=&gt;   &amp;&amp; || !   ??  ?:  ??=
+
+if ($n &gt; 0) { } elseif ($n &lt; 0) { } else { }
+$r = match(true) { $n &lt; 0 =&gt; "neg", $n === 0 =&gt; "cero", default =&gt; "pos" };
+switch ($d) { case 1: echo "Lun"; break; default: echo "?"; }
+
+for ($i = 0; $i &lt; 5; $i++) { }
+while ($x &lt; 10) { $x++; }
+foreach ($lista as $clave =&gt; $valor) { if ($valor === 0) continue; }
+$nombre = $_GET['n'] ?? 'Invitado';   // valor por defecto seguro</code></pre>
+<div class="box w">Usa <code>===</code> (compara valor y tipo) en lugar de <code>==</code>: <code>"0" == false</code> es verdadero y causa fallos de lógica y de seguridad.</div>
+
+<h2 id="s4">4. Funciones</h2>
+<pre><code>function sumar(int $a, int $b = 0): int { return $a + $b; }
+sumar(b: 5, a: 2);                       // argumentos con nombre
+function total(int ...$nums): int { return array_sum($nums); }
+$doble = fn($x) =&gt; $x * 2;               // arrow function
+$f = function($x) use ($doble) { return $doble($x) + 1; };
+function buscar(?string $q): string|null { return $q; }   // nullable y union</code></pre>
+<p>Ámbito: las variables de una función son locales; usa parámetros y <code>return</code>, evita <code>global</code>.</p>
+
+<h2 id="s5">5. Arrays y strings</h2>
+<pre><code>$frutas = ["pera", "uva"];  $user = ["id" =&gt; 1, "nombre" =&gt; "Ana"];
+$frutas[] = "kiwi";  unset($frutas[0]);
+count($a); in_array("uva", $a, true); array_keys($a); array_merge($a, $b);
+array_map(fn($x) =&gt; $x * 2, $n);  array_filter($n, fn($x) =&gt; $x &gt; 2);
+usort($users, fn($a, $b) =&gt; $a['edad'] &lt;=&gt; $b['edad']);
+[$a, $b] = [1, 2];  ['id' =&gt; $id] = $user;     // desestructuración
+
+strlen($s); strtoupper($s); trim($s); str_contains($s, "x"); substr($s, 0, 3);
+str_replace("a", "b", $s); explode(",", $s); implode(",", $a);
+sprintf("%05.2f", 3.14159); mb_strlen("ñandú");   // mb_* para UTF-8
+preg_match('/^\d{4}$/', $s);  json_encode($a);  json_decode($j, true);
+date("Y-m-d H:i"); $f = new DateTimeImmutable("tomorrow");</code></pre>
+
+<h2 id="s6">6. Formularios y HTTP</h2>
+<p>Superglobales: <code>$_GET</code>, <code>$_POST</code>, <code>$_SERVER</code>, <code>$_FILES</code>, <code>$_COOKIE</code>, <code>$_SESSION</code>.</p>
+<pre><code>&lt;form method="post"&gt;
+  &lt;input name="email" type="email" required&gt;
+  &lt;button&gt;Enviar&lt;/button&gt;
+&lt;/form&gt;
+&lt;?php
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $email = filter_input(INPUT_POST, 'email', FILTER_VALIDATE_EMAIL);
+    if (!$email) { $error = "Correo no válido"; }
+}
+echo htmlspecialchars($valor, ENT_QUOTES, 'UTF-8');   // SIEMPRE al imprimir
+header("Location: /gracias.php"); exit;               // redirección (patrón PRG)
+http_response_code(404);</code></pre>
+<p>Valida siempre en el servidor; la validación del navegador es solo comodidad.</p>
+
+<h2 id="s7">7. Sesiones y cookies</h2>
+<pre><code>session_set_cookie_params(['httponly' =&gt; true, 'secure' =&gt; true, 'samesite' =&gt; 'Lax']);
+session_start();
+$_SESSION['user_id'] = $id;
+session_regenerate_id(true);          // tras iniciar sesión
+// cerrar sesión
+$_SESSION = []; session_destroy();
+setcookie('tema', 'oscuro', ['expires' =&gt; time()+86400, 'httponly' =&gt; true, 'samesite' =&gt; 'Lax']);</code></pre>
+
+<h2 id="s8">8. Archivos y subidas</h2>
+<pre><code>$txt = file_get_contents("datos.txt");  file_put_contents("log.txt", "linea\n", FILE_APPEND);
+file_exists($p); unlink($p); mkdir($d, 0755, true);
+
+// subida segura
+$f = $_FILES['foto'];
+if ($f['error'] === UPLOAD_ERR_OK &amp;&amp; $f['size'] &lt;= 2_000_000) {
+    $mime = (new finfo(FILEINFO_MIME_TYPE))-&gt;file($f['tmp_name']);
+    $ext  = ['image/jpeg' =&gt; 'jpg', 'image/png' =&gt; 'png'][$mime] ?? null;
+    if ($ext) move_uploaded_file($f['tmp_name'], "uploads/" . bin2hex(random_bytes(8)) . ".$ext");
+}</code></pre>
+<p>Nunca uses el nombre ni la extensión que envía el usuario. Guarda las subidas fuera de la carpeta pública cuando sea posible.</p>
+
+<h2 id="s9">9. MySQL con PDO</h2>
+<pre><code>CREATE TABLE usuarios (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  nombre VARCHAR(80) NOT NULL,
+  email VARCHAR(120) NOT NULL UNIQUE,
+  password VARCHAR(255) NOT NULL,
+  creado TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;</code></pre>
+<pre><code>$pdo = new PDO("mysql:host=localhost;dbname=app;charset=utf8mb4", $user, $pass, [
+    PDO::ATTR_ERRMODE            =&gt; PDO::ERRMODE_EXCEPTION,
+    PDO::ATTR_DEFAULT_FETCH_MODE =&gt; PDO::FETCH_ASSOC,
+    PDO::ATTR_EMULATE_PREPARES   =&gt; false,
+]);
+$st = $pdo-&gt;prepare("SELECT * FROM usuarios WHERE email = :e");
+$st-&gt;execute([':e' =&gt; $email]);
+$u = $st-&gt;fetch();            // una fila; fetchAll() para todas
+$pdo-&gt;lastInsertId();
+$pdo-&gt;beginTransaction(); /* ... */ $pdo-&gt;commit();   // o rollBack()</code></pre>
+<div class="box w">Nunca concatenes variables en el SQL. Las consultas preparadas son la defensa contra la inyección SQL.</div>
+
+<h2 id="s10">10. CRUD completo</h2>
+<p>CRUD = Create, Read, Update, Delete. Ejemplo sobre la tabla <code>productos(id, nombre, precio)</code>:</p>
+<pre><code>// CREATE
+$pdo-&gt;prepare("INSERT INTO productos (nombre, precio) VALUES (?, ?)")-&gt;execute([$n, $p]);
+// READ (listado con paginación)
+$st = $pdo-&gt;prepare("SELECT * FROM productos ORDER BY id DESC LIMIT :l OFFSET :o");
+$st-&gt;bindValue(':l', 10, PDO::PARAM_INT); $st-&gt;bindValue(':o', ($pag-1)*10, PDO::PARAM_INT);
+$st-&gt;execute(); $filas = $st-&gt;fetchAll();
+// UPDATE
+$pdo-&gt;prepare("UPDATE productos SET nombre = ?, precio = ? WHERE id = ?")-&gt;execute([$n, $p, $id]);
+// DELETE
+$pdo-&gt;prepare("DELETE FROM productos WHERE id = ?")-&gt;execute([$id]);</code></pre>
+<p>Flujo típico de pantallas: <code>index.php</code> (lista) → <code>crear.php</code> (formulario POST) → <code>editar.php?id=</code> → <code>borrar.php</code> (solo POST con token CSRF). Tras cada escritura, redirige con <code>header("Location: ...")</code>.</p>
+
+<h2 id="s11">11. Programación orientada a objetos</h2>
+<pre><code>declare(strict_types=1);
+interface Describible { public function describir(): string; }
+abstract class Modelo { abstract public function tabla(): string; }
+trait Fechas { public function ahora(): string { return date('c'); } }
+enum Estado: string { case Activo = 'activo'; case Baja = 'baja'; }
+
+final class Producto extends Modelo implements Describible {
+    use Fechas;
+    private static int $total = 0;
+    public function __construct(
+        private string $nombre,
+        protected float $precio,
+        public readonly Estado $estado = Estado::Activo,
+    ) { self::$total++; }
+    public function tabla(): string { return 'productos'; }
+    public function describir(): string { return "{$this-&gt;nombre}: {$this-&gt;precio}"; }
+    public function getNombre(): string { return $this-&gt;nombre; }
+    public static function total(): int { return self::$total; }
+}
+$p = new Producto("Teclado", 25.5);
+echo $p-&gt;describir(); echo Producto::total();</code></pre>
+<table><tr><th>Concepto</th><th>Para qué sirve</th></tr>
+<tr><td>Encapsulación</td><td><code>private/protected/public</code> protegen el estado interno</td></tr>
+<tr><td>Herencia / interfaces</td><td>Reutilizar y definir contratos; prefiere composición sobre herencia profunda</td></tr>
+<tr><td>Excepciones</td><td><code>try { } catch (Throwable $e) { } finally { }</code> y <code>throw new DomainException()</code></td></tr>
+<tr><td>Inyección de dependencias</td><td>Pasar colaboradores (ej. <code>PDO</code>) por el constructor, no crearlos dentro</td></tr></table>
+<p>Principios útiles: SOLID, una clase = una responsabilidad, y tipado estricto en todo.</p>
+
+<h2 id="s12">12. Composer, namespaces y autoload</h2>
+<pre><code>composer init
+composer require vlucas/phpdotenv monolog/monolog
+composer require --dev phpunit/phpunit
+
+// composer.json
+"autoload": { "psr-4": { "App\\": "src/" } }
+
+composer dump-autoload
+
+// public/index.php
+require __DIR__ . '/../vendor/autoload.php';
+use App\Models\Producto;
+$p = new Producto(...);</code></pre>
+<p>Cada clase vive en su archivo, con <code>namespace App\Models;</code> que coincide con su carpeta (estándar PSR-4). Guarda secretos en <code>.env</code> (fuera de Git) y léelos con phpdotenv.</p>
+
+<h2 id="s13">13. Patrón MVC</h2>
+<pre><code>proyecto/
+├── public/          index.php, css/, js/   (única carpeta expuesta)
+├── src/
+│   ├── Controllers/ ProductoController.php
+│   ├── Models/      Producto.php
+│   ├── Core/        Router.php, Database.php, View.php
+│   └── Views/       productos/index.php
+├── config/ · storage/ · vendor/ · .env · composer.json</code></pre>
+<p><b>Modelo</b> = datos y reglas; <b>Vista</b> = HTML; <b>Controlador</b> = recibe la petición, usa el modelo y elige la vista.</p>
+<pre><code>// public/index.php (front controller)
+$router = new App\Core\Router();
+$router-&gt;get('/productos', [ProductoController::class, 'index']);
+$router-&gt;post('/productos', [ProductoController::class, 'store']);
+$router-&gt;dispatch($_SERVER['REQUEST_METHOD'], parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH));
+
+// Router.php
+final class Router {
+    private array $rutas = [];
+    public function get(string $p, array $h): void  { $this-&gt;rutas['GET'][$p] = $h; }
+    public function post(string $p, array $h): void { $this-&gt;rutas['POST'][$p] = $h; }
+    public function dispatch(string $m, string $uri): void {
+        [$clase, $metodo] = $this-&gt;rutas[$m][$uri] ?? [null, null];
+        if (!$clase) { http_response_code(404); echo "No encontrado"; return; }
+        (new $clase(Database::pdo()))-&gt;$metodo();
+    }
+}
+
+// ProductoController.php
+final class ProductoController {
+    public function __construct(private PDO $pdo) {}
+    public function index(): void {
+        $productos = (new Producto($this-&gt;pdo))-&gt;todos();
+        View::render('productos/index', compact('productos'));
+    }
+}
+
+// View.php + vista
+final class View { public static function render(string $v, array $d = []): void {
+    extract($d); require __DIR__ . "/../Views/$v.php"; } }
+// Views/productos/index.php
+&lt;?php foreach ($productos as $p): ?&gt;
+  &lt;li&gt;&lt;?= htmlspecialchars($p['nombre']) ?&gt;&lt;/li&gt;
+&lt;?php endforeach; ?&gt;</code></pre>
+<p>Apache: añade <code>.htaccess</code> en <code>public/</code> con <code>RewriteRule ^ index.php [L]</code> para que todas las URL pasen por el front controller. Cuando el proyecto crezca, usa Laravel o Symfony, que implementan estas ideas.</p>
+
+<h2 id="s14">14. Seguridad en PHP</h2>
+<h3>Contraseñas</h3>
+<pre><code>$hash = password_hash($pass, PASSWORD_DEFAULT);          // registro
+if ($u &amp;&amp; password_verify($pass, $u['password'])) { session_regenerate_id(true); }
+if (password_needs_rehash($u['password'], PASSWORD_DEFAULT)) { /* actualizar hash */ }</code></pre>
+<p>No uses <code>md5</code> ni <code>sha1</code>. Mensaje de error genérico: "Credenciales incorrectas".</p>
+<h3>Inyección SQL</h3>
+<p>Solo consultas preparadas (sección 9). Para nombres dinámicos de columnas o tablas usa una lista blanca: <code>in_array($col, ['nombre','precio'], true)</code>.</p>
+<h3>XSS</h3>
+<pre><code>function e(?string $s): string { return htmlspecialchars($s ?? '', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); }
+// Cabecera adicional
+header("Content-Security-Policy: default-src 'self'");</code></pre>
+<h3>CSRF</h3>
+<pre><code>$_SESSION['csrf'] ??= bin2hex(random_bytes(32));
+// en el formulario:
+// &lt;input type="hidden" name="csrf" value="&lt;?= e($_SESSION['csrf']) ?&gt;"&gt;
+if (!hash_equals($_SESSION['csrf'] ?? '', $_POST['csrf'] ?? '')) { http_response_code(419); exit; }</code></pre>
+<h3>Autorización</h3>
+<p>Comprueba el permiso en el servidor en cada acción, y que el recurso pertenezca al usuario (<code>WHERE id = ? AND user_id = ?</code>). Esconder un botón no protege nada (IDOR).</p>
+<h3>Otras defensas</h3>
+<table class="tw"><tr><th>Riesgo</th><th>Defensa</th></tr>
+<tr><td>Subidas de archivos</td><td>Validar MIME real, tamaño, renombrar, no ejecutar en la carpeta destino</td></tr>
+<tr><td>Fuerza bruta</td><td>Limitar intentos por IP y cuenta, retraso progresivo, 2FA</td></tr>
+<tr><td>Fijación de sesión</td><td><code>session_regenerate_id(true)</code>, cookies <code>HttpOnly</code>, <code>Secure</code>, <code>SameSite</code></td></tr>
+<tr><td>Inclusión de archivos</td><td>Nunca hacer <code>include $_GET['p']</code>; usar lista blanca de rutas</td></tr>
+<tr><td>Redirección abierta</td><td>Validar el destino contra rutas propias</td></tr>
+<tr><td>Deserialización</td><td>No usar <code>unserialize()</code> con datos del usuario; preferir JSON</td></tr>
+<tr><td>Exposición de errores</td><td>Producción: <code>display_errors=0</code>, registrar en log</td></tr>
+<tr><td>Secretos</td><td><code>.env</code> fuera de <code>public/</code> y de Git</td></tr>
+<tr><td>Transporte</td><td>HTTPS siempre y cabecera HSTS</td></tr>
+<tr><td>Dependencias</td><td><code>composer audit</code> y actualizar con regularidad</td></tr></table>
+<div class="box">Regla de oro: toda entrada es hostil. Valida al entrar, escapa al salir y aplica el mínimo privilegio (usuario de base de datos con permisos limitados).</div>
+
+<h2 id="s15">15. Temas avanzados</h2>
+<h3>API REST con JSON</h3>
+<pre><code>header('Content-Type: application/json; charset=utf-8');
+$datos = json_decode(file_get_contents('php://input'), true, 512, JSON_THROW_ON_ERROR);
+http_response_code(201);
+echo json_encode(['id' =&gt; $id, 'mensaje' =&gt; 'creado'], JSON_UNESCAPED_UNICODE);</code></pre>
+<p>Usa verbos (GET, POST, PUT/PATCH, DELETE), códigos HTTP correctos (200, 201, 400, 401, 403, 404, 422, 500) y autenticación por token (JWT con <code>firebase/php-jwt</code> o tokens opacos).</p>
+<h3>Manejo de errores y logs</h3>
+<pre><code>set_exception_handler(function (Throwable $e) {
+    error_log($e-&gt;getMessage() . "\n" . $e-&gt;getTraceAsString());
+    http_response_code(500); echo "Error interno";
+});
+error_reporting(E_ALL);</code></pre>
+<h3>Características modernas de PHP 8</h3>
+<ul><li>Promoción de propiedades, <code>readonly</code>, enums, <code>match</code>, operador <code>?-&gt;</code>, argumentos con nombre, tipos unión, <code>never</code>, atributos <code>#[Route]</code>, fibers.</li></ul>
+<h3>Otros pilares profesionales</h3>
+<ul>
+<li><b>Pruebas:</b> PHPUnit (<code>composer require --dev phpunit/phpunit</code>) y Pest. Prueba reglas de negocio primero.</li>
+<li><b>Calidad:</b> PHPStan o Psalm, PHP-CS-Fixer, estándar PSR-12.</li>
+<li><b>Rendimiento:</b> OPcache, índices SQL, evitar consultas N+1, caché con Redis o APCu.</li>
+<li><b>Tareas en segundo plano:</b> colas (Redis, RabbitMQ, Symfony Messenger) y cron para correos y reportes.</li>
+<li><b>Correo:</b> PHPMailer o Symfony Mailer con SMTP autenticado.</li>
+<li><b>Migraciones:</b> Phinx o Doctrine Migrations para versionar la base de datos.</li>
+<li><b>Frameworks:</b> Laravel (el más popular), Symfony (empresarial), Slim (microservicios).</li>
+<li><b>Despliegue:</b> Git, Docker, Nginx + PHP-FPM, CI/CD con GitHub Actions, variables de entorno por entorno.</li></ul>
+
+<h2 id="s16">16. Proyecto real y ruta de estudio</h2>
+<p>Construye en este orden una gestión de tareas o inventario con usuarios:</p>
+<ol>
+<li>Diseña la base de datos (usuarios, tareas, relaciones y claves foráneas).</li>
+<li>Estructura MVC con Composer, autoload y <code>.env</code>.</li>
+<li>Registro, login y cierre de sesión con <code>password_hash</code> y CSRF.</li>
+<li>CRUD de tareas con PDO, validación y paginación, siempre filtrado por usuario.</li>
+<li>Roles y permisos (usuario/admin) comprobados en el servidor.</li>
+<li>Subida de adjuntos con validación estricta.</li>
+<li>API JSON para consumo desde JavaScript o móvil.</li>
+<li>Pruebas, logs, cabeceras de seguridad y despliegue con HTTPS.</li></ol>
+<div class="box">Siguiente paso recomendado: repite el proyecto con Laravel para ver cómo el framework resuelve rutas, ORM (Eloquent), validación, autenticación y migraciones. Con las bases de esta guía lo entenderás por dentro.</div>
+<p style="color:var(--mu);font-size:.9rem">Documentación oficial: php.net/manual/es · phptherightway.com · owasp.org (Cheat Sheet Series).</p>
+</main>
+</div>
+</body>
+</html>

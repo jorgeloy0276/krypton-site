@@ -1,0 +1,1346 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guía Maestra de Power Apps: Fórmulas, Arquitectura e Integraciones</title>
+    <style>
+        :root {
+            --bg-main: #0f172a;
+            --bg-sidebar: #1e293b;
+            --bg-card: #1e293b;
+            --bg-code: #0b1120;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --accent-purple: #a855f7;
+            --accent-purple-dark: #7e22ce;
+            --accent-blue: #38bdf8;
+            --accent-emerald: #10b981;
+            --accent-amber: #f59e0b;
+            --border-color: #334155;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-primary);
+            line-height: 1.6;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar Navigation */
+        aside {
+            width: 290px;
+            background-color: var(--bg-sidebar);
+            border-right: 1px solid var(--border-color);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            padding: 1.5rem 1rem;
+            z-index: 100;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding-bottom: 1.25rem;
+            margin-bottom: 1.25rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .brand-icon {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, #742774, #a855f7);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+            color: white;
+        }
+
+        .brand-text h1 {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .brand-text span {
+            font-size: 0.75rem;
+            color: var(--accent-purple);
+            font-weight: 600;
+        }
+
+        .search-box {
+            width: 100%;
+            padding: 0.6rem 0.85rem;
+            background-color: var(--bg-main);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            color: var(--text-primary);
+            font-size: 0.875rem;
+            margin-bottom: 1.25rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .search-box:focus {
+            border-color: var(--accent-purple);
+        }
+
+        nav ul {
+            list-style: none;
+        }
+
+        nav li {
+            margin-bottom: 0.35rem;
+        }
+
+        nav a {
+            display: block;
+            padding: 0.5rem 0.75rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+
+        nav a:hover, nav a.active {
+            background-color: rgba(168, 85, 247, 0.15);
+            color: var(--text-primary);
+            border-left: 3px solid var(--accent-purple);
+        }
+
+        .nav-group-title {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-secondary);
+            margin: 1rem 0 0.4rem 0.75rem;
+            font-weight: 700;
+        }
+
+        /* Main Content */
+        main {
+            margin-left: 290px;
+            flex: 1;
+            padding: 2.5rem 3rem;
+            max-width: 1200px;
+        }
+
+        header.hero {
+            background: linear-gradient(135deg, rgba(116, 39, 116, 0.35), rgba(30, 41, 59, 0.9));
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2.5rem;
+        }
+
+        header.hero h2 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(to right, #f8fafc, #d8b4fe);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        header.hero p {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            max-width: 800px;
+        }
+
+        .badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .badge {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.65rem;
+            border-radius: 999px;
+            font-weight: 600;
+            background-color: rgba(168, 85, 247, 0.2);
+            color: #d8b4fe;
+            border: 1px solid rgba(168, 85, 247, 0.4);
+        }
+
+        .badge.blue {
+            background-color: rgba(56, 189, 248, 0.15);
+            color: #7dd3fc;
+            border-color: rgba(56, 189, 248, 0.3);
+        }
+
+        .badge.green {
+            background-color: rgba(16, 185, 129, 0.15);
+            color: #6ee7b7;
+            border-color: rgba(16, 185, 129, 0.3);
+        }
+
+        section {
+            margin-bottom: 3rem;
+            scroll-margin-top: 1.5rem;
+        }
+
+        h3.section-title {
+            font-size: 1.5rem;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        h3.section-title span.num {
+            background-color: var(--accent-purple);
+            color: white;
+            font-size: 0.85rem;
+            padding: 0.15rem 0.55rem;
+            border-radius: 6px;
+        }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(460px, 1fr));
+            gap: 1.25rem;
+        }
+
+        .card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 1.25rem;
+            transition: transform 0.15s, border-color 0.15s;
+        }
+
+        .card:hover {
+            border-color: var(--accent-purple);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.6rem;
+        }
+
+        .formula-name {
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--accent-blue);
+        }
+
+        .tag-prop {
+            font-size: 0.7rem;
+            background-color: rgba(245, 158, 11, 0.15);
+            color: #fcd34d;
+            padding: 0.15rem 0.5rem;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+
+        .card p {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.85rem;
+        }
+
+        pre {
+            background-color: var(--bg-code);
+            border: 1px solid #1e293b;
+            border-radius: 6px;
+            padding: 0.85rem;
+            overflow-x: auto;
+            position: relative;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.84rem;
+            color: #e2e8f0;
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 0.45rem;
+            right: 0.45rem;
+            background-color: #334155;
+            color: #f8fafc;
+            border: none;
+            border-radius: 4px;
+            padding: 0.25rem 0.55rem;
+            font-size: 0.72rem;
+            cursor: pointer;
+            opacity: 0.85;
+            transition: background-color 0.2s;
+        }
+
+        .copy-btn:hover {
+            background-color: var(--accent-purple);
+            opacity: 1;
+        }
+
+        /* Syntax Highlighting hints */
+        .kw { color: #c084fc; font-weight: bold; }
+        .str { color: #86efac; }
+        .cmt { color: #64748b; font-style: italic; }
+        .fn { color: #38bdf8; }
+
+        /* Steps & Architecture */
+        .step-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .step-item {
+            background-color: var(--bg-card);
+            border-left: 4px solid var(--accent-purple);
+            border-top: 1px solid var(--border-color);
+            border-right: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+            border-radius: 0 8px 8px 0;
+            padding: 1.15rem 1.4rem;
+        }
+
+        .step-item h4 {
+            color: var(--text-primary);
+            margin-bottom: 0.4rem;
+            font-size: 1.05rem;
+        }
+
+        .step-item p, .step-item li {
+            color: var(--text-secondary);
+            font-size: 0.92rem;
+        }
+
+        .step-item ul {
+            margin-left: 1.25rem;
+            margin-top: 0.4rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 0.75rem;
+            background-color: var(--bg-card);
+            border-radius: 8px;
+            overflow: hidden;
+            font-size: 0.88rem;
+        }
+
+        th, td {
+            padding: 0.75rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background-color: #0f172a;
+            color: var(--accent-purple);
+            font-weight: 600;
+        }
+
+        td code {
+            background-color: var(--bg-code);
+            padding: 0.15rem 0.4rem;
+            border-radius: 4px;
+            color: var(--accent-blue);
+            font-size: 0.82rem;
+        }
+
+        .alert {
+            background-color: rgba(56, 189, 248, 0.1);
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            border-radius: 8px;
+            padding: 1rem 1.25rem;
+            margin: 1rem 0;
+            font-size: 0.9rem;
+            color: #bae6fd;
+        }
+
+        @media (max-width: 900px) {
+            aside {
+                display: none;
+            }
+            main {
+                margin-left: 0;
+                padding: 1.5rem;
+            }
+            .card-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<aside>
+    <div class="brand">
+        <div class="brand-icon">fx</div>
+        <div class="brand-text">
+            <h1>Power Fx & Apps</h1>
+            <span>Guía Técnica Completa</span>
+        </div>
+    </div>
+
+    <input type="text" id="searchInput" class="search-box" placeholder="Filtrar fórmula o tema (ej. Patch, ForAll, Teams)...">
+
+    <nav id="sidebarNav">
+        <div class="nav-group-title">Fundamentos & Setup</div>
+        <ul>
+            <li><a href="#proyecto-cero">1. Proyecto desde Cero (Arquitectura)</a></li>
+            <li><a href="#variables">2. Variables y Contexto</a></li>
+            <li><a href="#navegacion">3. Navegación y Pantallas</a></li>
+        </ul>
+
+        <div class="nav-group-title">Fórmulas Power Fx</div>
+        <ul>
+            <li><a href="#datos-crud">4. Datos y CRUD (Patch, Filter, LookUp)</a></li>
+            <li><a href="#colecciones-tablas">5. Tablas y Colecciones (ForAll, AddColumns)</a></li>
+            <li><a href="#logica-control">6. Lógica, Condicionales y Errores</a></li>
+            <li><a href="#texto-regex">7. Texto, Formato y RegEx</a></li>
+            <li><a href="#fechas-horas">8. Fechas, Horas y Calendario</a></li>
+            <li><a href="#matematicas">9. Matemáticas y Agregaciones</a></li>
+            <li><a href="#objetos-ui">10. Propiedades de Objetos y UI</a></li>
+        </ul>
+
+        <div class="nav-group-title">Ecosistema Microsoft 365</div>
+        <ul>
+            <li><a href="#power-automate">11. Integración Power Automate</a></li>
+            <li><a href="#ms-forms">12. Integración Microsoft Forms</a></li>
+            <li><a href="#outlook">13. Conector Office 365 Outlook</a></li>
+            <li><a href="#teams">14. Conector Microsoft Teams</a></li>
+        </ul>
+    </nav>
+</aside>
+
+<main>
+    <header class="hero">
+        <h2>Referencia Maestra de Power Apps & Power Fx</h2>
+        <p>Compendio técnico con arquitectura de arranque desde cero, catálogo exhaustivo de fórmulas para lógica, datos, controles de interfaz e integración nativa con Power Automate, Microsoft Forms, Outlook y Teams.</p>
+        <div class="badges">
+            <span class="badge">Power Fx (ES / EN)</span>
+            <span class="badge blue">Canvas Apps</span>
+            <span class="badge green">Microsoft 365 Connectors</span>
+            <span class="badge">Delegación & Buenas Prácticas</span>
+        </div>
+    </header>
+
+    <div class="alert">
+        <strong>Nota de Sintaxis Regional:</strong> En entornos configurados en español, el separador de argumentos es <code>;</code> y el encadenamiento de comandos es <code>;;</code>. En inglés, se usa <code>,</code> y <code>;</code> respectivamente. Todos los ejemplos aquí usan la sintaxis estándar internacional (<code>,</code> y <code>;</code>) para evitar conflictos de copia directa; Power Apps los traduce automáticamente si los pegas en la barra de fórmulas o puedes ajustarlos según tu región.
+    </div>
+
+    <!-- SECCIÓN 1: PROYECTO DESDE CERO -->
+    <section id="proyecto-cero">
+        <h3 class="section-title"><span class="num">01</span> Iniciar un Proyecto desde Cero (Checklist de Arquitectura)</h3>
+        <div class="step-list">
+            <div class="step-item">
+                <h4>Paso 1: Capa de Datos (Antes de abrir Power Apps Studio)</h4>
+                <p>Define el origen de datos según volumen, seguridad y licenciamiento:</p>
+                <ul>
+                    <li><strong>SharePoint Lists:</strong> Ideal para licencias estándar M365. Usa columnas simples (Texto, Número, Fecha, Persona) y evita columnas "Lookup" complejas para prevenir problemas de delegación.</li>
+                    <li><strong>Microsoft Dataverse:</strong> Recomendado para relaciones complejas, seguridad a nivel de fila y entornos empresariales (requiere licencia Premium).</li>
+                    <li><strong>SQL Server / PostgreSQL:</strong> Para alto volumen transaccional y vistas/procedimientos almacenados.</li>
+                </ul>
+            </div>
+
+            <div class="step-item">
+                <h4>Paso 2: Configuración Inicial en Power Apps Studio</h4>
+                <ul>
+                    <li>Crear aplicación <strong>Lienzo en blanco (Blank Canvas App)</strong> &rarr; Elegir formato <strong>Tableta (16:9)</strong> para escritorio/web o <strong>Teléfono</strong> para uso móvil.</li>
+                    <li>Ir a <strong>Configuración &rarr; Pantalla</strong>: Desactivar <em>"Ajustar escala para llenar"</em> si deseas diseño responsivo real con contenedores (Horizontal/Vertical Containers).</li>
+                    <li>Ir a <strong>Configuración &rarr; Próximas características</strong>: Activar <em>Fórmulas con nombre (Named Formulas)</em> y <em>Funciones definidas por el usuario (UDFs)</em>.</li>
+                </ul>
+            </div>
+
+            <div class="step-item">
+                <h4>Paso 3: Convención de Nombres (Estándar Oficial Microsoft)</h4>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Control / Objeto</th>
+                            <th>Prefijo</th>
+                            <th>Ejemplo</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Pantalla (Screen)</td><td><code>scr</code></td><td><code>scrInicio</code>, <code>scrDetalleTicket</code></td></tr>
+                        <tr><td>Botón (Button)</td><td><code>btn</code></td><td><code>btnGuardar</code>, <code>btnCancelar</code></td></tr>
+                        <tr><td>Entrada de Texto (TextInput)</td><td><code>txt</code></td><td><code>txtNombreCliente</code>, <code>txtBuscar</code></td></tr>
+                        <tr><td>Etiqueta (Label)</td><td><code>lbl</code></td><td><code>lblTitulo</code>, <code>lblTotalPagar</code></td></tr>
+                        <tr><td>Galería (Gallery)</td><td><code>gal</code></td><td><code>galProductos</code>, <code>galHistorial</code></td></tr>
+                        <tr><td>Desplegable / ComboBox</td><td><code>drp</code> / <code>cmb</code></td><td><code>drpCategoria</code>, <code>cmbUsuarios</code></td></tr>
+                        <tr><td>Formulario (Edit Form)</td><td><code>frm</code></td><td><code>frmRegistroSolicitud</code></td></tr>
+                        <tr><td>Contenedor (Container)</td><td><code>con</code></td><td><code>conHeader</code>, <code>conCuerpoPrincipal</code></td></tr>
+                        <tr><td>Variable Global / Contexto / Colección</td><td><code>gbl</code> / <code>loc</code> / <code>col</code></td><td><code>gblUsuarioActual</code>, <code>locMostrarModal</code>, <code>colCarrito</code></td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="step-item">
+                <h4>Paso 4: Configuración de <code>App.Formulas</code> y <code>App.OnStart</code></h4>
+                <p>Usa <code>App.Formulas</code> (inmutables y reactivas) para constantes y perfil del usuario en lugar de sobrecargar <code>OnStart</code>:</p>
+                <pre><button class="copy-btn" onclick="copyCode(this)">Copiar</button><span class="cmt">// En la propiedad App.Formulas (No requiere Set ni se recalcula manualmente)</span>
+fxUsuarioActual = User();
+fxEsAdmin = !IsBlank(LookUp(Administradores, Correo = User().Email));
+fxColorPrimario = ColorValue("#742774");
+fxColorFondo = ColorValue("#F8FAFC");
+fxVersionApp = "v2.4.0";</pre>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECCIÓN 2: VARIABLES -->
+    <section id="variables">
+        <h3 class="section-title"><span class="num">02</span> Variables, Contexto y Estado</h3>
+        <div class="card-grid">
+            <div class="card">
+                <div class="card-header">
+                    <span class="formula-name">Set() — Variable Global</span>
+                    <span class="tag-prop">Toda la App</span>
+                </div>
+                <p>Crea o actualiza una variable accesible desde cualquier pantalla de la aplicación.</p>
+                <pre><button class="copy-btn" onclick="copyCode(this)">Copiar</button><span class="fn">Set</span>(gblRegistroSeleccionado, ThisItem);
+<span class="fn">Set</span>(gblContador, gblContador + 1);
+<span class="fn">Set</span>(gblRegistroSeleccionado, <span class="fn">Blank</span>()); <span class="cmt">// Limpiar variable</span></pre>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <span class="formula-name">UpdateContext() — Variable Local</span>
+                    <span class="tag-prop">Pantalla Actual</span>
+                </div>
+                <p>Crea variables que solo existen en la pantalla actual (ideal para modales, pestañas o estados de carga).</p>
+                <pre><button class="copy-btn" onclick="copyCode(this)">Copiar</button><span class="fn">UpdateContext</span>({
+    locMostrarModal: <span class="kw">true</span>,
+    locModoEdicion: <span class="kw">false</span>,
+    locMensajeError: <span class="str">""</span>
+});</pre>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <span class="formula-name">With() — Variable Temporal de Cálculo</span>
+                    <span class="tag-prop">Bloque Local</span>
+                </div>
+                <p>Evalúa valores intermedios dentro de una sola fórmula para evitar repetir consultas lentas o cálculos complejos.</p>
+                <pre><button class="copy-btn" onclick="copyCode(this)">Copiar</button><span class="fn">With</span>(
+    {
+        wSubtotal: <span class="fn">Value</span>(txtCantidad.Text) * <span class="fn">Value</span>(txtPrecio.Text),
+        wTasaITBMS: 0.07
+    },
+    wSubtotal + (wSubtotal * wTasaITBMS)
+)</pre>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <span class="formula-name">Reset() & ResetForm()</span>
+                    <span class="tag-prop">Controles</span>
+                </div>
+                <p>Restablece un control o formulario completo a su propiedad <code>Default</code>.</p>
+                <pre><button class="copy-btn" onclick="copyCode(this)">Copiar</button><span class="fn">Reset</span>(txtBuscar);
+<span class="fn">Reset</span>(drpEstado);
+<span class="fn">ResetForm</span>(frmSolicitud);
+<span class="fn">NewForm</span>(frmSolicitud); <span class="cmt">// Prepara formulario para crear nuevo registro</span></pre>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECCIÓN 3: NAVEGACIÓN -->
+    <section id="navegacion">
+        <h3 class="section-title"><span class="num">03</span> Navegación, Pantallas y Sesión</h3>
+        <div class="card-grid">
+            <div class="card">
+                <div class="card-header">
+                    <span class="formula-name">Navigate() & Back()</span>
+                    <span class="tag-prop">OnSelect</span>
+                </div>
+                <p>Cambia de pantalla con transición opcional y envía parámetros de contexto directamente a la pantalla destino.</p>
+                <pre><button class="copy-btn" onclick="copyCode(this)">Copiar</button><span class="fn">Navigate</span>(
+    scrDetalle,
+    ScreenTransition.Fade,
+    { locIdRecibido: ThisItem.ID, locSoloLectura: <span class="kw">true</span> }
+);
+
+<span class="cmt">// Volver a la pantalla anterior</span>
+<span class="fn">Back</span>(ScreenTransition.CoverRight);</pre>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <span class="formula-name">Launch() & Param() & Exit()</span>
+                    <span class="tag-prop">URLs / Deep Linking</span>
+                </div>
+                <p>Abre URLs externas, lee parámetros enviados por URL (Deep Linking) o cierra la aplicación.</p>
+                <pre><button class="copy-btn" onclick="copyCode(this)">Copiar</button><span class="cmt">// Abrir enlace en nueva pestaña</span>
+<span class="fn">Launch</span>(<span class="str">"https://portal.empresa.com/ticket/"</span> & ThisItem.ID);
+
+<span class="cmt">// Leer parámetro de URL al abrir app (?ticketId=105)</span>
+<span class="fn">Set</span>(gblTicketURL, <span class="fn">Param</span>(<span class="str">"ticketId"</span>));
+
+<span class="cmt">// Cerrar sesión / salir de la app</span>
+<span class="fn">Exit</span>(<span class="kw">true</span>);</pre>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECCIÓN 4: DATOS Y CRUD -->
+    <section id="datos-crud">
+        <h3 class="section-title"><span class="num">04</span> Operaciones de Datos y CRUD (Delegables)</h3>
+        <div class="card-grid">
+            <div class="card">
+                <div class="card-header">
+                    <span class="formula-name">Patch() — Crear Registro</span>
+                    <span class="tag-prop">Insertar</span>
+                </div>
+                <p>Inserta un nuevo registro en el origen de datos usando <code>Defaults()</code> y captura el registro creado.</p>
+                <pre><button class="copy-btn" onclick="copyCode(this)">Copiar</button><span class="fn">Set</span>(
+    gblNuevoRegistro,
+    <span class="fn">Patch</span>(
+        TicketsSoporte,
+        <span class="fn">Defaults</span>(TicketsSoporte),
+        {
+            Title: txtAsunto.Text,
+            Descripcion: txtDetalle.Text,
+            Prioridad: drpPrioridad.Selected.Value,
+            FechaCreacion: <span class="fn">Now</span>(),
+            SolicitanteCorreo: <span class="fn">User</span>().Email
+        }
+    )
+);</pre>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <span class="formula-name">Patch() — Actualizar Registro</span>
+                    <span class="tag-prop">Modificar</span>
+                </div>
+                <p>Actualiza únicamente las columnas especificadas en un registro existente localizado por <code>LookUp()</code>.</p>
+                <pre><button class="copy-btn" onclick="copyCode(this)">Copiar</button><span class="fn">Patch</span>(
+    TicketsSoporte,
+    <span class="fn">LookUp</span>(TicketsSoporte, ID = gblRegistroSeleccionado.ID),
+    {
+        Estado: <span class="str">"Resuelto"</span>,
+        ComentariosCierre: txtSolucion.Text,
+        FechaCierre: <span class="fn">Now</span>()
+    }
+);</pre>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <span class="formula-name">Filter(), Search() & SortByColumns()</span>
+                    <span class="tag-prop">Galerías / Tablas</span>
+                </div>
+                <p>Filtra y ordena registros de forma delegable en el servidor.</p>
+                <pre><button class="copy-btn" onclick="copyCode(this)">Copiar</button><span class="fn">SortByColumns</span>(
+    <span class="fn">Filter</span>(
+        TicketsSoporte,
+        (drpEstado.Selected.Value = <span class="str">"Todos"</span> || Estado = drpEstado.Selected.Value) &&
+        (<span class="fn">IsBlank</span>(txtBuscar.Text) || <span class="fn">StartsWith</span>(Title, txtBuscar.Text))
+    ),
+    <span class="str">"Created"</span>,
+    SortOrder.Descending
+)</pre>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <span class="formula-name">LookUp() — Buscar Registro Único</span>
+                    <span class="tag-prop">Búsqueda Exacta</span>
+                </div>
+                <p>Devuelve el primer registro que cumple la condición, o extrae directamente un campo específico.</p>
+                <pre><button class="copy-btn" onclick="copyCode(this)">Copiar</button><span class="cmt">// Obtener el registro completo</span>
+<span class="fn">Set</span>(gblCliente, <span class="fn">LookUp</span>(Clientes, RUC = txtRUC.Text));
+
+<span class="cmt">// Obtener solo un campo (ej. Nombre del departamento)</span>
+<span class="fn">LookUp</span>(Departamentos, Codigo = ThisItem.DeptoID, Nombre)</pre>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <span class="formula-name">Remove() & RemoveIf()</span>
+                    <span class="tag-prop">Eliminar</span>
+                </div>
+                <p>Elimina un registro específico o todos los que cumplan una condición.</p>
+                <pre><button class="copy-btn" onclick="copyCode(this)">Copiar</button><span class="cmt">// Eliminar registro puntual</span>
+<span class="fn">Remove</span>(TicketsSoporte, ThisItem);
+
+<span class="cmt">// Eliminar registros temporales de una colección</span>
+<span class="fn">RemoveIf</span>(colCarrito, Cantidad <= 0);</pre>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <span class="formula-name">Refresh() & SubmitForm()</span>
+                    <span class="tag-prop">Formularios</span>
+                </div>
+                <p>Guarda un control <code>EditForm</code> y gestiona acciones en <code>OnSuccess</code> y <code>OnFailure</code>.</p>
+                <pre><button class="copy-btn" onclick="copyCode(this)">Copiar</button><span class="cmt">// En botón Guardar</span>
+<span class="fn">SubmitForm</span>(frmSolicitud);
+
+<span class="cmt">// En propiedad OnSuccess de frmSolicitud</span>
+<span class="fn">Notify</span>(<span class="str">"Registro guardado con ID: "</span> & frmSolicitud.LastSubmit.ID, NotificationType.Success);
+<span class="fn">Back</span>();</pre>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECCIÓN 5: COLECCIONES Y TABLAS -->
+    <section id="colecciones-tablas">
+        <h3 class="section-title"><span class="num">05</span> Colecciones y Manipulación de Tablas en Memoria</h3>
+        <div class="card-grid">
+            <div class="card">
+                <div class="card-header">
+                    <span class="formula-name">ClearCollect() & Collect()</span>
+                    <span class="tag-prop">Memoria Local</span>
+                </div>
+                <p>Crea colecciones locales en RAM para listas desplegables, carritos de compra o caché rápido.</p>
+                <pre><button class="copy-btn" onclick="copyCode(this)">Copiar</button><span class="fn">ClearCollect</span>(
+    colEstados,
+    { Id: 1, Nombre: <span class="str">"Pendiente"</span>, Color: <span class="str">"#F59E0B"</span> },
+    { Id: 2, Nombre: <span class="str">"En Proceso"</span>, Color: <span class="str">"#38BDF8"</span> },
+    { Id: 3, Nombre: <span class="str">"Completado"</span>, Color: <span class="str">"#10B981"</span> }
+);
+
+<span class="cmt">// Agregar ítem sin borrar los existentes</span>
+<span class="fn">Collect</span>(colCarrito, { ProductoId: ThisItem.ID, Cantidad: 1 });</pre>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <span class="formula-name">ForAll() — Bucle / Iteración masiva</span>
+                    <span class="tag-prop">Procesamiento Lote</span>
+                </div>
+                <p>Ejecuta una acción o transformación por cada fila de una tabla o galería (ej. guardar líneas de una factura).</p>
+                <pre><button class="copy-btn" onclick="copyCode(this)">Copiar</button><span class="fn">ForAll</span>(
+    colCarrito <span class="kw">As</span> ItemCarrito,
+    <span class="fn">Patch</span>(
+        DetalleFactura,
+        <span class="fn">Defaults</span>(DetalleFactura),
+        {
+            FacturaID: gblNuevaFactura.ID,
+            Producto: ItemCarrito.Nombre,
+            Cantidad: ItemCarrito.Cantidad,
+            Subtotal: ItemCarrito.Cantidad * ItemCarrito.Precio
+        }
+    )
+);</pre>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <span class="formula-name">AddColumns(), DropColumns(), RenameColumns()</span>
+                    <span class="tag-prop">Moldeo de Tablas</span>
+                </div>
+                <p>Transforma la estructura de una tabla virtual sin modificar el origen de datos.</p>
+                <pre><button class="copy-btn" onclick="copyCode(this)">Copiar</button><span class="fn">AddColumns</span>(
+    Ventas,
+    <span class="str">"TotalConImpuesto"</span>, Precio * Cantidad * 1.07,
+    <span class="str">"NombreCompleto"</span>, Nombre & <span class="str">" "</span> & Apellido
+)</pre>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <span class="formula-name">GroupBy(), Ungroup(), Distinct()</span>
+                    <span class="tag-prop">Agrupación</span>
+                </div>
+                <p>Obtiene valores únicos para filtros o agrupa registros para reportes y gráficos.</p>
+                <pre><button class="copy-btn" onclick="copyCode(this)">Copiar</button><span class="cmt">// Valores únicos para un Dropdown</span>
+<span class="fn">Distinct</span>(Empleados, Departamento)
+
+<span class="cmt">// Agrupar ventas por categoría</span>
+<span class="fn">GroupBy</span>(Ventas, <span class="str">"Categoria"</span>, <span class="str">"RegistrosCategoria"</span>)</pre>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <span class="formula-name">First(), Last(), FirstN(), Index()</span>
+                    <span class="tag-prop">Posición</span>
+                </div>
+                <p>Accede a registros por su posición dentro de una tabla o colección.</p>
+                <pre><button class="copy-btn" onclick="copyCode(this)">Copiar</button><span class="fn">First</span>(colHistorial).Fecha
+<span class="fn">Last</span>(colHistorial).Comentario
+<span class="fn">FirstN</span>(<span class="fn">Sort</span>(Productos, Ventas, SortOrder.Descending), 5) <span class="cmt">// Top 5</span>
+<span class="fn">Index</span>(colPasos, 3).Titulo <span class="cmt">// Tercer elemento exacto</span></pre>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <span class="formula-name">Sequence() — Generador de Series</span>
+                    <span class="tag-prop">Dinámico</span>
+                </div>
+                <p>Genera una tabla numérica al vuelo (útil para paginación, calendarios, estrellas de calificación o repeticiones).</p>
+                <pre><button class="copy-btn" onclick="copyCode(this)">Copiar</button><span class="cmt">// Generar 12 meses [1..12]</span>
+<span class="fn">Sequence</span>(12, 1, 1)
+
+<span class="cmt">// Generar los próximos 7 días desde hoy</span>
+<span class="fn">ForAll</span>(<span class="fn">Sequence</span>(7, 0, 1), <span class="fn">DateAdd</span>(<span class="fn">Today</span>(), Value, TimeUnit.Days))</pre>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECCIÓN 6: LÓGICA Y ERRORES -->
+    <section id="logica-control">
+        <h3 class="section-title"><span class="num">06</span> Lógica, Condicionales y Manejo de Errores</h3>
+        <div class="card-grid">
+            <div class="card">
+                <div class="card-header">
+                    <span class="formula-name">If() & Switch()</span>
+                    <span class="tag-prop">Condicionales</span>
+                </div>
+                <p>Evalúa múltiples condiciones o compara una expresión contra valores exactos.</p>
+                <pre><button class="copy-btn" onclick="copyCode(this)">Copiar</button><span class="fn">Switch</span>(
+    ThisItem.Prioridad,
+    <span class="str">"Alta"</span>, Color.Red,
+    <span class="str">"Media"</span>, Color.Orange,
+    <span class="str">"Baja"</span>, Color.Green,
+    Color.Gray <span class="cmt">// Valor por defecto</span>
+)</pre>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <span class="formula-name">Coalesce() & IsBlank() & IsEmpty()</span>
+                    <span class="tag-prop">Validación Nulos</span>
+                </div>
+                <p><code>Coalesce</code> devuelve el primer argumento que no esté en blanco. <code>IsBlank</code> evalúa valores/campos; <code>IsEmpty</code> evalúa tablas.</p>
+                <pre><button class="copy-btn" onclick="copyCode(this)">Copiar</button><span class="cmt">// Mostrar texto alternativo si el campo es nulo</span>
+<span class="fn">Coalesce</span>(ThisItem.TelefonoSecundario, ThisItem.TelefonoPrincipal, <span class="str">"Sin teléfono"</span>)
+
+<span class="cmt">// Validar formulario antes de enviar</span>
+<span class="kw">If</span>(
+    <span class="fn">IsBlank</span>(txtNombre.Text) || <span class="fn">IsEmpty</span>(colItems),
+    <span class="fn">Notify</span>(<span class="str">"Complete los campos obligatorios"</span>, NotificationType.Warning),
+    <span class="fn">SubmitForm</span>(frmDatos)
+)</pre>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <span class="formula-name">IfError() & IsError() & Errors()</span>
+                    <span class="tag-prop">Try / Catch</span>
+                </div>
+                <p>Captura errores en tiempo de ejecución (como fallos de red o permisos en Patch) sin mostrar banners rojos al usuario.</p>
+                <pre><button class="copy-btn" onclick="copyCode(this)">Copiar</button><span class="fn">IfError</span>(
+    <span class="fn">Patch</span>(Inventario, ThisItem, { Stock: ThisItem.Stock - 1 }),
+    <span class="fn">Notify</span>(<span class="str">"Error al actualizar stock: "</span> & FirstError.Message, NotificationType.Error),
+    <span class="fn">Notify</span>(<span class="str">"Stock actualizado correctamente"</span>, NotificationType.Success)
+)</pre>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <span class="formula-name">Concurrent() — Ejecución Paralela</span>
+                    <span class="tag-prop">Rendimiento</span>
+                </div>
+                <p>Ejecuta múltiples llamadas a conectores simultáneamente en <code>OnStart</code> o <code>OnVisible</code> reduciendo el tiempo de carga hasta un 70%.</p>
+                <pre><button class="copy-btn" onclick="copyCode(this)">Copiar</button><span class="fn">Concurrent</span>(
+    <span class="fn">ClearCollect</span>(colClientes, Clientes),
+    <span class="fn">ClearCollect</span>(colProductos, Productos),
+    <span class="fn">ClearCollect</span>(colCategorias, Categorias)
+);</pre>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECCIÓN 7: TEXTO Y REGEX -->
+    <section id="texto-regex">
+        <h3 class="section-title"><span class="num">07</span> Texto, Formato y Expresiones Regulares</h3>
+        <div class="card-grid">
+            <div class="card">
+                <div class="card-header">
+                    <span class="formula-name">Concat() vs Concatenate()</span>
+                    <span class="tag-prop">Unión de Cadenas</span>
+                </div>
+                <p><code>Concatenate</code> (o <code>&</code>) une cadenas sueltas. <code>Concat</code> une una columna de toda una tabla en un solo texto.</p>
+                <pre><button class="copy-btn" onclick="copyCode(this)">Copiar</button><span class="cmt">// Unir todos los correos de una colección separados por punto y coma</span>
+<span class="fn">Concat</span>(colDestinatarios, Correo, <span class="str">"; "</span>)
+
+<span class="cmt">// Interpolación moderna de cadenas ($"...")</span>
+$<span class="str">"Hola {User().FullName}, tienes {CountRows(colTareas)} tareas pendientes."</span></pre>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <span class="formula-name">IsMatch() & Match() — Validación RegEx</span>
+                    <span class="tag-prop">Validación</span>
+                </div>
+                <p>Valida correos electrónicos, teléfonos, formatos de cédula o extrae patrones mediante expresiones regulares.</p>
+                <pre><button class="copy-btn" onclick="copyCode(this)">Copiar</button><span class="cmt">// Validar formato de correo electrónico</span>
+<span class="fn">IsMatch</span>(txtCorreo.Text, Match.Email)
+
+<span class="cmt">// Validar patrón personalizado (ej. Código TIC-2026-001)</span>
+<span class="fn">IsMatch</span>(txtCodigo.Text, <span class="str">"^TIC-\d{4}-\d{3}$"</span>)</pre>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <span class="formula-name">Left(), Mid(), Right(), Split(), Substitute()</span>
+                    <span class="tag-prop">Extracción</span>
+                </div>
+                <p>Manipula subcadenas, divide textos por delimitadores y limpia caracteres.</p>
+                <pre><button class="copy-btn" onclick="copyCode(this)">Copiar</button><span class="cmt">// Obtener iniciales de nombre y apellido</span>
+<span class="fn">Upper</span>(<span class="fn">Left</span>(<span class="fn">First</span>(<span class="fn">Split</span>(User().FullName, <span class="str">" "</span>)).Value, 1) & 
+      <span class="fn">Left</span>(<span class="fn">Last</span>(<span class="fn">Split</span>(User().FullName, <span class="str">" "</span>)).Value, 1))
+
+<span class="cmt">// Reemplazar texto</span>
+<span class="fn">Substitute</span>(<span class="fn">Trim</span>(txtInput.Text), <span class="str">"-"</span>, <span class="str">""</span>)</pre>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <span class="formula-name">JSON() & ParseJSON()</span>
+                    <span class="tag-prop">Intercambio Datos</span>
+                </div>
+                <p>Serializa colecciones/imágenes a texto JSON para enviar a Power Automate, o lee respuestas JSON complejas.</p>
+                <pre><button class="copy-btn" onclick="copyCode(this)">Copiar</button><span class="cmt">// Convertir colección (incluyendo imágenes) a JSON</span>
+<span class="fn">JSON</span>(colEvidencias, JSONFormat.IncludeBinaryData)
+
+<span class="cmt">// Leer respuesta JSON desde un flujo</span>
+<span class="fn">Text</span>(<span class="fn">ParseJSON</span>(gblRespuestaFlujo).estado)</pre>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECCIÓN 8: FECHAS Y HORAS -->
+    <section id="fechas-horas">
+        <h3 class="section-title"><span class="num">08</span> Fechas, Horas y Cálculos de Calendario</h3>
+        <div class="card-grid">
+            <div class="card">
+                <div class="card-header">
+                    <span class="formula-name">Text() — Formateo de Fechas y Moneda</span>
+                    <span class="tag-prop">Visualización</span>
+                </div>
+                <p>Formatea fechas, horas y números monetarios para etiquetas visuales.</p>
+                <pre><button class="copy-btn" onclick="copyCode(this)">Copiar</button><span class="fn">Text</span>(<span class="fn">Now</span>(), <span class="str">"dd/mm/yyyy hh:mm AM/PM"</span>)
+<span class="fn">Text</span>(<span class="fn">Today</span>(), <span class="str">"dddd, dd 'de' mmmm 'de' yyyy"</span>, <span class="str">"es-PA"</span>)
+<span class="fn">Text</span>(1250.5, <span class="str">"$#,##0.00"</span>)</pre>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <span class="formula-name">DateAdd() & DateDiff()</span>
+                    <span class="tag-prop">Aritmética Temporal</span>
+                </div>
+                <p>Suma o resta días, horas o meses, y calcula diferencias exactas entre dos fechas.</p>
+                <pre><button class="copy-btn" onclick="copyCode(this)">Copiar</button><span class="cmt">// Sumar 15 días a hoy</span>
+<span class="fn">DateAdd</span>(<span class="fn">Today</span>(), 15, TimeUnit.Days)
+
+<span class="cmt">// Días transcurridos desde la creación del ticket</span>
+<span class="fn">DateDiff</span>(ThisItem.FechaCreacion, <span class="fn">Now</span>(), TimeUnit.Days)
+
+<span class="cmt">// Primer y último día del mes actual</span>
+<span class="fn">Date</span>(<span class="fn">Year</span>(<span class="fn">Today</span>()), <span class="fn">Month</span>(<span class="fn">Today</span>()), 1)
+<span class="fn">DateAdd</span>(<span class="fn">DateAdd</span>(<span class="fn">Date</span>(<span class="fn">Year</span>(<span class="fn">Today</span>()), <span class="fn">Month</span>(<span class="fn">Today</span>()), 1), 1, TimeUnit.Months), -1, TimeUnit.Days)</pre>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECCIÓN 9: MATEMÁTICAS -->
+    <section id="matematicas">
+        <h3 class="section-title"><span class="num">09</span> Matemáticas, Agregaciones y Estadística</h3>
+        <div class="card-grid">
+            <div class="card">
+                <div class="card-header">
+                    <span class="formula-name">Sum(), Average(), Min(), Max(), CountRows()</span>
+                    <span class="tag-prop">KPIs / Tarjetas</span>
+                </div>
+                <p>Calcula totales y métricas sobre colecciones o galerías filtradas.</p>
+                <pre><button class="copy-btn" onclick="copyCode(this)">Copiar</button><span class="cmt">// Total de la galería actual</span>
+<span class="fn">Sum</span>(galItems.AllItems, Subtotal)
+
+<span class="cmt">// Contar registros filtrados</span>
+<span class="fn">CountRows</span>(<span class="fn">Filter</span>(Tickets, Estado = <span class="str">"Abierto"</span>))
+
+<span class="cmt">// Promedio redondeado a 2 decimales</span>
+<span class="fn">Round</span>(<span class="fn">Average</span>(Encuestas, Calificacion), 2)</pre>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <span class="formula-name">Round(), RoundUp(), RoundDown(), Mod(), RandBetween()</span>
+                    <span class="tag-prop">Numérico</span>
+                </div>
+                <p>Funciones matemáticas de precisión, residuos y aleatoriedad.</p>
+                <pre><button class="copy-btn" onclick="copyCode(this)">Copiar</button><span class="fn">RoundUp</span>(TotalHoras, 0) <span class="cmt">// Redondea siempre hacia arriba</span>
+<span class="fn">Mod</span>(ThisItem.Indice, 2) = 0 <span class="cmt">// Detectar fila par para efecto cebra</span>
+<span class="fn">RandBetween</span>(100000, 999999) <span class="cmt">// Código PIN aleatorio de 6 dígitos</span></pre>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECCIÓN 10: PROPIEDADES DE OBJETOS Y UI -->
+    <section id="objetos-ui">
+        <h3 class="section-title"><span class="num">10</span> Fórmulas para Objetos, Controles y Diseño UI</h3>
+        <div class="card-grid">
+            <div class="card">
+                <div class="card-header">
+                    <span class="formula-name">Posicionamiento Responsivo (X, Y, Width, Height)</span>
+                    <span class="tag-prop">Layout Dinámico</span>
+                </div>
+                <p>Alinea controles dinámicamente respecto a la pantalla o a controles hermanos sin usar números fijos.</p>
+                <pre><button class="copy-btn" onclick="copyCode(this)">Copiar</button><span class="cmt">// Centrar un modal en pantalla</span>
+X: (App.Width - Self.Width) / 2
+Y: (App.Height - Self.Height) / 2
+
+<span class="cmt">// Ubicar control 16px debajo del control anterior</span>
+Y: lblTitulo.Y + lblTitulo.Height + 16
+Width: Parent.Width - 32</pre>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <span class="formula-name">Galerías: TemplateFill, IsSelected, AllItems</span>
+                    <span class="tag-prop">Gallery</span>
+                </div>
+                <p>Resalta el ítem seleccionado, aplica filas alternas (efecto cebra) y lee valores editados dentro de una galería.</p>
+                <pre><button class="copy-btn" onclick="copyCode(this)">Copiar</button><span class="cmt">// En propiedad TemplateFill de la galería</span>
+<span class="kw">If</span>(
+    ThisItem.IsSelected,
+    <span class="fn">ColorFade</span>(fxColorPrimario, 0.85),
+    <span class="kw">If</span>(<span class="fn">Mod</span>(ThisItem.ID, 2) = 0, ColorValue("#F8FAFC"), Color.White)
+)
+
+<span class="cmt">// Leer valor de un TextInput dentro de la galería</span>
+<span class="fn">Sum</span>(galDetalle.AllItems, <span class="fn">Value</span>(txtCantidadFila.Text))</pre>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <span class="formula-name">Estados de Botón (DisplayMode) & Visibilidad</span>
+                    <span class="tag-prop">UX / Validación</span>
+                </div>
+                <p>Deshabilita botones automáticamente si el formulario es inválido o si está procesando una petición.</p>
+                <pre><button class="copy-btn" onclick="copyCode(this)">Copiar</button><span class="cmt">// En propiedad DisplayMode de btnGuardar</span>
+<span class="kw">If</span>(
+    frmSolicitud.Valid && !locCargando,
+    DisplayMode.Edit,
+    DisplayMode.Disabled
+)
+
+<span class="cmt">// En propiedad Visible de botones administrativos</span>
+fxEsAdmin</pre>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <span class="formula-name">Colores Dinámicos: ColorValue(), RGBA(), ColorFade()</span>
+                    <span class="tag-prop">Estilos</span>
+                </div>
+                <p>Define paletas corporativas en hexadecimal y calcula estados <code>HoverFill</code> y <code>PressedFill</code> automáticamente.</p>
+                <pre><button class="copy-btn" onclick="copyCode(this)">Copiar</button>Fill: <span class="fn">ColorValue</span>(<span class="str">"#742774"</span>)
+HoverFill: <span class="fn">ColorFade</span>(Self.Fill, -0.15) <span class="cmt">// 15% más oscuro</span>
+PressedFill: <span class="fn">ColorFade</span>(Self.Fill, -0.30)
+DisabledFill: <span class="fn">RGBA</span>(148, 163, 184, 0.4)</pre>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECCIÓN 11: POWER AUTOMATE -->
+    <section id="power-automate">
+        <h3 class="section-title"><span class="num">11</span> Integración Bidireccional con Power Automate</h3>
+        <div class="step-list">
+            <div class="step-item">
+                <h4>1. Configuración del Flujo en Power Automate (Trigger V2)</h4>
+                <ul>
+                    <li>Crear un <strong>Flujo de nube instantáneo</strong> con el desencadenador <strong>Power Apps (V2)</strong>.</li>
+                    <li>Definir entradas tipadas (Texto, Número, Booleano, Archivo/Imagen o Correo).</li>
+                    <li>Ejecutar acciones (ej. generar PDF, insertar en SQL, llamar API REST, aprobar).</li>
+                    <li>Finalizar con la acción <strong>Responder a una Power App o flujo</strong> devolviendo variables de salida (ej. <code>urlArchivo</code>, <code>codigoEstado</code>).</li>
+                </ul>
+            </div>
+
+            <div class="step-item">
+                <h4>2. Invocación desde Power Apps y Captura de Respuesta</h4>
+                <pre><button class="copy-btn" onclick="copyCode(this)">Copiar</button><span class="fn">UpdateContext</span>({ locCargando: <span class="kw">true</span> });
+
+<span class="fn">Set</span>(
+    gblResultadoFlujo,
+    MiFlujoGenerarReporte.<span class="fn">Run</span>(
+        ThisItem.ID,
+        <span class="fn">User</span>().Email,
+        <span class="fn">JSON</span>(colLineasReporte)
+    )
+);
+
+<span class="fn">UpdateContext</span>({ locCargando: <span class="kw">false</span> });
+
+<span class="cmt">// Usar el valor devuelto por Power Automate</span>
+<span class="kw">If</span>(
+    !<span class="fn">IsBlank</span>(gblResultadoFlujo.urlpdf),
+    <span class="fn">Launch</span>(gblResultadoFlujo.urlpdf),
+    <span class="fn">Notify</span>(<span class="str">"No se pudo generar el documento"</span>, NotificationType.Error)
+);</pre>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECCIÓN 12: MICROSOFT FORMS -->
+    <section id="ms-forms">
+        <h3 class="section-title"><span class="num">12</span> Integración con Microsoft Forms</h3>
+        <div class="alert">
+            <strong>Arquitectura de Conexión:</strong> Power Apps no tiene un conector directo nativo para leer respuestas de MS Forms en tiempo real. La arquitectura estándar empresarial conecta <strong>MS Forms &rarr; Power Automate &rarr; SharePoint / Dataverse &rarr; Power Apps</strong> (o embebe Forms dentro de Power Apps).
+        </div>
+        <div class="card-grid">
+            <div class="card">
+                <div class="card-header">
+                    <span class="formula-name">Flujo Automatizado Forms &rarr; App</span>
+                    <span class="tag-prop">Backend Sync</span>
+                </div>
+                <p>Cuando un usuario externo llena un MS Form, Power Automate captura los datos y los deposita en la base de datos de tu Power App.</p>
+                <pre><button class="copy-btn" onclick="copyCode(this)">Copiar</button><span class="cmt">// Arquitectura del Flujo:</span>
+1. Trigger: When a new response is submitted (MS Forms)
+2. Action: Get response details (Response Id)
+3. Action: Create item (SharePoint / Dataverse)
+4. En Power Apps: Refresh(OrigenDatos) o galería auto-actualizada</pre>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <span class="formula-name">Embeber MS Forms en Power Apps</span>
+                    <span class="tag-prop">Control HTML / Launch</span>
+                </div>
+                <p>Puedes abrir el formulario pre-rellenado o incrustarlo mediante un control <code>HtmlText</code> (en entorno web) o lanzarlo con parámetros.</p>
+                <pre><button class="copy-btn" onclick="copyCode(this)">Copiar</button><span class="cmt">// Abrir formulario externo desde botón</span>
+<span class="fn">Launch</span>(<span class="str">"https://forms.office.com/r/TuCodigoDeFormulario"</span>);
+
+<span class="cmt">// Incrustar mediante iframe en control HtmlText</span>
+<span class="str">"&lt;iframe width='100%' height='600px' src='https://forms.office.com/r/TuCodigo?embed=true' frameborder='0'&gt;&lt;/iframe&gt;"</span></pre>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECCIÓN 13: OUTLOOK -->
+    <section id="outlook">
+        <h3 class="section-title"><span class="num">13</span> Conector Office 365 Outlook</h3>
+        <p style="color: var(--text-secondary); margin-bottom: 1rem;">Agregar origen de datos: <strong>Office365Outlook</strong>. Permite enviar correos HTML, adjuntar archivos, consultar calendario y crear reuniones.</p>
+        <div class="card-grid">
+            <div class="card">
+                <div class="card-header">
+                    <span class="formula-name">Office365Outlook.SendEmailV2()</span>
+                    <span class="tag-prop">Correo HTML</span>
+                </div>
+                <p>Envía correos con formato HTML enriquecido, copias (CC/BCC) e importancia alta.</p>
+                <pre><button class="copy-btn" onclick="copyCode(this)">Copiar</button>Office365Outlook.<span class="fn">SendEmailV2</span>(
+    txtDestinatario.Text,
+    <span class="str">"Notificación de Solicitud #"</span> & gblNuevoRegistro.ID,
+    <span class="str">"&lt;h3&gt;Solicitud Registrada&lt;/h3&gt;"</span> &
+    <span class="str">"&lt;p&gt;Estimado/a, su solicitud ha sido recibida con estado &lt;b&gt;Pendiente&lt;/b&gt;.&lt;/p&gt;"</span>,
+    {
+        Cc: <span class="fn">User</span>().Email,
+        Importance: <span class="str">"High"</span>
+    }
+);</pre>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <span class="formula-name">SendEmailV2() con Archivos Adjuntos</span>
+                    <span class="tag-prop">Attachments</span>
+                </div>
+                <p>Adjunta archivos cargados desde un control <code>Attachments</code> de un formulario o imágenes tomadas con la cámara.</p>
+                <pre><button class="copy-btn" onclick="copyCode(this)">Copiar</button>Office365Outlook.<span class="fn">SendEmailV2</span>(
+    <span class="str">"soporte@empresa.com"</span>,
+    <span class="str">"Evidencia Adjunta"</span>,
+    <span class="str">"Se adjuntan los archivos correspondientes."</span>,
+    {
+        Attachments: <span class="fn">ForAll</span>(
+            DataCardValueAdjuntos.Attachments,
+            {
+                Name: Name,
+                ContentBytes: Value
+            }
+        )
+    }
+);</pre>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <span class="formula-name">V4CalendarPostItem() — Agendar Reunión</span>
+                    <span class="tag-prop">Calendario</span>
+                </div>
+                <p>Crea un evento en el calendario del usuario o programa una reunión con asistentes.</p>
+                <pre><button class="copy-btn" onclick="copyCode(this)">Copiar</button>Office365Outlook.<span class="fn">V4CalendarPostItem</span>(
+    <span class="fn">LookUp</span>(Office365Outlook.<span class="fn">CalendarGetTablesV2</span>().value, name = <span class="str">"Calendar"</span>).id,
+    <span class="str">"Revisión de Proyecto"</span>,
+    <span class="fn">Text</span>(dtpInicio.SelectedDate, DateTimeFormat.UTC),
+    <span class="fn">Text</span>(<span class="fn">DateAdd</span>(dtpInicio.SelectedDate, 1, TimeUnit.Hours), DateTimeFormat.UTC),
+    <span class="str">"(UTC-05:00) Bogota, Lima, Quito, Rio Branco"</span>,
+    {
+        RequiredAttendees: <span class="str">"colega@empresa.com"</span>,
+        Body: <span class="str">"Sesión de seguimiento generada desde Power Apps."</span>,
+        IsHtml: <span class="kw">true</span>
+    }
+);</pre>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <span class="formula-name">Office365Users — Perfil y Jefatura</span>
+                    <span class="tag-prop">Directorio Activo</span>
+                </div>
+                <p>Complemento esencial junto a Outlook para obtener el gerente (aprobador), foto y departamento del usuario.</p>
+                <pre><button class="copy-btn" onclick="copyCode(this)">Copiar</button><span class="cmt">// Obtener correo del jefe directo para flujo de aprobación</span>
+Office365Users.<span class="fn">ManagerV2</span>(<span class="fn">User</span>().Email).mail
+
+<span class="cmt">// Obtener foto de perfil (en propiedad Image)</span>
+<span class="kw">If</span>(
+    Office365Users.<span class="fn">UserPhotoMetadata</span>(<span class="fn">User</span>().Email).HasPhoto,
+    Office365Users.<span class="fn">UserPhotoV2</span>(<span class="fn">User</span>().Email),
+    imgAvatarPorDefecto
+)</pre>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECCIÓN 14: MICROSOFT TEAMS -->
+    <section id="teams">
+        <h3 class="section-title"><span class="num">14</span> Conector Microsoft Teams</h3>
+        <p style="color: var(--text-secondary); margin-bottom: 1rem;">Agregar origen de datos: <strong>MicrosoftTeams</strong>. Permite publicar mensajes en canales, enviar chats directos y crear reuniones de Teams.</p>
+        <div class="card-grid">
+            <div class="card">
+                <div class="card-header">
+                    <span class="formula-name">PostMessageToChannelV3()</span>
+                    <span class="tag-prop">Canal de Equipo</span>
+                </div>
+                <p>Publica una notificación formateada en HTML dentro de un canal específico de un equipo de Teams.</p>
+                <pre><button class="copy-btn" onclick="copyCode(this)">Copiar</button>MicrosoftTeams.<span class="fn">PostMessageToChannelV3</span>(
+    <span class="str">"ID-DEL-EQUIPO-GUID"</span>,
+    <span class="str">"19:id-del-canal@thread.tacv2"</span>,
+    {
+        content: <span class="str">"&lt;b&gt;Nuevo Ticket Crítico:&lt;/b&gt; "</span> & txtAsunto.Text & <span class="str">"&lt;br&gt;Asignado a: "</span> & cmbTecnico.Selected.DisplayName,
+        contentType: <span class="str">"html"</span>
+    },
+    {
+        subject: <span class="str">"Alerta de Soporte #"</span> & gblNuevoRegistro.ID
+    }
+);</pre>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <span class="formula-name">CreateChat() & PostMessageToConversation()</span>
+                    <span class="tag-prop">Chat Directo 1:1</span>
+                </div>
+                <p>Inicia una conversación privada con un usuario y envía un mensaje directo desde la app.</p>
+                <pre><button class="copy-btn" onclick="copyCode(this)">Copiar</button><span class="fn">With</span>(
+    {
+        wChat: MicrosoftTeams.<span class="fn">CreateChat</span>(
+            <span class="fn">User</span>().Email & <span class="str">";"</span> & cmbAprobador.Selected.Mail,
+            { topic: <span class="str">"Aprobación Pendiente"</span> }
+        )
+    },
+    MicrosoftTeams.<span class="fn">PostMessageToConversation</span>(
+        <span class="str">"Flow bot"</span>,
+        <span class="str">"Chat with flow bot"</span>,
+        {
+            recipient: cmbAprobador.Selected.Mail,
+            messageBody: <span class="str">"Hola, tienes una solicitud pendiente en Power Apps."</span>
+        }
+    )
+);</pre>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <span class="formula-name">CreateTeamsMeeting()</span>
+                    <span class="tag-prop">Videollamada</span>
+                </div>
+                <p>Genera una reunión de Teams instantánea o programada y devuelve el enlace <code>joinUrl</code>.</p>
+                <pre><button class="copy-btn" onclick="copyCode(this)">Copiar</button><span class="fn">Set</span>(
+    gblReunionTeams,
+    MicrosoftTeams.<span class="fn">CreateTeamsMeeting</span>(
+        <span class="fn">LookUp</span>(Office365Outlook.<span class="fn">CalendarGetTablesV2</span>().value, name = <span class="str">"Calendar"</span>).id,
+        <span class="str">"Soporte Remoto Ticket #"</span> & ThisItem.ID,
+        <span class="str">"Sesión técnica generada desde la aplicación."</span>,
+        <span class="str">"UTC"</span>,
+        { dateTime: <span class="fn">Text</span>(<span class="fn">Now</span>(), DateTimeFormat.UTC) },
+        { dateTime: <span class="fn">Text</span>(<span class="fn">DateAdd</span>(<span class="fn">Now</span>(), 30, TimeUnit.Minutes), DateTimeFormat.UTC) },
+        <span class="kw">true</span>,
+        <span class="str">"teamsForBusiness"</span>,
+        { requiredAttendees: ThisItem.SolicitanteCorreo }
+    )
+);
+<span class="cmt">// Unirse inmediatamente</span>
+<span class="fn">Launch</span>(gblReunionTeams.onlineMeeting.joinUrl);</pre>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <span class="formula-name">Host Object (Cuando la App corre dentro de Teams)</span>
+                    <span class="tag-prop">Contexto Teams</span>
+                </div>
+                <p>Detecta si la aplicación está incrustada como pestaña en Microsoft Teams para adaptar el tema visual (oscuro/claro) o leer el ID del canal.</p>
+                <pre><button class="copy-btn" onclick="copyCode(this)">Copiar</button><span class="cmt">// Detectar tema oscuro de Teams</span>
+<span class="kw">If</span>(
+    <span class="fn">Param</span>(<span class="str">"theme"</span>) = <span class="str">"dark"</span>,
+    ColorValue("#1F1F1F"),
+    ColorValue("#FFFFFF")
+)
+
+<span class="cmt">// Obtener ID del equipo donde está alojada la pestaña</span>
+<span class="fn">Param</span>(<span class="str">"groupId"</span>)</pre>
+            </div>
+        </div>
+    </section>
+</main>
+
+<script>
+    // Función para copiar código al portapapeles
+    function copyCode(button) {
+        const pre = button.parentElement;
+        const codeText = pre.innerText.replace('Copiar', '').replace('¡Copiado!', '').trim();
+        navigator.clipboard.writeText(codeText).then(() => {
+            const originalText = button.innerText;
+            button.innerText = '¡Copiado!';
+            button.style.backgroundColor = '#10b981';
+            setTimeout(() => {
+                button.innerText = originalText;
+                button.style.backgroundColor = '#334155';
+            }, 1800);
+        });
+    }
+
+    // Filtro de búsqueda en tiempo real
+    const searchInput = document.getElementById('searchInput');
+    searchInput.addEventListener('input', function() {
+        const query = this.value.toLowerCase().trim();
+        const cards = document.querySelectorAll('.card, .step-item');
+        
+        cards.forEach(card => {
+            const text = card.innerText.toLowerCase();
+            if (text.includes(query)) {
+                card.style.display = '';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+
+        // Ocultar secciones vacías
+        document.querySelectorAll('main section').forEach(sec => {
+            const visibleItems = sec.querySelectorAll('.card:not([style*="display: none"]), .step-item:not([style*="display: none"])');
+            sec.style.display = (query !== '' && visibleItems.length === 0) ? 'none' : '';
+        });
+    });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Guía práctica de Google Antigravity 2.0</title>
+<style>
+:root{--bg:#0b1020;--panel:#131b2e;--panel2:#19243a;--text:#e8eefc;--muted:#a9b6d0;--line:#2b3853;--blue:#76a9ff;--cyan:#6ee7df;--green:#7ee0a1;--yellow:#ffd27a}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--text);font:16px/1.65 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+a{color:var(--blue)}header{padding:58px 22px 42px;background:radial-gradient(ellipse at 80% 0%,#25477d 0,transparent 45%),linear-gradient(135deg,#101a31,#0b1020);border-bottom:1px solid var(--line)}
+.wrap{max-width:1100px;margin:auto;padding:0 22px}h1{font-size:clamp(2rem,5vw,3.4rem);line-height:1.12;margin:10px 0 16px}h2{font-size:1.75rem;margin:0 0 16px}h3{font-size:1.15rem;margin:22px 0 8px;color:#d8e6ff}p{margin:9px 0 14px}.eyebrow{color:var(--cyan);text-transform:uppercase;letter-spacing:.13em;font-size:.8rem;font-weight:700}.lead{font-size:1.15rem;max-width:800px;color:#c8d5ed}.badge{display:inline-block;border:1px solid #45618c;background:#172947;color:#cfe0ff;border-radius:99px;padding:5px 11px;font-size:.82rem;margin:5px 5px 0 0}
+.layout{display:grid;grid-template-columns:250px minmax(0,1fr);gap:28px;max-width:1350px;margin:28px auto;padding:0 22px}.toc{position:sticky;top:16px;align-self:start;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px;max-height:calc(100vh - 32px);overflow:auto}.toc strong{display:block;margin-bottom:10px}.toc a{display:block;text-decoration:none;color:var(--muted);padding:5px 0;font-size:.92rem}.toc a:hover{color:white}.content{min-width:0}.section{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:26px;margin:0 0 22px;scroll-margin-top:18px}.note,.warning,.tip{border-left:4px solid var(--blue);background:#17243b;padding:13px 16px;border-radius:8px;margin:16px 0}.warning{border-color:var(--yellow);background:#30291d}.tip{border-color:var(--green);background:#172c2a}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}.card{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:16px}.card h3{margin:0 0 6px}.muted{color:var(--muted)}code,pre{font-family:Consolas,Monaco,monospace}code{background:#0b1427;color:#a9ceff;padding:2px 6px;border-radius:5px}pre{background:#080e1b;border:1px solid var(--line);border-radius:10px;padding:16px;overflow:auto;color:#d5e3ff;white-space:pre-wrap}
+table{width:100%;border-collapse:collapse;margin:12px 0}th,td{border:1px solid var(--line);padding:10px;text-align:left;vertical-align:top}th{background:#1b2a44}ul,ol{padding-left:23px}li{margin:5px 0}.flow{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:16px 0}.step{background:#1b2b47;border:1px solid #3b5279;border-radius:9px;padding:9px 12px}.arrow{color:var(--cyan);font-weight:bold}
+footer{color:var(--muted);padding:25px 0 50px;font-size:.9rem}.small{font-size:.9rem}.pill{color:var(--green);font-weight:700}
+@media(max-width:850px){.layout{grid-template-columns:1fr}.toc{position:relative;top:0;max-height:none}.grid{grid-template-columns:1fr}.section{padding:20px}}
+@media print{body{background:white;color:#111}.section,.toc,.card{background:white;color:#111;border-color:#bbb}.toc a,a{color:#124c99}.layout{display:block}.toc{position:static;max-height:none}header{background:white;color:#111;border-color:#aaa}.lead,.muted,footer{color:#444}.note,.warning,.tip{background:#f3f3f3}}
+</style>
+</head>
+<body>
+<header>
+<div class="wrap">
+<div class="eyebrow">Manual práctico · edición 2026</div>
+<h1>Domina el administrador de agentes<br>de Google Antigravity 2.0</h1>
+<p class="lead">Una guía paso a paso para entender el entorno que aparece en tu captura, crear proyectos, asignar tareas a agentes, revisar cambios, trabajar con archivos y mantener el control de lo que la IA ejecuta.</p>
+<span class="badge">Windows 10/11</span><span class="badge">Enfoque práctico</span><span class="badge">Ejemplos con Flask, Laravel y web</span>
+</div>
+</header>
+<div class="layout">
+<nav class="toc">
+<strong>Contenido de la guía</strong>
+<a href="#antes">0. Primero: qué aplicación tienes</a>
+<a href="#mapa">1. Reconocer la pantalla</a>
+<a href="#conceptos">2. Conceptos importantes</a>
+<a href="#proyecto">3. Crear un proyecto</a>
+<a href="#agente">4. Iniciar y dirigir un agente</a>
+<a href="#modos">5. Local Mode y Worktree</a>
+<a href="#archivos">6. Files, Review y cambios</a>
+<a href="#terminal">7. Terminal y permisos</a>
+<a href="#comandos">8. Comandos útiles</a>
+<a href="#automatizaciones">9. Automations y tareas programadas</a>
+<a href="#custom">10. Customizations, Skills y MCP</a>
+<a href="#flujo">11. Ejercicio práctico guiado</a>
+<a href="#seguridad">12. Reglas de seguridad</a>
+<a href="#atajos">13. Atajos y solución de problemas</a>
+<a href="#fuentes">14. Documentación oficial</a>
+</nav>
+<main class="content">
+<section class="section" id="antes">
+<h2>0. Primero: qué aplicación tienes</h2>
+<p>La aplicación de tu captura es <strong>Antigravity 2.0</strong>, la aplicación independiente orientada a administrar agentes. No es el editor de código tradicional.</p>
+<div class="grid">
+<div class="card"><h3>Antigravity 2.0</h3><p>Es un centro de control para iniciar agentes, asignarles tareas, organizar proyectos, revisar artefactos y coordinar trabajo en paralelo. Puede operar sobre carpetas locales y realizar tareas sin que tengas que mantener abierto un editor.</p></div>
+<div class="card"><h3>Antigravity IDE</h3><p>Es el entorno de desarrollo con explorador de archivos, editor de código, terminal y capacidades de agente integradas. Google recomienda conservarlo si programas habitualmente.</p></div>
+</div>
+<div class="warning"><strong>Importante:</strong> en Antigravity 2.0 no existe un botón para convertir la pantalla actual en un editor de código completo. Son aplicaciones separadas. Puedes usar ambas: el administrador para coordinar agentes y el IDE (o VS Code) para editar y depurar manualmente.</div>
+<p>La guía se concentra en la aplicación que ya tienes instalada y en los elementos que aparecen en tu captura. Algunas etiquetas pueden variar según la versión y el idioma.</p>
+</section>
+
+<section class="section" id="mapa">
+<h2>1. Reconocer la pantalla principal</h2>
+<p>Tu captura muestra tres zonas: navegación a la izquierda, conversación y resultados en el centro, y un panel de herramientas/contexto a la derecha.</p>
+<div class="card">
+<h3>Mapa simplificado del entorno</h3>
+<pre>┌─────────────────────┬─────────────────────────────────────┐
+│ BARRA IZQUIERDA     │ ÁREA CENTRAL                        │
+│                     │                                     │
+│ + New Conversation  │ Conversación con el agente          │
+│ Automations         │                                     │
+│ Customizations      │ Respuestas, planes y artefactos     │
+│                     │                                     │
+│ Projects            │ Archivos modificados / resultados   │
+│  └ Proyecto         │                                     │
+│                     │ Cuadro para escribir instrucciones  │
+│ Settings            │                                     │
+└─────────────────────┴─────────────────────────────────────┘
+                                      ┌──────────────────────┐
+                                      │ OVERVIEW             │
+                                      │ Review               │
+                                      │ Files                │
+                                      │ Terminal             │
+                                      │ Extensions           │
+                                      └──────────────────────┘</pre>
+</div>
+<table><thead><tr><th>Elemento</th><th>Para qué sirve</th><th>Cuándo lo usarás</th></tr></thead><tbody>
+<tr><td><strong>New Conversation</strong></td><td>Inicia una conversación/sesión nueva con un agente.</td><td>Cuando quieras una tarea nueva o separar trabajos.</td></tr>
+<tr><td><strong>Automations</strong></td><td>Administra tareas que se ejecutan mediante una programación.</td><td>Para comprobaciones recurrentes o trabajos futuros.</td></tr>
+<tr><td><strong>Customizations</strong></td><td>Gestiona personalizaciones como Skills, MCP y otros recursos disponibles.</td><td>Cuando quieras ampliar las capacidades del agente.</td></tr>
+<tr><td><strong>Projects</strong></td><td>Organiza carpetas, repositorios, conversaciones y reglas.</td><td>Es el punto de partida para trabajar sobre tu código.</td></tr>
+<tr><td><strong>Settings</strong></td><td>Configura cuenta, apariencia, modelos, permisos y comportamiento.</td><td>Antes de permitir operaciones importantes.</td></tr>
+<tr><td><strong>Overview</strong></td><td>Acceso contextual a Review, Files, Terminal y Extensions.</td><td>Para inspeccionar el trabajo del agente.</td></tr>
+</tbody></table>
+<div class="note">En tu captura se ve un resultado de dos archivos modificados: <code>index.html</code> y <code>styles.css</code>. El resumen verde/rojo indica líneas añadidas y eliminadas; no significa por sí solo que el trabajo esté correcto.</div>
+</section>
+
+<section class="section" id="conceptos">
+<h2>2. Cuatro conceptos que debes dominar</h2>
+<div class="grid">
+<div class="card"><h3>Project</h3><p>Es el contenedor lógico del trabajo. Puede incluir una o varias carpetas o repositorios relacionados. Define el contexto y los límites a los que acceden los agentes.</p></div>
+<div class="card"><h3>Conversation / Agent</h3><p>Es una sesión de trabajo. Le describes un objetivo, el agente analiza el contexto, propone o ejecuta acciones y presenta resultados para revisión.</p></div>
+<div class="card"><h3>Artifact</h3><p>Es un resultado visible del agente: por ejemplo un plan, un informe, una propuesta o una revisión de cambios. Sirve para inspeccionar y comentar su trabajo.</p></div>
+<div class="card"><h3>Worktree</h3><p>Es un espacio de trabajo Git aislado. Permite que una tarea trabaje separada de tu carpeta principal, reduciendo conflictos entre trabajos paralelos.</p></div>
+</div>
+<p><strong>Ejemplo:</strong> crea un Project llamado <em>Inventario Flask</em>, agrega la carpeta de tu aplicación y abre una conversación para implementar el módulo de productos. Otra conversación podría revisar pruebas o documentación.</p>
+</section>
+
+<section class="section" id="proyecto">
+<h2>3. Crear tu primer Project</h2>
+<ol>
+<li>En la barra izquierda, localiza el icono de carpeta con el signo <strong>+</strong> junto a Projects.</li>
+<li>Selecciona <strong>New Project</strong>.</li>
+<li>Escribe un nombre claro, por ejemplo <code>Flask - Sistema de inventario</code>.</li>
+<li>Usa <strong>Add Folder</strong> y selecciona la carpeta real de tu proyecto. Ejemplo: <code>C:\Projects\inventario-flask</code>.</li>
+<li>Si el proyecto tiene frontend y backend en carpetas/repositorios separados, puedes agregar más de una carpeta relacionada.</li>
+<li>Presiona <strong>Create</strong>.</li>
+<li>Abre la configuración del Project y revisa sus permisos antes de iniciar tareas.</li>
+</ol>
+<div class="tip"><strong>Consejo:</strong> no agregues todo tu disco C: como carpeta de un proyecto. Agrega únicamente las carpetas que el agente necesita. Así reduces accesos innecesarios y confusiones.</div>
+<h3>¿Project o conversación independiente?</h3>
+<p>Para modificar un sistema existente, usa un Project asociado a sus carpetas. Para una consulta general, lluvia de ideas o investigación que no necesita acceder a tu código, una conversación independiente puede ser suficiente.</p>
+</section>
+
+<section class="section" id="agente">
+<h2>4. Iniciar y dirigir un agente</h2>
+<ol>
+<li>Selecciona el Project correspondiente.</li>
+<li>Haz clic en <strong>New Conversation</strong>.</li>
+<li>Escribe una instrucción que explique el resultado que necesitas, las restricciones y cómo comprobarlo.</li>
+<li>Cuando aparezca la selección de modo, elige Local o New Worktree según el tipo de trabajo.</li>
+<li>Lee el plan o las preguntas del agente. No aceptes operaciones que no entiendas.</li>
+<li>Supervisa el progreso y revisa los archivos modificados.</li>
+</ol>
+<h3>Plantilla de una buena instrucción</h3>
+<pre>OBJETIVO:
+[Qué resultado necesito.]
+
+CONTEXTO:
+[Qué aplicación es y cómo está organizada.]
+
+ALCANCE:
+[Archivos o módulos que puede modificar.]
+
+RESTRICCIONES:
+- No cambies tecnologías ni dependencias sin consultarme.
+- No elimines funcionalidades existentes.
+- Mantén el estilo y convenciones actuales.
+- No modifiques archivos de configuración sensibles.
+
+VERIFICACIÓN:
+- Ejecuta las pruebas disponibles.
+- Comprueba errores de sintaxis.
+- Resume los archivos modificados.
+- Indica cualquier prueba que no hayas podido ejecutar.
+
+Antes de hacer cambios importantes, presenta un plan.</pre>
+<div class="note"><strong>Evita instrucciones vagas.</strong> En vez de “mejora mi aplicación”, indica qué pantalla, qué comportamiento esperas y qué no debe cambiar.</div>
+</section>
+
+<section class="section" id="modos">
+<h2>5. Local Mode y New Worktree Mode</h2>
+<table><thead><tr><th>Modo</th><th>Qué ocurre</th><th>Recomendación</th></tr></thead><tbody>
+<tr><td><strong>Local Mode</strong></td><td>El agente trabaja directamente sobre las carpetas activas del Project.</td><td>Úsalo para cambios pequeños y controlados cuando tienes respaldo o Git.</td></tr>
+<tr><td><strong>New Worktree Mode</strong></td><td>Si el repositorio tiene Git, crea un espacio de trabajo separado para esa conversación.</td><td>Úsalo para tareas grandes, experimentos o agentes trabajando en paralelo.</td></tr>
+</tbody></table>
+<div class="warning">Un worktree no sustituye un respaldo. Si la carpeta no está configurada como repositorio Git, el comportamiento puede recurrir a la carpeta local. Verifica el estado del repositorio y confirma dónde se aplicarán los cambios.</div>
+<h3>Flujo sugerido antes de una tarea grande</h3>
+<div class="flow"><span class="step">Guardar cambios</span><span class="arrow">→</span><span class="step">Commit en Git</span><span class="arrow">→</span><span class="step">Crear conversación</span><span class="arrow">→</span><span class="step">New Worktree</span><span class="arrow">→</span><span class="step">Revisar y probar</span></div>
+</section>
+
+<section class="section" id="archivos">
+<h2>6. Files, Review y los cambios del agente</h2>
+<h3>Files</h3><p>Abre la vista <strong>Files</strong> para explorar los archivos asociados al trabajo/proyecto según el contexto disponible. Úsala para ubicar el resultado, no como sustituto de una revisión de código.</p>
+<h3>Review</h3><p>Abre <strong>Review</strong> para inspeccionar los cambios propuestos. Busca el diff: qué líneas se agregaron, cuáles se eliminaron y en qué archivo.</p>
+<h3>Cómo revisar un cambio</h3>
+<ol>
+<li>Identifica todos los archivos modificados.</li>
+<li>Abre cada diff y revisa el contexto alrededor de las líneas cambiadas.</li>
+<li>Comprueba que no haya contraseñas, tokens, claves API ni datos privados añadidos.</li>
+<li>Verifica que no se hayan eliminado funcionalidades o estilos necesarios.</li>
+<li>Ejecuta la aplicación y sus pruebas desde tu entorno de desarrollo.</li>
+<li>Conserva o descarta los cambios utilizando el flujo de revisión disponible en tu versión.</li>
+</ol>
+<div class="tip">En tu captura aparece “2 files changed, +1122 -0”. Eso indica dos archivos con 1.122 líneas añadidas y ninguna eliminada. Revisa el contenido completo: muchas líneas nuevas pueden ser correctas, pero también pueden contener código duplicado o innecesario.</div>
+</section>
+
+<section class="section" id="terminal">
+<h2>7. Terminal y permisos</h2>
+<p>La opción <strong>Terminal</strong> permite consultar la actividad de comandos y, según la versión y el contexto, interactuar con una terminal. El agente también puede solicitar ejecutar comandos para instalar paquetes, correr pruebas o iniciar servicios.</p>
+<h3>Antes de aprobar un comando</h3>
+<ul>
+<li>Lee el comando completo y comprueba en qué carpeta se ejecutará.</li>
+<li>Ten especial cuidado con <code>del</code>, <code>rmdir</code>, <code>Remove-Item</code>, scripts descargados y comandos que cambien permisos.</li>
+<li>No compartas credenciales ni pegues claves API en conversaciones.</li>
+<li>Revisa si el comando instala dependencias o modifica archivos de configuración.</li>
+<li>Para bases de datos, exige respaldo antes de ejecutar migraciones destructivas o borrar datos.</li>
+</ul>
+<p>En <strong>Settings → Project Settings → Agent Settings</strong> puedes encontrar controles relativos a ejecución de terminal, acceso a archivos fuera de las carpetas del Project y sandbox, según plataforma y configuración.</p>
+<div class="warning"><strong>Regla práctica:</strong> para empezar, conserva las opciones de confirmación. No configures permisos amplios para que el agente ejecute cualquier comando sin preguntar.</div>
+</section>
+
+<section class="section" id="comandos">
+<h2>8. Comandos útiles para escribir en el prompt</h2>
+<p>Antigravity 2.0 admite comandos con barra. Escribe <code>/</code> en el cuadro de entrada para consultar las opciones disponibles en tu versión.</p>
+<table><thead><tr><th>Comando</th><th>Uso</th><th>Ejemplo</th></tr></thead><tbody>
+<tr><td><code>/goal</code></td><td>Indica que el agente continúe hasta completar el objetivo, sin detenerse a pedir confirmación intermedia para cada paso normal.</td><td><code>/goal Implementa la búsqueda de productos y ejecuta las pruebas.</code></td></tr>
+<tr><td><code>/grill-me</code></td><td>Hace que el agente te entreviste para aclarar requisitos antes de implementar.</td><td><code>/grill-me Quiero crear un módulo de inventario.</code></td></tr>
+<tr><td><code>/schedule</code></td><td>Programa una tarea futura o recurrente mediante Scheduled Tasks.</td><td><code>/schedule Revisa semanalmente los enlaces rotos del sitio.</code></td></tr>
+<tr><td><code>/browser</code></td><td>Solicita explícitamente el uso del navegador para investigación o comprobaciones web.</td><td><code>/browser Comprueba el flujo de registro en Chrome.</code></td></tr>
+</tbody></table>
+<div class="warning">No interpretes <code>/goal</code> como autorización para saltarse la seguridad: sigue revisando permisos, comandos peligrosos y cambios importantes. La disponibilidad y sintaxis exacta puede cambiar; el menú que aparece al escribir <code>/</code> es la referencia de tu instalación.</div>
+</section>
+
+<section class="section" id="automatizaciones">
+<h2>9. Automations y tareas programadas</h2>
+<p>La sección <strong>Automations</strong> sirve para administrar ejecuciones que no necesitas iniciar manualmente cada vez. Antigravity 2.0 incorpora Scheduled Tasks, incluyendo programaciones recurrentes y temporizadores de una sola ejecución.</p>
+<p>Ideas de uso para un desarrollador:</p>
+<ul>
+<li>Una vez por semana: revisar documentación pendiente del proyecto.</li>
+<li>Cada mañana: analizar un conjunto de registros de prueba y generar un resumen.</li>
+<li>Una sola vez: ejecutar una tarea de mantenimiento a una hora futura.</li>
+</ul>
+<h3>Cómo diseñar una automatización responsable</h3>
+<ol>
+<li>Define una tarea acotada y repetible.</li>
+<li>Especifica el proyecto y los archivos que puede consultar.</li>
+<li>Indica qué debe entregar: por ejemplo, un informe, no cambios automáticos.</li>
+<li>Configura una frecuencia razonable y revisa la zona horaria.</li>
+<li>Comprueba el resultado de la primera ejecución antes de dejarla recurrente.</li>
+</ol>
+<div class="note">No programes inicialmente tareas que borren archivos, desplieguen a producción o modifiquen bases de datos reales sin revisión humana.</div>
+</section>
+
+<section class="section" id="custom">
+<h2>10. Customizations: Skills, MCP y extensiones</h2>
+<p>Esta sección permite ampliar lo que el agente sabe hacer o las herramientas con las que puede interactuar. Los elementos concretos que aparecen dependen de tu versión y configuración.</p>
+<div class="grid">
+<div class="card"><h3>Skills</h3><p>Instrucciones reutilizables para enseñar al agente un procedimiento especializado. Por ejemplo, convenciones para crear módulos Flask o revisar un proyecto Laravel.</p></div>
+<div class="card"><h3>MCP servers</h3><p>Conectan el agente con herramientas o fuentes de datos externas mediante el Model Context Protocol. Revisa cuidadosamente qué datos y acciones permite cada servidor.</p></div>
+<div class="card"><h3>Extensions</h3><p>Integraciones o extensiones disponibles para añadir capacidades al entorno. Comprueba el origen y los permisos antes de instalarlas.</p></div>
+<div class="card"><h3>Hooks</h3><p>Reglas o acciones configurables que pueden intervenir en determinados momentos del ciclo del agente, según las capacidades habilitadas.</p></div>
+</div>
+<p><strong>Ejemplo de Skill que te sería útil:</strong> “Desarrollar aplicaciones Flask siguiendo mi estructura MVC, usando Flask-MySQLdb, sin SQLAlchemy ni Flask-WTF, con consultas parametrizadas y plantillas Tailwind”. La Skill debería contener instrucciones concretas, no solamente una descripción general.</p>
+</section>
+
+<section class="section" id="flujo">
+<h2>11. Ejercicio práctico: crear una página sencilla</h2>
+<p>Vamos a practicar con una carpeta de prueba, no con tu proyecto de producción. Crea una carpeta <code>C:\Projects\antigravity-practica</code> y agrega un archivo <code>index.html</code> vacío o una página sencilla.</p>
+<h3>Parte A — Crear el Project</h3>
+<ol><li>Crea el Project <code>Antigravity - Práctica HTML</code>.</li><li>Agrega solamente la carpeta de práctica.</li><li>Inicia una conversación en Local Mode para este ejercicio pequeño.</li></ol>
+<h3>Parte B — Pedir un plan antes de editar</h3>
+<pre>/grill-me
+Quiero crear una página web personal de presentación con HTML y CSS.
+Debe ser adaptable a móviles, tener una sección de presentación,
+servicios, proyectos y contacto. No uses frameworks ni JavaScript.
+Antes de modificar archivos, pregúntame lo necesario y presenta
+un plan de implementación.</pre>
+<h3>Parte C — Implementar</h3>
+<p>Cuando estés de acuerdo con el plan, solicita la implementación:</p>
+<pre>/goal
+Implementa la página aprobada. Separa el contenido en index.html
+y styles.css. Usa HTML semántico, CSS responsive y buenas prácticas
+de accesibilidad. No agregues dependencias. Al terminar, revisa
+los archivos y explica cómo abrir la página en el navegador.</pre>
+<h3>Parte D — Revisar</h3>
+<ol><li>Abre <strong>Review</strong> y examina los dos archivos.</li><li>Abre <strong>Files</strong> y localiza <code>index.html</code> y <code>styles.css</code>.</li><li>Abre la carpeta en tu navegador o IDE y comprueba el diseño.</li><li>Si algo está mal, pide una corrección concreta en la misma conversación.</li></ol>
+<div class="tip"><strong>Objetivo del ejercicio:</strong> aprender el ciclo completo: Project → conversación → instrucción → ejecución → Review → prueba. Cuando domines esto, repite el flujo con una tarea pequeña de Flask o Laravel.</div>
+</section>
+
+<section class="section" id="seguridad">
+<h2>12. Reglas de seguridad para trabajar con tus proyectos</h2>
+<ul>
+<li><strong>Git antes de cambios grandes:</strong> confirma tu trabajo o crea una rama antes de pedir refactorizaciones.</li>
+<li><strong>Respaldo:</strong> conserva una copia independiente de proyectos importantes.</li>
+<li><strong>Secretos:</strong> nunca incluyas archivos <code>.env</code>, contraseñas, tokens o claves privadas en prompts o repositorios.</li>
+<li><strong>Base de datos:</strong> utiliza una base de pruebas; revisa migraciones y scripts antes de ejecutarlos.</li>
+<li><strong>Producción:</strong> no permitas despliegues automáticos sin revisar el diff, las pruebas y el destino.</li>
+<li><strong>Permisos mínimos:</strong> agrega al Project únicamente las carpetas que necesita el agente.</li>
+<li><strong>Revisión humana:</strong> el código generado puede contener errores aunque el agente indique que terminó correctamente.</li>
+</ul>
+</section>
+
+<section class="section" id="atajos">
+<h2>13. Atajos y solución de problemas</h2>
+<table><thead><tr><th>Atajo (Windows/Linux)</th><th>Acción documentada</th></tr></thead><tbody>
+<tr><td><code>Ctrl + K</code></td><td>Abrir selector de conversaciones.</td></tr>
+<tr><td><code>Ctrl + P</code></td><td>Abrir búsqueda de archivos.</td></tr>
+<tr><td><code>Ctrl + L</code></td><td>Enfocar el cuadro de entrada.</td></tr>
+<tr><td><code>Ctrl + N</code></td><td>Crear una conversación nueva.</td></tr>
+<tr><td><code>Alt + ↑ / ↓</code></td><td>Cambiar entre conversaciones anterior/siguiente.</td></tr>
+</tbody></table>
+<h3>Si el agente no encuentra tus archivos</h3>
+<ul><li>Confirma que abriste el Project correcto.</li><li>Comprueba que agregaste la carpeta correcta y que la ruta existe.</li><li>Revisa los permisos de acceso a carpetas.</li></ul>
+<h3>Si no ves un comando o una opción</h3>
+<ul><li>Escribe <code>/</code> en el cuadro de entrada para ver los comandos habilitados.</li><li>Revisa <strong>Settings</strong> y la documentación oficial, porque algunas funciones dependen de la versión.</li><li>Comprueba si estás en Antigravity 2.0 o en Antigravity IDE: no tienen exactamente la misma interfaz.</li></ul>
+<h3>Si quieres editar como en VS Code</h3>
+<p>Abre el proyecto en Antigravity IDE o en VS Code. Antigravity 2.0 puede seguir funcionando como administrador de agentes, mientras el IDE se utiliza para editar, navegar por el código y depurar.</p>
+</section>
+
+<section class="section" id="fuentes">
+<h2>14. Documentación oficial y enlaces</h2>
+<ul>
+<li><a href="https://www.antigravity.google/blog/introducing-google-antigravity-2" target="_blank" rel="noopener">Anuncio oficial de Antigravity 2.0</a> — explica por qué se separó el administrador de agentes del IDE.</li>
+<li><a href="https://www.antigravity.google/docs" target="_blank" rel="noopener">Getting Started y documentación</a> — instalación, creación de proyectos y navegación.</li>
+<li><a href="https://www.antigravity.google/docs/projects" target="_blank" rel="noopener">Documentación de Projects</a> — carpetas, permisos, Local Mode y Worktree.</li>
+<li><a href="https://www.antigravity.google/docs/settings/" target="_blank" rel="noopener">Documentación de Settings</a> — configuración global y por proyecto.</li>
+<li><a href="https://codelabs.developers.google.com/getting-started-google-antigravity?hl=es_419" target="_blank" rel="noopener">Google Codelabs: Primeros pasos con Antigravity</a> — tutorial oficial con recorrido del entorno.</li>
+<li><a href="https://www.antigravity.google/download" target="_blank" rel="noopener">Descargas oficiales</a> — Antigravity 2.0, Antigravity IDE y otras superficies disponibles.</li>
+</ul>
+<p class="small muted">Esta guía es un material de aprendizaje elaborado a partir de la documentación pública de Google consultada en noviembre de 2026 y de la interfaz visible en la captura compartida. La interfaz, los nombres de controles, los comandos y la disponibilidad de funciones pueden cambiar con las actualizaciones.</p>
+</section>
+<footer>
+<strong>Fin de la guía.</strong> Recomendación: practica primero con una carpeta de prueba y, cuando domines Projects, conversaciones y Review, pasa a un proyecto real con Git y respaldo.
+</footer>
+</main>
+</div>
+</body>
+</html>

@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Docker en Linux: de cero a avanzado</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{--bg:#f4f7fb;--fg:#13202f;--mut:#566577;--card:#fff;--line:#d8e0ea;--acc:#1558d6;--code:#0e1a29;--codefg:#e4ecf6;--warn:#fff3d1;--warnb:#d9a520;--tip:#e2f5ea;--tipb:#2a9a5e;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0b121b;--fg:#e3eaf3;--mut:#9aa8b9;--card:#121c28;--line:#25344a;--acc:#6aa4ff;--code:#060b12;--warn:#2e2610;--warnb:#b8901c;--tip:#0f2a1c;--tipb:#3cb878}}
+:root[data-theme="dark"]{--bg:#0b121b;--fg:#e3eaf3;--mut:#9aa8b9;--card:#121c28;--line:#25344a;--acc:#6aa4ff;--code:#060b12;--warn:#2e2610;--warnb:#b8901c;--tip:#0f2a1c;--tipb:#3cb878}
+html{scroll-padding-top:12px;height:100%}
+body{margin:0;background:var(--bg);color:var(--fg);font:17px/1.65 "IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif}
+main{max-width:820px;margin:0 auto;padding:28px 18px 60px}
+h1{font-size:2.2rem;line-height:1.15;margin:.2em 0 .3em;letter-spacing:-.02em}
+h2{font-size:1.55rem;margin:2.4em 0 .5em;padding-top:.6em;border-top:2px solid var(--acc)}
+h3{font-size:1.1rem;margin:1.6em 0 .3em}
+p,li{max-width:70ch}
+a{color:var(--acc)}
+code{font-family:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;font-size:.88em}
+:not(pre)>code{background:var(--card);border:1px solid var(--line);border-radius:5px;padding:1px 5px}
+pre{position:relative;background:var(--code);color:var(--codefg);border-radius:8px;padding:14px 16px;overflow-x:auto;margin:.8em 0;line-height:1.5}
+pre code{font-size:.85rem}
+pre button{position:absolute;top:6px;right:6px;font:12px "IBM Plex Sans",sans-serif;background:#25344a;color:#e4ecf6;border:0;border-radius:5px;padding:3px 9px;cursor:pointer}
+pre button:focus-visible,a:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+.note,.tip{border-left:4px solid var(--warnb);background:var(--warn);padding:10px 14px;border-radius:0 8px 8px 0;margin:1em 0}
+.tip{border-color:var(--tipb);background:var(--tip)}
+.toc{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:8px;margin:1.4em 0;padding:0;list-style:none}
+.toc a{display:block;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:9px 12px;text-decoration:none;color:var(--fg)}
+.toc a:hover{border-color:var(--acc)}
+.tw{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:.95rem}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+th{background:var(--card)}
+.sub{color:var(--mut)}
+</style>
+</head>
+<body>
+<main>
+<h1>Docker en Linux: de cero a avanzado</h1>
+<p class="sub">Guía paso a paso para principiantes. Instalación con el repositorio oficial de Docker Engine (serie 29.x) y el plugin Compose, probada para Ubuntu y Debian. Verificada en noviembre de 2026.</p>
+<ul class="toc">
+<li><a href="#que">1. Qué es Docker</a></li>
+<li><a href="#instalar">2. Instalación</a></li>
+<li><a href="#post">3. Configuración inicial</a></li>
+<li><a href="#basico">4. Comandos esenciales</a></li>
+<li><a href="#datos">5. Volúmenes y redes</a></li>
+<li><a href="#build">6. Tu propia imagen</a></li>
+<li><a href="#compose">7. Docker Compose</a></li>
+<li><a href="#avanzado">8. Nivel avanzado</a></li>
+<li><a href="#fallas">9. Solución de problemas</a></li>
+</ul>
+
+<h2 id="que">1. Qué es Docker</h2>
+<p>Docker empaqueta una aplicación con todo lo que necesita para funcionar, de modo que corre igual en tu laptop, en un servidor o en la nube.</p>
+<ul>
+<li><b>Imagen:</b> plantilla de solo lectura (por ejemplo <code>nginx</code>).</li>
+<li><b>Contenedor:</b> una imagen en ejecución. Es desechable.</li>
+<li><b>Volumen:</b> carpeta persistente. Sin volumen, los datos se pierden al borrar el contenedor.</li>
+<li><b>Red:</b> canal por el que los contenedores se hablan entre sí.</li>
+<li><b>Compose:</b> un archivo <code>compose.yaml</code> que describe varios contenedores y se levanta con un solo comando.</li>
+</ul>
+
+<h2 id="instalar">2. Instalación (Ubuntu / Debian)</h2>
+<p>Usa el repositorio oficial. El paquete <code>docker.io</code> de Ubuntu suele ir atrasado y no es el recomendado.</p>
+<h3>Paso 1: comprueba tu sistema</h3>
+<pre><code>. /etc/os-release &amp;&amp; echo "$PRETTY_NAME"; uname -m</code></pre>
+<p>Necesitas una versión de 64 bits soportada. La lista vigente está en <a href="https://docs.docker.com/engine/install/">docs.docker.com/engine/install</a>.</p>
+<h3>Paso 2: elimina paquetes que chocan</h3>
+<pre><code>sudo apt remove $(dpkg --get-selections docker.io docker-compose docker-compose-v2 docker-doc podman-docker containerd runc | cut -f1)</code></pre>
+<p>Si dice que no hay nada instalado, está bien.</p>
+<h3>Paso 3: agrega el repositorio de Docker</h3>
+<p>Este ejemplo es para Ubuntu. En Debian cambia <code>ubuntu</code> por <code>debian</code> en las dos URL.</p>
+<pre><code>sudo apt update
+sudo apt install -y ca-certificates curl
+sudo install -m 0755 -d /etc/apt/keyrings
+sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+sudo chmod a+r /etc/apt/keyrings/docker.asc
+
+sudo tee /etc/apt/sources.list.d/docker.sources &lt;&lt;EOF
+Types: deb
+URIs: https://download.docker.com/linux/ubuntu
+Suites: $(. /etc/os-release &amp;&amp; echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}")
+Components: stable
+Signed-By: /etc/apt/keyrings/docker.asc
+EOF
+sudo apt update</code></pre>
+<h3>Paso 4: instala Docker Engine y Compose</h3>
+<pre><code>sudo apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin</code></pre>
+<h3>Paso 5: verifica</h3>
+<pre><code>sudo systemctl status docker --no-pager
+sudo docker run hello-world
+docker --version
+docker compose version</code></pre>
+<p>Si ves el mensaje “Hello from Docker!”, ya funciona.</p>
+<div class="tip"><b>Otras distros.</b> Fedora: <code>sudo dnf config-manager addrepo --from-repofile=https://download.docker.com/linux/fedora/docker-ce.repo</code> y luego <code>sudo dnf install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin</code>. Atajo solo para aprender: <code>curl -fsSL https://get.docker.com | sudo sh</code>. En servidores reales prefiere el repositorio, porque el script puede subir de versión mayor sin avisar.</div>
+
+<h2 id="post">3. Configuración inicial</h2>
+<h3>Usar Docker sin escribir sudo</h3>
+<pre><code>sudo usermod -aG docker $USER
+newgrp docker
+docker run --rm hello-world</code></pre>
+<div class="note"><b>Ojo:</b> pertenecer al grupo <code>docker</code> equivale a tener permisos de root en la máquina. Hazlo solo con usuarios de confianza.</div>
+<h3>Arrancar con el sistema</h3>
+<pre><code>sudo systemctl enable --now docker containerd</code></pre>
+<h3>Limitar el tamaño de los logs</h3>
+<p>Sin límite, los logs pueden llenar el disco. Crea <code>/etc/docker/daemon.json</code>:</p>
+<pre><code>{
+  "log-driver": "json-file",
+  "log-opts": { "max-size": "10m", "max-file": "3" }
+}</code></pre>
+<pre><code>sudo systemctl restart docker</code></pre>
+<p>Afecta a los contenedores que crees después del reinicio.</p>
+
+<h2 id="basico">4. Comandos esenciales</h2>
+<pre><code>docker run -d --name web -p 8080:80 nginx   # crea y arranca en segundo plano
+docker ps                                   # contenedores activos (-a: todos)
+docker logs -f web                          # ver logs en vivo
+docker exec -it web sh                      # entrar al contenedor
+docker stop web &amp;&amp; docker rm web            # detener y borrar
+docker images                               # imágenes locales
+docker pull nginx:1.27                      # descargar una versión concreta
+docker rmi nginx                            # borrar imagen
+docker stats                                # CPU y RAM en vivo</code></pre>
+<p>Abre <code>http://localhost:8080</code> para ver nginx. En <code>-p 8080:80</code>, el primer número es el puerto de tu máquina y el segundo el del contenedor.</p>
+<div class="tip">Evita la etiqueta <code>latest</code> en proyectos serios. Fija una versión (<code>nginx:1.27</code>) para que una actualización no te rompa nada por sorpresa.</div>
+
+<h2 id="datos">5. Volúmenes y redes</h2>
+<h3>Volúmenes (datos que sobreviven)</h3>
+<pre><code>docker volume create datos
+docker run -d --name db -e POSTGRES_PASSWORD=cambiame \
+  -v datos:/var/lib/postgresql/data postgres:17
+docker volume ls
+docker volume inspect datos</code></pre>
+<p>Un <i>bind mount</i> enlaza una carpeta de tu disco: <code>-v $(pwd)/site:/usr/share/nginx/html:ro</code>. El <code>:ro</code> lo deja de solo lectura.</p>
+<h3>Redes (que los contenedores se vean)</h3>
+<pre><code>docker network create mired
+docker run -d --name api --network mired miimagen
+docker run --rm --network mired curlimages/curl http://api:3000</code></pre>
+<p>En una red creada por ti, los contenedores se resuelven por su nombre (<code>api</code>, <code>db</code>). Nunca uses <code>localhost</code> para llegar a otro contenedor: cada uno tiene su propio <code>localhost</code>.</p>
+
+<h2 id="build">6. Crear tu propia imagen</h2>
+<p>Archivo <code>Dockerfile</code> de ejemplo para una app Python:</p>
+<pre><code>FROM python:3.13-slim
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+COPY . .
+USER 10001
+CMD ["python", "app.py"]</code></pre>
+<pre><code>docker build -t miapp:1.0 .
+docker run -d -p 5000:5000 miapp:1.0</code></pre>
+<p>Copiar primero <code>requirements.txt</code> aprovecha la caché: si solo cambias tu código, Docker no reinstala las dependencias. Añade un archivo <code>.dockerignore</code> con <code>.git</code>, <code>node_modules</code> y <code>.env</code> para no meter basura ni secretos en la imagen.</p>
+
+<h2 id="compose">7. Docker Compose</h2>
+<p>Crea una carpeta con este <code>compose.yaml</code>. No lleva la línea <code>version:</code>, porque ya está obsoleta.</p>
+<pre><code>services:
+  web:
+    image: nginx:1.27
+    ports: ["127.0.0.1:8080:80"]
+    volumes: ["./site:/usr/share/nginx/html:ro"]
+    depends_on:
+      db: { condition: service_healthy }
+    restart: unless-stopped
+  db:
+    image: postgres:17
+    environment:
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes: ["dbdata:/var/lib/postgresql/data"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      retries: 10
+    restart: unless-stopped
+volumes:
+  dbdata:</code></pre>
+<pre><code>echo "DB_PASSWORD=$(openssl rand -hex 16)" &gt; .env
+mkdir site &amp;&amp; echo "&lt;h1&gt;Hola Docker&lt;/h1&gt;" &gt; site/index.html
+docker compose up -d        # levantar
+docker compose ps           # estado
+docker compose logs -f web  # logs
+docker compose down         # apagar (conserva volúmenes)
+docker compose down -v      # apagar y BORRAR datos</code></pre>
+
+<h2 id="avanzado">8. Nivel avanzado</h2>
+<h3>Seguridad de puertos y firewall</h3>
+<p>Docker escribe sus propias reglas de red y puede saltarse UFW. Un puerto publicado como <code>-p 5432:5432</code> queda abierto a internet aunque UFW diga que no. Publica solo en local cuando no necesites acceso externo: <code>-p 127.0.0.1:5432:5432</code>. Si accedes desde fuera, ponlo detrás de un proxy inverso con HTTPS.</p>
+<h3>Límites de recursos y endurecimiento</h3>
+<pre><code>docker run -d --name app --memory 512m --cpus 1 \
+  --read-only --tmpfs /tmp --cap-drop ALL \
+  --security-opt no-new-privileges miimagen</code></pre>
+<h3>Políticas de reinicio</h3>
+<p><code>restart: unless-stopped</code> reinicia el contenedor tras un fallo o un reinicio del servidor, salvo que lo detengas tú.</p>
+<h3>Imágenes pequeñas con multi-stage</h3>
+<p>Compila en una etapa y copia solo el resultado a una imagen final ligera:</p>
+<pre><code>FROM node:24 AS build
+WORKDIR /src
+COPY . .
+RUN npm ci &amp;&amp; npm run build
+
+FROM nginx:1.27-alpine
+COPY --from=build /src/dist /usr/share/nginx/html</code></pre>
+<h3>Respaldar y restaurar un volumen</h3>
+<pre><code>docker run --rm -v datos:/d -v $(pwd):/b alpine tar czf /b/datos.tgz -C /d .
+docker run --rm -v datos:/d -v $(pwd):/b alpine tar xzf /b/datos.tgz -C /d</code></pre>
+<h3>Limpieza de disco</h3>
+<pre><code>docker system df            # cuánto ocupa todo
+docker system prune         # borra lo no usado (contenedores parados, redes, caché)
+docker image prune -a       # borra imágenes sin contenedor</code></pre>
+<h3>Otras herramientas que conviene conocer</h3>
+<ul>
+<li><b>Rootless:</b> Docker sin privilegios de root (<code>dockerd-rootless-setuptool.sh install</code>), más seguro y con algunas limitaciones.</li>
+<li><b>Buildx:</b> construye imágenes para varias arquitecturas, por ejemplo <code>--platform linux/amd64,linux/arm64</code>.</li>
+<li><b>Context:</b> <code>docker context create srv --docker "host=ssh://usuario@servidor"</code> controla un Docker remoto por SSH.</li>
+<li><b>Actualizar:</b> <code>sudo apt update &amp;&amp; sudo apt install --only-upgrade docker-ce docker-ce-cli containerd.io docker-compose-plugin</code>.</li>
+<li><b>GPU NVIDIA:</b> instala <code>nvidia-container-toolkit</code> y usa <code>--gpus all</code>. Lo necesitarás para correr IA local rápida.</li>
+</ul>
+
+<h2 id="fallas">9. Solución de problemas</h2>
+<div class="tw"><table>
+<tr><th>Síntoma</th><th>Causa probable y solución</th></tr>
+<tr><td><code>permission denied ... docker.sock</code></td><td>No estás en el grupo docker. Ejecuta <code>sudo usermod -aG docker $USER</code> y vuelve a iniciar sesión.</td></tr>
+<tr><td><code>port is already allocated</code></td><td>Otro programa usa ese puerto. Revisa con <code>sudo ss -tlnp | grep 8080</code> o cambia el puerto.</td></tr>
+<tr><td>El contenedor se detiene al instante</td><td>Mira <code>docker logs nombre</code>. Casi siempre falta una variable de entorno o el comando falló.</td></tr>
+<tr><td>Un contenedor no alcanza a otro</td><td>Deben estar en la misma red y usar el nombre del servicio, no <code>localhost</code>.</td></tr>
+<tr><td>Disco lleno</td><td>Ejecuta <code>docker system df</code> y luego <code>docker system prune</code>. Configura la rotación de logs (sección 3).</td></tr>
+<tr><td><code>apt update</code> falla tras añadir el repo</td><td>Revisa el nombre de versión con <code>. /etc/os-release &amp;&amp; echo $VERSION_CODENAME</code> y el archivo <code>docker.sources</code>.</td></tr>
+</table></div>
+<div class="tip"><b>Siguiente paso:</b> con Docker funcionando, sigue con la guía de n8n e IA local, que usa todo lo de las secciones 5, 7 y 8.</div>
+</main>
+<script>
+document.querySelectorAll('pre').forEach(function(p){var b=document.createElement('button');b.type='button';b.textContent='Copiar';b.onclick=async function(){try{await navigator.clipboard.writeText(p.querySelector('code').innerText);b.textContent='Copiado'}catch(e){b.textContent='Selecciona y copia'}setTimeout(function(){b.textContent='Copiar'},1800)};p.appendChild(b)});
+</script>
+</body>
+</html>

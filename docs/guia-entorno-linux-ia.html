@@ -1,0 +1,1318 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guía Definitiva de Entorno IA & Desarrollo: Linux Mint y Ubuntu</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #090d16;
+            --bg-secondary: #111827;
+            --bg-card: rgba(17, 24, 39, 0.72);
+            --bg-code: #060911;
+            --border-color: rgba(148, 163, 184, 0.14);
+            --border-glow: rgba(56, 189, 248, 0.45);
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --accent-cyan: #38bdf8;
+            --accent-purple: #a855f7;
+            --accent-mint: #10b981;
+            --accent-ubuntu: #f97316;
+            --accent-amber: #fbbf24;
+            --shadow-glow: 0 0 30px rgba(56, 189, 248, 0.12);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.65;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Fondo animado sutil */
+        .bg-mesh {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(110px);
+            opacity: 0.25;
+            animation: floatOrb 18s ease-in-out infinite alternate;
+        }
+
+        .orb-1 {
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, var(--accent-cyan), transparent 70%);
+            top: -120px;
+            left: -100px;
+        }
+
+        .orb-2 {
+            width: 450px;
+            height: 450px;
+            background: radial-gradient(circle, var(--accent-purple), transparent 70%);
+            bottom: -100px;
+            right: -80px;
+            animation-delay: -6s;
+        }
+
+        .orb-3 {
+            width: 350px;
+            height: 350px;
+            background: radial-gradient(circle, var(--accent-mint), transparent 70%);
+            top: 45%;
+            left: 40%;
+            opacity: 0.12;
+            animation-delay: -12s;
+        }
+
+        @keyframes floatOrb {
+            0% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(40px, -30px) scale(1.08); }
+            100% { transform: translate(-30px, 40px) scale(0.95); }
+        }
+
+        /* Barra de progreso superior */
+        .progress-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: rgba(255, 255, 255, 0.05);
+            z-index: 1000;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--accent-cyan), var(--accent-purple), var(--accent-mint));
+            transition: width 0.1s ease-out;
+        }
+
+        /* Layout principal */
+        .layout-wrapper {
+            max-width: 1360px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 2.5rem;
+            padding: 2rem;
+        }
+
+        /* Sidebar / Índice interactivo */
+        .sidebar {
+            position: sticky;
+            top: 2rem;
+            height: calc(100vh - 4rem);
+            background: var(--bg-card);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .sidebar::-webkit-scrollbar {
+            width: 5px;
+        }
+        .sidebar::-webkit-scrollbar-thumb {
+            background: rgba(148, 163, 184, 0.25);
+            border-radius: 10px;
+        }
+
+        .brand-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--accent-cyan);
+            background: rgba(56, 189, 248, 0.1);
+            border: 1px solid rgba(56, 189, 248, 0.25);
+            padding: 0.35rem 0.75rem;
+            border-radius: 999px;
+            margin-bottom: 1rem;
+            width: fit-content;
+        }
+
+        .pulse-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: var(--accent-mint);
+            box-shadow: 0 0 8px var(--accent-mint);
+            animation: pulseDot 2s infinite;
+        }
+
+        @keyframes pulseDot {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(1.3); }
+        }
+
+        .sidebar-title {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 1.25rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .nav-group-label {
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-muted);
+            margin: 1rem 0 0.45rem 0.5rem;
+        }
+
+        .nav-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+            padding: 0.55rem 0.75rem;
+            border-radius: 10px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.86rem;
+            font-weight: 500;
+            transition: all 0.22s ease;
+            border: 1px solid transparent;
+        }
+
+        .nav-link:hover {
+            color: var(--text-primary);
+            background: rgba(255, 255, 255, 0.05);
+            transform: translateX(4px);
+        }
+
+        .nav-link.active {
+            color: var(--accent-cyan);
+            background: rgba(56, 189, 248, 0.12);
+            border-color: rgba(56, 189, 248, 0.3);
+            font-weight: 600;
+        }
+
+        .step-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 22px;
+            height: 22px;
+            font-size: 0.72rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            border-radius: 6px;
+            background: rgba(148, 163, 184, 0.14);
+            color: var(--text-primary);
+        }
+
+        .nav-link.active .step-num {
+            background: var(--accent-cyan);
+            color: #090d16;
+        }
+
+        /* Contenido principal */
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            gap: 2.25rem;
+            padding-bottom: 4rem;
+        }
+
+        /* Hero Header */
+        .hero {
+            background: linear-gradient(135deg, rgba(17, 24, 39, 0.9), rgba(15, 23, 42, 0.75));
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 2.75rem;
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--shadow-glow);
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent-mint), var(--accent-cyan), var(--accent-purple), var(--accent-ubuntu));
+        }
+
+        .hero h1 {
+            font-size: clamp(1.85rem, 3.2vw, 2.65rem);
+            font-weight: 800;
+            letter-spacing: -0.025em;
+            line-height: 1.2;
+            margin-bottom: 1rem;
+            background: linear-gradient(to right, #ffffff, #cbd5e1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero p {
+            color: var(--text-secondary);
+            font-size: 1.05rem;
+            max-width: 780px;
+            margin-bottom: 1.75rem;
+        }
+
+        /* Filtro / Selector de Distro rápido */
+        .distro-filter-bar {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.75rem;
+            padding-top: 1.25rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .filter-label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-right: 0.25rem;
+        }
+
+        .distro-btn {
+            cursor: pointer;
+            border: 1px solid var(--border-color);
+            background: rgba(255, 255, 255, 0.04);
+            color: var(--text-secondary);
+            padding: 0.5rem 1rem;
+            border-radius: 10px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            transition: all 0.2s ease;
+        }
+
+        .distro-btn:hover {
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--text-primary);
+        }
+
+        .distro-btn.active[data-filter="all"] {
+            background: rgba(56, 189, 248, 0.16);
+            border-color: var(--accent-cyan);
+            color: var(--accent-cyan);
+        }
+
+        .distro-btn.active[data-filter="mint"] {
+            background: rgba(16, 185, 129, 0.16);
+            border-color: var(--accent-mint);
+            color: var(--accent-mint);
+        }
+
+        .distro-btn.active[data-filter="ubuntu"] {
+            background: rgba(249, 115, 22, 0.16);
+            border-color: var(--accent-ubuntu);
+            color: var(--accent-ubuntu);
+        }
+
+        /* Tarjetas de Pasos */
+        .step-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 2.25rem;
+            transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease, box-shadow 0.3s ease;
+            opacity: 0;
+            transform: translateY(24px);
+            scroll-margin-top: 2rem;
+        }
+
+        .step-card.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .step-card:hover {
+            border-color: rgba(56, 189, 248, 0.32);
+            box-shadow: 0 18px 38px rgba(0, 0, 0, 0.35);
+        }
+
+        .step-header {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .step-title-group {
+            display: flex;
+            align-items: center;
+            gap: 0.9rem;
+        }
+
+        .step-badge-large {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.35rem 0.85rem;
+            border-radius: 10px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.82rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, rgba(56, 189, 248, 0.2), rgba(168, 85, 247, 0.2));
+            border: 1px solid rgba(56, 189, 248, 0.35);
+            color: var(--accent-cyan);
+        }
+
+        .step-card h2 {
+            font-size: 1.45rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .os-tags {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .tag {
+            font-size: 0.74rem;
+            font-weight: 700;
+            padding: 0.28rem 0.65rem;
+            border-radius: 6px;
+            letter-spacing: 0.03em;
+            text-transform: uppercase;
+        }
+
+        .tag-both {
+            background: rgba(168, 85, 247, 0.15);
+            color: #d8b4fe;
+            border: 1px solid rgba(168, 85, 247, 0.3);
+        }
+
+        .tag-mint {
+            background: rgba(16, 185, 129, 0.15);
+            color: #6ee7b7;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .tag-ubuntu {
+            background: rgba(249, 115, 22, 0.15);
+            color: #fdba74;
+            border: 1px solid rgba(249, 115, 22, 0.3);
+        }
+
+        .step-intro {
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+            font-size: 0.98rem;
+        }
+
+        /* Bloques de Comando + Explicación */
+        .cmd-block {
+            background: rgba(6, 9, 17, 0.65);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            margin-bottom: 1.35rem;
+            overflow: hidden;
+            transition: border-color 0.25s ease;
+        }
+
+        .cmd-block:last-child {
+            margin-bottom: 0;
+        }
+
+        .cmd-block:hover {
+            border-color: rgba(148, 163, 184, 0.32);
+        }
+
+        .cmd-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.65rem 1.1rem;
+            background: rgba(255, 255, 255, 0.03);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .cmd-label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .terminal-dots {
+            display: flex;
+            gap: 5px;
+            margin-right: 0.4rem;
+        }
+
+        .terminal-dots span {
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+        }
+        .terminal-dots span:nth-child(1) { background: #ef4444; }
+        .terminal-dots span:nth-child(2) { background: #f59e0b; }
+        .terminal-dots span:nth-child(3) { background: #10b981; }
+
+        .copy-btn {
+            cursor: pointer;
+            background: rgba(56, 189, 248, 0.12);
+            border: 1px solid rgba(56, 189, 248, 0.28);
+            color: var(--accent-cyan);
+            padding: 0.3rem 0.75rem;
+            border-radius: 7px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.76rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            transition: all 0.2s ease;
+        }
+
+        .copy-btn:hover {
+            background: var(--accent-cyan);
+            color: #090d16;
+        }
+
+        .copy-btn.copied {
+            background: var(--accent-mint);
+            border-color: var(--accent-mint);
+            color: #090d16;
+        }
+
+        pre {
+            padding: 1.1rem 1.25rem;
+            overflow-x: auto;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.86rem;
+            line-height: 1.6;
+            color: #e2e8f0;
+            background: var(--bg-code);
+        }
+
+        code {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .inline-code {
+            background: rgba(56, 189, 248, 0.12);
+            color: var(--accent-cyan);
+            padding: 0.15rem 0.45rem;
+            border-radius: 5px;
+            font-size: 0.85em;
+        }
+
+        .cmd-explanation {
+            padding: 1rem 1.25rem;
+            background: rgba(17, 24, 39, 0.55);
+            border-top: 1px solid rgba(148, 163, 184, 0.08);
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .cmd-explanation strong {
+            color: var(--text-primary);
+        }
+
+        .cmd-explanation ul {
+            margin-top: 0.45rem;
+            padding-left: 1.25rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+        }
+
+        /* Cajas de Alerta / Diagnóstico / Verificación */
+        .callout {
+            border-radius: 12px;
+            padding: 1rem 1.25rem;
+            margin-top: 1.25rem;
+            font-size: 0.9rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+        }
+
+        .callout-verify {
+            background: rgba(16, 185, 129, 0.08);
+            border: 1px solid rgba(16, 185, 129, 0.25);
+            color: #a7f3d0;
+        }
+
+        .callout-warn {
+            background: rgba(251, 191, 36, 0.08);
+            border: 1px solid rgba(251, 191, 36, 0.28);
+            color: #fde68a;
+        }
+
+        .callout-title {
+            font-weight: 700;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        /* Grid comparativo VMware */
+        .specs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .spec-item {
+            background: rgba(6, 9, 17, 0.6);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.1rem;
+        }
+
+        .spec-item h4 {
+            font-size: 0.82rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--accent-cyan);
+            margin-bottom: 0.35rem;
+        }
+
+        .spec-item p {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            border-top: 1px solid var(--border-color);
+            margin-top: 1rem;
+        }
+
+        /* Ocultar elementos según filtro */
+        .hidden-by-filter {
+            display: none !important;
+        }
+
+        /* Botón móvil para índice */
+        .mobile-toc-btn {
+            display: none;
+            position: fixed;
+            bottom: 1.5rem;
+            right: 1.5rem;
+            z-index: 999;
+            background: var(--accent-cyan);
+            color: #090d16;
+            border: none;
+            border-radius: 999px;
+            padding: 0.8rem 1.2rem;
+            font-weight: 700;
+            font-size: 0.88rem;
+            box-shadow: 0 10px 25px rgba(56, 189, 248, 0.4);
+            cursor: pointer;
+        }
+
+        @media (max-width: 980px) {
+            .layout-wrapper {
+                grid-template-columns: 1fr;
+                padding: 1.25rem;
+            }
+            .sidebar {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 290px;
+                height: 100vh;
+                border-radius: 0 20px 20px 0;
+                z-index: 1001;
+                transform: translateX(-105%);
+                transition: transform 0.3s ease;
+            }
+            .sidebar.open {
+                transform: translateX(0);
+            }
+            .mobile-toc-btn {
+                display: inline-flex;
+                align-items: center;
+                gap: 0.4rem;
+            }
+            .hero {
+                padding: 1.75rem;
+            }
+            .step-card {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <div class="bg-mesh">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+    </div>
+
+    <button class="mobile-toc-btn" id="mobileTocBtn">☰ Índice de Pasos</button>
+
+    <div class="layout-wrapper">
+        <!-- ÍNDICE LATERAL INTERACTIVO -->
+        <aside class="sidebar" id="sidebar">
+            <div class="brand-badge">
+                <span class="pulse-dot"></span> Guía Técnica 2026
+            </div>
+            <div class="sidebar-title">Índice Cronológico</div>
+
+            <div class="nav-group-label">Fase 0 · Preparación VMware</div>
+            <ul class="nav-list">
+                <li><a href="#paso-0" class="nav-link active"><span class="step-num">00</span> Hardware Virtual y Arranque</a></li>
+            </ul>
+
+            <div class="nav-group-label">Fase 1 · Base del Sistema</div>
+            <ul class="nav-list">
+                <li><a href="#paso-1" class="nav-link"><span class="step-num">01</span> Actualización y VMware Tools</a></li>
+                <li><a href="#paso-2" class="nav-link"><span class="step-num">02</span> Sesión Gráfica (Xorg / Térmica)</a></li>
+            </ul>
+
+            <div class="nav-group-label">Fase 2 · IDEs y Agentes IA</div>
+            <ul class="nav-list">
+                <li><a href="#paso-3" class="nav-link"><span class="step-num">03</span> Visual Studio Code (.deb)</a></li>
+                <li><a href="#paso-4" class="nav-link"><span class="step-num">04</span> Google Antigravity IDE y CLI</a></li>
+                <li><a href="#paso-5" class="nav-link"><span class="step-num">05</span> Agente OpenCode (CLI)</a></li>
+            </ul>
+
+            <div class="nav-group-label">Fase 3 · Runtimes y Contenedores</div>
+            <ul class="nav-list">
+                <li><a href="#paso-6" class="nav-link"><span class="step-num">06</span> Python (uv) y Node.js (fnm)</a></li>
+                <li><a href="#paso-7" class="nav-link"><span class="step-num">07</span> Docker Engine Nativo</a></li>
+            </ul>
+
+            <div class="nav-group-label">Fase 4 · Ajustes Finales</div>
+            <ul class="nav-list">
+                <li><a href="#paso-8" class="nav-link"><span class="step-num">08</span> Fix Gráfico GPU en IDEs</a></li>
+            </ul>
+        </aside>
+
+        <!-- CONTENIDO PRINCIPAL -->
+        <main class="main-content">
+            <!-- HERO -->
+            <header class="hero">
+                <div class="brand-badge">Linux Mint 22.x &amp; Ubuntu 24.04 / 26.04 LTS</div>
+                <h1>Despliegue Cronológico de Entorno de Desarrollo e IA</h1>
+                <p>
+                    Guía paso a paso diseñada para estaciones de trabajo (como <strong>HP ZBook G6</strong>) en entorno nativo o virtualizado con <strong>VMware</strong>. Configura <strong>VS Code</strong>, <strong>Google Antigravity</strong>, <strong>OpenCode</strong>, <strong>uv</strong>, <strong>fnm</strong> y <strong>Docker</strong> de forma 100% nativa, evitando conflictos de permisos de paquetes Snap.
+                </p>
+
+                <div class="distro-filter-bar">
+                    <span class="filter-label">Filtrar vista por sistema:</span>
+                    <button class="distro-btn active" data-filter="all">Todos los pasos (Mint + Ubuntu)</button>
+                    <button class="distro-btn" data-filter="mint">Solo Linux Mint</button>
+                    <button class="distro-btn" data-filter="ubuntu">Solo Ubuntu</button>
+                </div>
+            </header>
+
+            <!-- PASO 0 -->
+            <section id="paso-0" class="step-card" data-os="both">
+                <div class="step-header">
+                    <div class="step-title-group">
+                        <span class="step-badge-large">PASO 00</span>
+                        <h2>Configuración Previa en VMware y Solución de Arranque</h2>
+                    </div>
+                    <div class="os-tags">
+                        <span class="tag tag-both">VMware Workstation</span>
+                    </div>
+                </div>
+                <p class="step-intro">
+                    Antes de encender la máquina virtual por primera vez, ajusta los recursos asignados desde <strong>Edit virtual machine settings</strong> para evitar cuellos de botella y bloqueos en la pantalla inicial.
+                </p>
+
+                <div class="specs-grid">
+                    <div class="spec-item">
+                        <h4>Memoria RAM</h4>
+                        <p>Asigna <strong>16384 MB (16 GB)</strong> en sistemas con 32 GB físicos para correr IDEs Electron y contenedores sin usar swap.</p>
+                    </div>
+                    <div class="spec-item">
+                        <h4>Procesador (CPU)</h4>
+                        <p>Asigna <strong>6 u 8 núcleos</strong> y marca <em>"Virtualize Intel VT-x/EPT or AMD-V/RVI"</em> para habilitar Docker anidado.</p>
+                    </div>
+                    <div class="spec-item">
+                        <h4>Almacenamiento NVMe</h4>
+                        <p>Crea un disco de <strong>100 GB</strong> sobre controlador <strong>NVMe</strong> guardado en tu SSD interno para máxima velocidad de I/O.</p>
+                    </div>
+                    <div class="spec-item">
+                        <h4>Pantalla y 3D</h4>
+                        <p>En <strong>Display</strong>, desmarca <em>"Accelerate 3D graphics"</em> durante la instalación si el arranque se congela.</p>
+                    </div>
+                </div>
+
+                <div class="callout callout-warn">
+                    <div class="callout-title">⚠ Nota sobre el mensaje "piix4_smbus: SMBus Host Controller not enabled!"</div>
+                    <div>
+                        Este aviso en rojo es normal en VMware (el bus físico de sensores no se emula). Sin embargo, si la pantalla se queda congelada más de 1 minuto ahí, apaga la VM, <strong>desactiva "Accelerate 3D graphics"</strong> en Display y vuelve a arrancar; el conflicto gráfico de la ISO con la GPU virtual es lo que detiene la carga del escritorio.
+                    </div>
+                </div>
+            </section>
+
+            <!-- PASO 1 -->
+            <section id="paso-1" class="step-card" data-os="both">
+                <div class="step-header">
+                    <div class="step-title-group">
+                        <span class="step-badge-large">PASO 01</span>
+                        <h2>Actualización del Sistema e Integración VMware Tools</h2>
+                    </div>
+                    <div class="os-tags">
+                        <span class="tag tag-mint">Linux Mint</span>
+                        <span class="tag tag-ubuntu">Ubuntu</span>
+                    </div>
+                </div>
+                <p class="step-intro">
+                    Con el sistema operativo recién instalado, abre la terminal (<span class="inline-code">Ctrl + Alt + T</span>) y actualiza los repositorios base junto con las herramientas esenciales de compilación e integración con el anfitrión.
+                </p>
+
+                <div class="cmd-block">
+                    <div class="cmd-header">
+                        <div class="cmd-label">
+                            <div class="terminal-dots"><span></span><span></span><span></span></div>
+                            <span>Actualizar paquetes e instalar utilidades base</span>
+                        </div>
+                        <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+                    </div>
+                    <pre><code>sudo apt update && sudo apt upgrade -y
+sudo apt install -y curl wget git build-essential ca-certificates gnupg software-properties-common</code></pre>
+                    <div class="cmd-explanation">
+                        <strong>¿Qué hace este comando?</strong>
+                        <ul>
+                            <li><span class="inline-code">apt update && apt upgrade -y</span>: Sincroniza el índice de paquetes y actualiza todo el sistema sin pedir confirmación manual.</li>
+                            <li><span class="inline-code">curl / wget / git</span>: Herramientas indispensables para descargar instaladores, claves GPG y clonar repositorios.</li>
+                            <li><span class="inline-code">build-essential / gnupg</span>: Instala compiladores C/C++ (GCC, Make) y gestión de firmas criptográficas para repositorios externos.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="cmd-block">
+                    <div class="cmd-header">
+                        <div class="cmd-label">
+                            <div class="terminal-dots"><span></span><span></span><span></span></div>
+                            <span>Instalar Open VM Tools (Solo si usas VMware)</span>
+                        </div>
+                        <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+                    </div>
+                    <pre><code>sudo apt install -y open-vm-tools open-vm-tools-desktop
+sudo reboot</code></pre>
+                    <div class="cmd-explanation">
+                        <strong>¿Qué hace este comando?</strong>
+                        <ul>
+                            <li><span class="inline-code">open-vm-tools-desktop</span>: Habilita el portapapeles bidireccional (copiar/pegar entre el host y Linux), arrastrar archivos y el autoajuste dinámico de resolución al maximizar la ventana de VMware.</li>
+                            <li><span class="inline-code">sudo reboot</span>: Reinicia la máquina virtual para cargar los controladores gráficos y de integración en el kernel.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="callout callout-verify">
+                    <div class="callout-title">✓ Verificación</div>
+                    <div>Al volver a iniciar sesión, maximiza la ventana de VMware: el escritorio debe adaptarse automáticamente al tamaño completo de tu monitor.</div>
+                </div>
+            </section>
+
+            <!-- PASO 2 -->
+            <section id="paso-2" class="step-card" data-os="both">
+                <div class="step-header">
+                    <div class="step-title-group">
+                        <span class="step-badge-large">PASO 02</span>
+                        <h2>Ajuste de Sesión Gráfica y Control Térmico</h2>
+                    </div>
+                    <div class="os-tags">
+                        <span class="tag tag-mint">Mint (X11/Térmica)</span>
+                        <span class="tag tag-ubuntu">Ubuntu (Xorg)</span>
+                    </div>
+                </div>
+                <p class="step-intro">
+                    Aplica el ajuste específico según tu distribución antes de instalar aplicaciones gráficas basadas en Electron.
+                </p>
+
+                <div class="cmd-block" data-os="ubuntu">
+                    <div class="cmd-header">
+                        <div class="cmd-label">
+                            <div class="terminal-dots"><span></span><span></span><span></span></div>
+                            <span>[UBUNTU] Cambiar servidor gráfico de Wayland a Xorg</span>
+                        </div>
+                        <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+                    </div>
+                    <pre><code># 1. Cierra tu sesión actual (Log Out) desde el menú superior derecho.
+# 2. Haz clic en tu usuario, pulsa el engranaje (⚙️) abajo a la derecha y elige "Ubuntu on Xorg".
+# 3. Inicia sesión y comprueba en terminal con:
+echo $XDG_SESSION_TYPE</code></pre>
+                    <div class="cmd-explanation">
+                        <strong>¿Por qué es necesario en Ubuntu?</strong>
+                        <ul>
+                            <li>Wayland dentro de VMware suele provocar parpadeos, menús desfasados o pantallas negras en VS Code y Antigravity.</li>
+                            <li>Al elegir <strong>Ubuntu on Xorg</strong>, el comando <span class="inline-code">echo $XDG_SESSION_TYPE</span> devolverá <span class="inline-code">x11</span>, garantizando estabilidad total.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="cmd-block" data-os="mint">
+                    <div class="cmd-header">
+                        <div class="cmd-label">
+                            <div class="terminal-dots"><span></span><span></span><span></span></div>
+                            <span>[LINUX MINT] Instalar daemon de control térmico (Instalación física)</span>
+                        </div>
+                        <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+                    </div>
+                    <pre><code>sudo apt install -y thermald
+sudo systemctl enable --now thermald</code></pre>
+                    <div class="cmd-explanation">
+                        <strong>¿Qué hace este comando?</strong>
+                        <ul>
+                            <li>Linux Mint ya usa <strong>X11 (Cinnamon)</strong> por defecto, por lo que no requiere cambiar de sesión gráfica.</li>
+                            <li>Si instalas Mint directamente en hardware físico (como un Core i7 serie H), <span class="inline-code">thermald</span> regula dinámicamente las frecuencias y temperaturas del procesador bajo cargas de compilación.</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- PASO 3 -->
+            <section id="paso-3" class="step-card" data-os="both">
+                <div class="step-header">
+                    <div class="step-title-group">
+                        <span class="step-badge-large">PASO 03</span>
+                        <h2>Instalar Visual Studio Code (Paquete Nativo .deb)</h2>
+                    </div>
+                    <div class="os-tags">
+                        <span class="tag tag-mint">Linux Mint</span>
+                        <span class="tag tag-ubuntu">Ubuntu</span>
+                    </div>
+                </div>
+                <p class="step-intro">
+                    Instalaremos VS Code desde el repositorio oficial de Microsoft para recibir actualizaciones automáticas vía <span class="inline-code">apt</span> y evitar el aislamiento restrictivo de Snap.
+                </p>
+
+                <div class="cmd-block">
+                    <div class="cmd-header">
+                        <div class="cmd-label">
+                            <div class="terminal-dots"><span></span><span></span><span></span></div>
+                            <span>Añadir repositorio oficial de Microsoft e instalar VS Code</span>
+                        </div>
+                        <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+                    </div>
+                    <pre><code>curl -fsSL https://packages.microsoft.com/keys/microsoft.asc | sudo gpg --dearmor --yes -o /usr/share/keyrings/microsoft.gpg
+echo "deb [arch=amd64 signed-by=/usr/share/keyrings/microsoft.gpg] https://packages.microsoft.com/repos/code stable main" | sudo tee /etc/apt/sources.list.d/vscode.list > /dev/null
+sudo apt update && sudo apt install -y code</code></pre>
+                    <div class="cmd-explanation">
+                        <strong>Explicación línea por línea:</strong>
+                        <ul>
+                            <li><strong>Línea 1:</strong> Descarga la clave pública de firma de Microsoft y la convierte al formato binario GPG en <span class="inline-code">/usr/share/keyrings/</span>.</li>
+                            <li><strong>Línea 2:</strong> Registra la URL del repositorio estable de VS Code vinculándolo únicamente a esa clave de seguridad.</li>
+                            <li><strong>Línea 3:</strong> Refresca la lista de paquetes e instala el binario nativo <span class="inline-code">code</span>.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="callout callout-verify">
+                    <div class="callout-title">✓ Verificación</div>
+                    <div>Ejecuta <span class="inline-code">code --version</span> en la terminal; debe mostrar la versión instalada y la arquitectura <span class="inline-code">x64</span>.</div>
+                </div>
+            </section>
+
+            <!-- PASO 4 -->
+            <section id="paso-4" class="step-card" data-os="both">
+                <div class="step-header">
+                    <div class="step-title-group">
+                        <span class="step-badge-large">PASO 04</span>
+                        <h2>Instalar Google Antigravity IDE y CLI (agy)</h2>
+                    </div>
+                    <div class="os-tags">
+                        <span class="tag tag-mint">Linux Mint</span>
+                        <span class="tag tag-ubuntu">Ubuntu</span>
+                    </div>
+                </div>
+                <p class="step-intro">
+                    Configura el repositorio oficial APT de Google para instalar tanto la interfaz gráfica de <strong>Antigravity IDE</strong> como su herramienta de línea de comandos <span class="inline-code">agy</span>.
+                </p>
+
+                <div class="cmd-block">
+                    <div class="cmd-header">
+                        <div class="cmd-label">
+                            <div class="terminal-dots"><span></span><span></span><span></span></div>
+                            <span>Configurar repositorio oficial de Google Antigravity</span>
+                        </div>
+                        <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+                    </div>
+                    <pre><code>sudo mkdir -p /etc/apt/keyrings
+curl -fsSL https://us-central1-apt.pkg.dev/doc/repo-signing-key.gpg | sudo gpg --dearmor --yes -o /etc/apt/keyrings/antigravity-repo-key.gpg
+echo "deb [signed-by=/etc/apt/keyrings/antigravity-repo-key.gpg] https://us-central1-apt.pkg.dev/projects/antigravity-auto-updater-dev/ antigravity-debian main" | sudo tee /etc/apt/sources.list.d/antigravity.list > /dev/null
+sudo apt update && sudo apt install -y antigravity</code></pre>
+                    <div class="cmd-explanation">
+                        <strong>Explicación línea por línea:</strong>
+                        <ul>
+                            <li><strong>Línea 1:</strong> Asegura que exista el directorio estándar <span class="inline-code">/etc/apt/keyrings</span> para llaves de repositorios de terceros.</li>
+                            <li><strong>Línea 2:</strong> Descarga y almacena la clave GPG oficial del Artifact Registry de Google para Antigravity.</li>
+                            <li><strong>Línea 3:</strong> Crea el archivo <span class="inline-code">antigravity.list</span> apuntando al canal oficial Debian/Ubuntu.</li>
+                            <li><strong>Línea 4:</strong> Instala el paquete completo <span class="inline-code">antigravity</span> (incluye el IDE y el ejecutable <span class="inline-code">agy</span> en el PATH).</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="callout callout-verify">
+                    <div class="callout-title">✓ Verificación</div>
+                    <div>Ejecuta <span class="inline-code">agy --version</span> para validar el CLI, o abre cualquier carpeta de proyecto con <span class="inline-code">agy .</span></div>
+                </div>
+            </section>
+
+            <!-- PASO 5 -->
+            <section id="paso-5" class="step-card" data-os="both">
+                <div class="step-header">
+                    <div class="step-title-group">
+                        <span class="step-badge-large">PASO 05</span>
+                        <h2>Instalar Agente IA OpenCode</h2>
+                    </div>
+                    <div class="os-tags">
+                        <span class="tag tag-mint">Linux Mint</span>
+                        <span class="tag tag-ubuntu">Ubuntu</span>
+                    </div>
+                </div>
+                <p class="step-intro">
+                    OpenCode se instala mediante su script oficial binario, permitiendo que el agente interactúe directamente con tu terminal, sistema de archivos y Git sin depender de contenedores aislados.
+                </p>
+
+                <div class="cmd-block">
+                    <div class="cmd-header">
+                        <div class="cmd-label">
+                            <div class="terminal-dots"><span></span><span></span><span></span></div>
+                            <span>Instalación directa del binario de OpenCode</span>
+                        </div>
+                        <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+                    </div>
+                    <pre><code>curl -fsSL https://opencode.ai/install | bash
+source ~/.bashrc</code></pre>
+                    <div class="cmd-explanation">
+                        <strong>¿Qué hace este comando?</strong>
+                        <ul>
+                            <li><span class="inline-code">curl -fsSL https://opencode.ai/install | bash</span>: Descarga el binario precompilado compatible con tu arquitectura Linux y lo ubica en <span class="inline-code">~/.opencode/bin</span>.</li>
+                            <li><span class="inline-code">source ~/.bashrc</span>: Recarga la configuración de tu terminal actual para reconocer inmediatamente el comando <span class="inline-code">opencode</span> sin tener que cerrar la ventana.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="callout callout-verify">
+                    <div class="callout-title">✓ Verificación</div>
+                    <div>Ejecuta <span class="inline-code">opencode --version</span>. Para iniciarlo en un proyecto, entra a la carpeta y escribe <span class="inline-code">opencode</span>.</div>
+                </div>
+            </section>
+
+            <!-- PASO 6 -->
+            <section id="paso-6" class="step-card" data-os="both">
+                <div class="step-header">
+                    <div class="step-title-group">
+                        <span class="step-badge-large">PASO 06</span>
+                        <h2>Gestores Modernos de Python (uv) y Node.js (fnm)</h2>
+                    </div>
+                    <div class="os-tags">
+                        <span class="tag tag-mint">Linux Mint</span>
+                        <span class="tag tag-ubuntu">Ubuntu</span>
+                    </div>
+                </div>
+                <p class="step-intro">
+                    Nunca instales paquetes con <span class="inline-code">sudo pip</span> ni uses versiones antiguas de Node de los repositorios base. Usa <strong>uv</strong> y <strong>fnm</strong> para que los agentes IA creen entornos aislados a máxima velocidad.
+                </p>
+
+                <div class="cmd-block">
+                    <div class="cmd-header">
+                        <div class="cmd-label">
+                            <div class="terminal-dots"><span></span><span></span><span></span></div>
+                            <span>Instalar uv (Gestor ultrarrápido de Python)</span>
+                        </div>
+                        <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+                    </div>
+                    <pre><code>curl -LsSf https://astral.sh/uv/install.sh | sh
+source ~/.bashrc</code></pre>
+                    <div class="cmd-explanation">
+                        <strong>¿Qué hace este comando?</strong>
+                        <ul>
+                            <li>Instala <strong>uv</strong> (escrito en Rust), capaz de descargar versiones de Python, crear entornos virtuales (<span class="inline-code">uv venv</span>) e instalar dependencias 10x–100x más rápido que <span class="inline-code">pip</span> tradicional.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="cmd-block">
+                    <div class="cmd-header">
+                        <div class="cmd-label">
+                            <div class="terminal-dots"><span></span><span></span><span></span></div>
+                            <span>Instalar fnm (Fast Node Manager) y Node.js LTS</span>
+                        </div>
+                        <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+                    </div>
+                    <pre><code>curl -fsSL https://fnm.vercel.app/install | bash
+source ~/.bashrc
+fnm install --lts
+fnm default lts-latest</code></pre>
+                    <div class="cmd-explanation">
+                        <strong>¿Qué hace este comando?</strong>
+                        <ul>
+                            <li><strong>Líneas 1-2:</strong> Instala <strong>fnm</strong> (gestor ligero de Node.js en Rust) y actualiza el PATH en <span class="inline-code">~/.bashrc</span>.</li>
+                            <li><strong>Líneas 3-4:</strong> Descarga la última versión estable de soporte extendido (LTS) de Node.js junto con <span class="inline-code">npm</span> y <span class="inline-code">npx</span>, dejándola configurada por defecto.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="callout callout-verify">
+                    <div class="callout-title">✓ Verificación</div>
+                    <div>Ejecuta <span class="inline-code">uv --version</span>, <span class="inline-code">node -v</span> y <span class="inline-code">npm -v</span> para confirmar que ambos runtimes están activos.</div>
+                </div>
+            </section>
+
+            <!-- PASO 7 -->
+            <section id="paso-7" class="step-card" data-os="both">
+                <div class="step-header">
+                    <div class="step-title-group">
+                        <span class="step-badge-large">PASO 07</span>
+                        <h2>Instalar Docker Engine Nativo (Sin Docker Desktop ni Snap)</h2>
+                    </div>
+                    <div class="os-tags">
+                        <span class="tag tag-mint">Linux Mint</span>
+                        <span class="tag tag-ubuntu">Ubuntu</span>
+                    </div>
+                </div>
+                <p class="step-intro">
+                    Instala el motor oficial de Docker y Docker Compose directamente sobre el kernel Linux para levantar bases de datos (PostgreSQL, MySQL, Redis) o servicios locales con mínimo consumo de RAM.
+                </p>
+
+                <div class="cmd-block">
+                    <div class="cmd-header">
+                        <div class="cmd-label">
+                            <div class="terminal-dots"><span></span><span></span><span></span></div>
+                            <span>Instalación oficial de Docker Engine y permisos de usuario</span>
+                        </div>
+                        <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+                    </div>
+                    <pre><code>curl -fsSL https://get.docker.com | sudo sh
+sudo usermod -aG docker $USER
+newgrp docker</code></pre>
+                    <div class="cmd-explanation">
+                        <strong>Explicación línea por línea:</strong>
+                        <ul>
+                            <li><strong>Línea 1:</strong> Ejecuta el script oficial de Docker que detecta automáticamente si estás en Ubuntu o Linux Mint, configura el repositorio e instala <span class="inline-code">docker-ce</span> y el plugin <span class="inline-code">docker compose</span>.</li>
+                            <li><strong>Línea 2:</strong> Añade tu usuario actual al grupo <span class="inline-code">docker</span> para poder ejecutar contenedores sin escribir <span class="inline-code">sudo</span> cada vez (vital para que los agentes IA ejecuten contenedores).</li>
+                            <li><strong>Línea 3:</strong> Aplica el cambio de grupo en la sesión de terminal actual sin necesidad de reiniciar.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="callout callout-verify">
+                    <div class="callout-title">✓ Verificación</div>
+                    <div>Ejecuta <span class="inline-code">docker run --rm hello-world</span>; debe descargar la imagen de prueba e imprimir <em>"Hello from Docker!"</em> sin pedir contraseña.</div>
+                </div>
+            </section>
+
+            <!-- PASO 8 -->
+            <section id="paso-8" class="step-card" data-os="both">
+                <div class="step-header">
+                    <div class="step-title-group">
+                        <span class="step-badge-large">PASO 08</span>
+                        <h2>Solución Preventiva de Gráficos Electron en VMware</h2>
+                    </div>
+                    <div class="os-tags">
+                        <span class="tag tag-both">Opcional / VMware</span>
+                    </div>
+                </div>
+                <p class="step-intro">
+                    Si al abrir <strong>VS Code</strong> o <strong>Antigravity IDE</strong> dentro de VMware notas pantallas negras, parpadeos o texto difuso debido a la emulación de GPU virtual, desactiva la aceleración por hardware en ambos editores.
+                </p>
+
+                <div class="cmd-block">
+                    <div class="cmd-header">
+                        <div class="cmd-label">
+                            <div class="terminal-dots"><span></span><span></span><span></span></div>
+                            <span>Configurar argv.json para desactivar aceleración GPU en ambos IDEs</span>
+                        </div>
+                        <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+                    </div>
+                    <pre><code>mkdir -p ~/.config/Code/User ~/.config/Antigravity/User
+
+cat << 'EOF' > ~/.config/Code/User/argv.json
+{
+    "disable-hardware-acceleration": true
+}
+EOF
+
+cp ~/.config/Code/User/argv.json ~/.config/Antigravity/User/argv.json</code></pre>
+                    <div class="cmd-explanation">
+                        <strong>¿Qué hace este comando?</strong>
+                        <ul>
+                            <li>Crea los directorios de configuración inicial si aún no has abierto los IDEs por primera vez.</li>
+                            <li>Escribe el parámetro <span class="inline-code">"disable-hardware-acceleration": true</span> en el archivo <span class="inline-code">argv.json</span> tanto de <strong>VS Code</strong> como de <strong>Google Antigravity</strong>, forzando un renderizado por CPU totalmente nítido y libre de fallos gráficos en máquinas virtuales.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="callout callout-verify">
+                    <div class="callout-title">✓ Entorno Completado</div>
+                    <div>Ya tienes todo tu stack listo. Puedes abrir tu proyecto con <span class="inline-code">code .</span> o <span class="inline-code">agy .</span> y lanzar el agente en terminal con <span class="inline-code">opencode</span>.</div>
+                </div>
+            </section>
+
+            <footer>
+                Documentación Técnica de Infraestructura y Desarrollo · Listo para despliegue estático en Render
+            </footer>
+        </main>
+    </div>
+
+    <script>
+        // 1. Barra de progreso de lectura
+        window.addEventListener('scroll', () => {
+            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = (winScroll / height) * 100;
+            document.getElementById('progressBar').style.width = scrolled + '%';
+        });
+
+        // 2. Animación de entrada de tarjetas al hacer scroll (Intersection Observer)
+        const observerOptions = {
+            threshold: 0.08,
+            rootMargin: '0px 0px -40px 0px'
+        };
+
+        const cardObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.step-card').forEach(card => {
+            cardObserver.observe(card);
+        });
+
+        // 3. Resaltado activo en el índice lateral (ScrollSpy)
+        const sections = document.querySelectorAll('.step-card');
+        const navLinks = document.querySelectorAll('.nav-link');
+
+        window.addEventListener('scroll', () => {
+            let current = '';
+            sections.forEach(section => {
+                if (section.classList.contains('hidden-by-filter')) return;
+                const sectionTop = section.offsetTop - 160;
+                if (pageYOffset >= sectionTop) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === '#' + current) {
+                    link.classList.add('active');
+                }
+            });
+        });
+
+        // 4. Botón Copiar comando al portapapeles
+        function copyCode(button) {
+            const cmdBlock = button.closest('.cmd-block');
+            const codeText = cmdBlock.querySelector('pre code').innerText;
+
+            navigator.clipboard.writeText(codeText).then(() => {
+                const originalText = button.innerText;
+                button.innerText = '¡Copiado!';
+                button.classList.add('copied');
+
+                setTimeout(() => {
+                    button.innerText = originalText;
+                    button.classList.remove('copied');
+                }, 2000);
+            });
+        }
+
+        // 5. Filtro interactivo por distribución (Todos / Mint / Ubuntu)
+        const filterButtons = document.querySelectorAll('.distro-btn');
+        filterButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                filterButtons.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+
+                const filter = btn.getAttribute('data-filter');
+                const osElements = document.querySelectorAll('[data-os]');
+
+                osElements.forEach(el => {
+                    const targetOs = el.getAttribute('data-os');
+                    if (filter === 'all' || targetOs === 'both' || targetOs === filter) {
+                        el.classList.remove('hidden-by-filter');
+                    } else {
+                        el.classList.add('hidden-by-filter');
+                    }
+                });
+            });
+        });
+
+        // 6. Menú móvil para el índice
+        const mobileTocBtn = document.getElementById('mobileTocBtn');
+        const sidebar = document.getElementById('sidebar');
+
+        mobileTocBtn.addEventListener('click', () => {
+            sidebar.classList.toggle('open');
+        });
+
+        navLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                if (window.innerWidth <= 980) {
+                    sidebar.classList.remove('open');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
